@@ -57,38 +57,91 @@ adata = bk.read_counts("counts.tsv")
 # QC
 bk.pp.qc_metrics(adata)
 bk.pl.qc_metrics(adata)
+bk.pp.filter_genes(adata)
+bk.pp.filter_samples(adata)
 
-# PCA + clustering
+# PCA + UMAP
+bk.pp.highly_variable_genes(adata)
 bk.tl.pca(adata)
+bk.pl.pca_scatter(adata)
+bk.tl.pca_variance_ratio(adata)
+bk.tl.pca_loadings(adata)
+bk.pl.pca_loadings_bar(adata)
+bk.pl.pca_loadings_heatmap(adata)
+bk.tl.neighbors(adata)
 bk.tl.cluster(adata, method="leiden")
+bk.tl.umap(adata)
+bk.tl.umap_graph(adata)
+bk.pl.umap(adata)
 
-# Differential expression
-res = bk.tl.de(
-    adata,
-    groupby="Project_ID",
-    groupA="LUAD",
-    groupB="LUSC",
-)
+# Clustering
+bk.tl.leiden_resolution_scan(adata)
+bk.pl.ari_resolution_heatmap(adata)
+bk.tl.cluster(adata)
+bk.tl.cluster_metrics(adata)
 
-# Volcano plot
+# Genes and gene signatures
+bk.tl.score_genes(adata, signature)
+bk.tl.score_genes_cell_cycle(adata)
+
+# Correlations and associations
+bk.pl.corr_heatmap(adata)
+bk.tl.gene_gene_correlations(adata)
+bk.tl.gene_gene_correlations(adata)
+bk.tl.top_gene_obs_correlations(adata)
+bk.tl.obs_obs_corr_matrix(adata)
+bk.pl.corrplot_obs(adata)
+bk.tl.plot_corr_scatter(adata)
+bk.tl.gene_categorical_association(adata)
+bk.pl.association_heatmap(dfg)
+bk.tl.obs_categorical_association(adata)
+bk.pl.boxplot_with_stats(adata)
+bk.pl.categorical_confusion(adata)
+bk.pl.gene_association(adata)
+bk.pl.gene_association_volcano(adata)
+bk.tl.pairwise_posthoc(y, method="mwu")
+bk.tl.cat_cat_association(adata)
+bk.pl.dotplot_association(df_all)
+bk.pl.heatmap_association(df_all)
+bk.tl.rank_genes_categorical(adata)
+bk.pl.rankplot_association(dfo)
+bk.pl.volcano_categorical(res)
+bk.tl.posthoc_per_gene(adata)
+
+# Marker genes and Differential expression
+res = bk.tl.de(adata)
+bk.tl.de_glm(data)
 bk.pl.volcano(res)
+bk.pl.rankplot(res)
+bk.pl.ma(res)
 
-# GSEA
-df_gsea, pre_res = bk.tl.gsea_preranked(
-    adata,
-    res=res,
-    gene_sets=["Hallmark_2020"],
-)
+# GSEA, genesets and pathway analysis
+bk.tl.gsea_preranked(adata)
 bk.pl.gsea_bubbleplot(df_gsea)
+bk.pl.gsea_leading_edge_heatmap(adata)
+bk.pl.leading_edge_jaccard_heatmap(pre_res)
+bk.pl.leading_edge_overlap_matrix(pre_res)
+bk.tl.list_enrichr_libraries()
+
+# Plots
+bk.pl.violin(adata)
+bk.pl.dotplot(adata)
+bk.pl.heatmap_de(adata)
+bk.pl.sample_distances(adata)
+bk.pl.sample_correlation_clustergram(adata)
+bk.pl.gene_plot(adata)
+bk.pl.oncoprint(adata)
+
 ```
 
 📊 Features
 
 	•	Bulk RNA-seq QC & filtering
-	•	PCA, UMAP, Leiden clustering
-	•	Differential expression
-	•	GSEA preranked pipeline (GSEApy)
+	•	PCA, UMAP, Leiden, k-means clustering
+	•	Differential expression from counts or log data
+	•	Gene scores and signatures
 	•	Gene–obs and obs–obs associations
+	•	GSEA preranked pipeline (GSEApy)
 	•	Leading-edge GSEA analysis
 	•	Oncoprint-style mutation plots
 	•	Scanpy-like API (pp, tl, pl)
@@ -96,7 +149,7 @@ bk.pl.gsea_bubbleplot(df_gsea)
 ⚠️ Notes
 
 	•	data/ and results/ are not versioned
-	•	Designed for large datasets (TCGA-scale)
+	•	Designed for small or large datasets (TCGA-scale)
 	•	Requires Python ≥ 3.9
 
 📄 License
