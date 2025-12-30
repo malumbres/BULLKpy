@@ -9,3 +9,4 @@ Scanpy-inspired pipeline for bulk RNA-seq analysis built around **AnnData**.
 install
 api/index
 notebooks/index
+```

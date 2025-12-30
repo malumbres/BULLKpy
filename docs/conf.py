@@ -87,11 +87,11 @@ html_theme_options = {
 
 # --- intersphinx (optional but useful) ---
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", {}),
-    "numpy": ("https://numpy.org/doc/stable", {}),
-    "pandas": ("https://pandas.pydata.org/docs", {}),
-    "anndata": ("https://anndata.readthedocs.io/en/stable", {}),
-    "scanpy": ("https://scanpy.readthedocs.io/en/stable", {}),
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
+    "pandas": ("https://pandas.pydata.org/docs", None),
+    "anndata": ("https://anndata.readthedocs.io/en/stable", None),
+    "scanpy": ("https://scanpy.readthedocs.io/en/stable", None),
 }
 
 # --- MyST parser file types ---
