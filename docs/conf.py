@@ -31,7 +31,6 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
     "sphinx_autodoc_typehints",
-    "myst_parser",
     "myst_nb",
     "sphinx_copybutton",
     "sphinx_design",
