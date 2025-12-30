@@ -1,0 +1,45 @@
+# ===============================
+# Large data & results (local)
+# ===============================
+data/
+results/
+
+# ===============================
+# AnnData / bioinformatics files
+# ===============================
+*.h5ad
+*.h5
+*.loom
+*.mtx
+*.npz
+
+# ===============================
+# Figures & temporary outputs
+# ===============================
+figs/
+my_figures/
+*.png
+*.pdf
+*.svg
+
+# ===============================
+# Python cache & build artifacts
+# ===============================
+__pycache__/
+*.py[cod]
+*.egg-info/
+.build/
+dist/
+
+# ===============================
+# Jupyter
+# ===============================
+.ipynb_checkpoints/
+
+# ===============================
+# OS / editor noise
+# ===============================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
