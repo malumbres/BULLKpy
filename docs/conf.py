@@ -31,7 +31,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
     "sphinx_autodoc_typehints",
-    "myst_nb",
+    "myst_nb",  # this provides MyST markdown support
     "sphinx_copybutton",
     "sphinx_design",
 ]
@@ -97,7 +97,7 @@ intersphinx_mapping = {
 # --- MyST parser file types ---
 source_suffix = {
     ".rst": "restructuredtext",
-    ".md": "markdown",
+    ".md": "myst-nb",
 }
 
 # Keep notebook UX clean
