@@ -46,7 +46,7 @@ Install in editable mode:
 pip install -e .
 ```
 
-🧪 Typical workflow
+## 🧪 Typical workflow
 
 ```bash
 import bullkpy as bk
@@ -134,7 +134,7 @@ bk.pl.oncoprint(adata)
 
 ```
 
-📊 Features
+## 📊 Features
 
 	•	Bulk RNA-seq QC & filtering
 	•	PCA, UMAP, Leiden, k-means clustering
@@ -146,11 +146,12 @@ bk.pl.oncoprint(adata)
 	•	Oncoprint-style mutation plots
 	•	Scanpy-like API (pp, tl, pl)
 
-⚠️ Notes
+## ⚠️ Notes
 
 	•	data/ and results/ are not versioned
 	•	Designed for small or large datasets (TCGA-scale)
 	•	Requires Python ≥ 3.9
 
-📄 License
+## 📄 License
+
 MIT License
