@@ -1,8 +1,7 @@
-```md
 # bullkpy
 
-```{autosummary}
-:toctree: generated
-:recursive:
-
-bullkpy
+```{automodule} bullkpy
+:members:
+:undoc-members:
+:show-inheritance:
+```
