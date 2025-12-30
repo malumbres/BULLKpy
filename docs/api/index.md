@@ -1,4 +1,3 @@
-### `docs/api/index.md`
 ```md
 # API reference
 

@@ -1,4 +1,3 @@
-### `docs/notebooks/index.md`
 ```md
 # Tutorials (notebooks)
 
