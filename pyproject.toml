@@ -36,14 +36,13 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest", "ruff", "black", "build", "twine"]
 docs = [
-  "sphinx>=7",
+  "sphinx>=7,<8",
   "pydata-sphinx-theme>=0.15",
   "myst-parser>=2",
   "myst-nb>=1.1",
   "sphinx-autodoc-typehints",
   "sphinx-copybutton>=0.5",
   "sphinx-design>=0.6",
-  "sphinx-rtd-theme",
 ]
 
 [project.urls]
