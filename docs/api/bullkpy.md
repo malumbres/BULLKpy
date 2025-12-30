@@ -1,4 +1,3 @@
-### `docs/api/bullkpy.md`
 ```md
 # bullkpy
 
