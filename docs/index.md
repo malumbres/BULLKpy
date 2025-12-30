@@ -1,11 +1,11 @@
 # BULLKpy
 
-Scanpy-like utilities for **bulk RNA-seq** analysis built around **AnnData**.
+Scanpy-inspired pipeline for bulk RNA-seq analysis built around **AnnData**.
 
 ```{toctree}
 :maxdepth: 2
-:hidden:
+:caption: Contents
 
-installation
-user_guide/index
+install
 api/index
+notebooks/index
