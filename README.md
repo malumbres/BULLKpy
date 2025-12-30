@@ -10,6 +10,7 @@ Developed and used for TCGA and large-scale cancer transcriptomics analyses.
 
 ## 📦 Project structure
 
+```bash
 bullkpy-skeleton/
 ├── src/                # BULLKpy Python package
 │   └── bullkpy/
@@ -27,7 +28,7 @@ bullkpy-skeleton/
 ├── README.md
 ├── LICENSE
 └── .gitignore
-
+```
 ---
 
 ## 🚀 Installation
@@ -37,14 +38,16 @@ Clone the repository:
 ```bash
 git clone https://github.com/malumbres/BULLKpy.git
 cd BULLKpy
-
+```
 
 Install in editable mode:
-
+```bash
 pip install -e .
-
+```
 
 🧪 Typical workflow
+
+```bash
 import bullkpy as bk
 
 # Load data
@@ -76,6 +79,7 @@ df_gsea, pre_res = bk.tl.gsea_preranked(
     gene_sets=["Hallmark_2020"],
 )
 bk.pl.gsea_bubbleplot(df_gsea)
+```
 
 📊 Features
 
