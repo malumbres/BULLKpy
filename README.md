@@ -1,5 +1,5 @@
 # BULLKpy 🧬
-<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/5915d41e-657d-4af8-8cbf-08bfdb46c9fa" />
+<img width="725" height="725" alt="image" src="https://github.com/user-attachments/assets/5915d41e-657d-4af8-8cbf-08bfdb46c9fa" />
 
 **BULLKpy** is a Python pipeline for **bulk RNA-seq analysis**, inspired by Scanpy but adapted for
 bulk transcriptomics. It integrates QC, normalization, clustering, differential expression,
