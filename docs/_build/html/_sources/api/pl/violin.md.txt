@@ -5,7 +5,7 @@ Use `bk.pl.violin` to plot QC/clinical variables from `adata.obs` or gene expres
 
 ```{figure} /_static/violin_genes_example.png
 :alt: Violin plot example
-:width: 500px
+:width: 800px
 :align: center
 ```
 
