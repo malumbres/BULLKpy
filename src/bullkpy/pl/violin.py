@@ -48,14 +48,92 @@ def violin(
     save: str | Path | None = None,
     show: bool = True,
 ):
-    """
-    Violin plots for:
-      - adata.obs columns (QC, clinical, signatures)
-      - and/or gene expression (genes in adata.var_names)
 
-    If a key is not found in adata.obs but is found in adata.var_names,
-    it will be plotted as gene expression from `layer` (or adata.X if layer is None).
+
     """
+    Violin plots of sample-level variables and/or gene expression across groups.
+
+    This function behaves Scanpy-like: each entry in `keys` is interpreted as
+    (i) an `adata.obs` column if present, otherwise (ii) a gene in `adata.var_names`.
+
+    Parameters
+    ----------
+    adata
+        AnnData object with samples in `.obs` and genes in `.var_names`.
+    keys
+        List of variables to plot. Each key can be either:
+        - name of a column in `adata.obs` (QC/clinical/signature scores), or
+        - a gene name found in `adata.var_names` (expression will be taken from `layer`).
+    groupby
+        Categorical column in `adata.obs` used to define groups on the x-axis.
+    layer
+        Layer to use for gene expression keys (default: `"log1p_cpm"`).
+        If `None`, uses `adata.X`.
+    figsize
+        Base figure size `(width, height)` in inches.
+        If multiple keys are provided, the final width is scaled by the number of panels.
+    panel_size
+        Alternative to `figsize`: size per panel `(width, height)` in inches.
+        If provided, overrides `figsize`.
+    show_points
+        Whether to overlay individual samples as points (strip plot).
+    point_size
+        Point size for the overlaid samples.
+    point_alpha
+        Transparency for the overlaid points.
+    palette
+        Categorical palette name (matplotlib/seaborn). If `None`, uses global defaults.
+    order
+        Explicit order of categories for `groupby`. If `None`, uses category order in `adata.obs[groupby]`.
+    rotate_xticks
+        Rotation angle (degrees) for x-axis tick labels.
+    inner
+        Passed to `seaborn.violinplot(inner=...)` (e.g. `"quartile"`, `"box"`, `None`).
+    cut
+        Passed to `seaborn.violinplot(cut=...)`.
+    save
+        If provided, path to save the figure.
+    show
+        If True, displays the plot (matplotlib `plt.show()`).
+
+    Returns
+    -------
+    fig
+        Matplotlib Figure.
+    axes
+        Array/list of Axes for each panel.
+
+    Notes
+    -----
+    - If `groupby` is numeric with many unique values, consider converting it to a categorical.
+    - For gene keys, missing genes are ignored/raised depending on implementation; see error message.
+
+    See Also
+    --------
+    bullkpy.pl.gene_association : association tests for genes vs categories
+    bullkpy.tl.score_genes      : compute signature scores for plotting in violin
+
+    Examples
+    --------
+    QC variables:
+
+    >>> bk.pl.violin(adata, keys=["total_counts", "pct_counts_mt"], groupby="Project_ID")
+
+    Gene expression:
+
+    >>> bk.pl.violin(adata, keys=["DLL3", "SOX10"], groupby="Subtype_PAM50", layer="log1p_cpm")
+
+    Control category order and tick rotation:
+
+    >>> bk.pl.violin(
+    ...     adata,
+    ...     keys=["CDC20"],
+    ...     groupby="Project_ID",
+    ...     order=["LUAD", "LUSC", "BRCA"],
+    ...     rotate_xticks=90,
+    ... )
+    """
+
     set_style()
 
     if groupby not in adata.obs.columns:

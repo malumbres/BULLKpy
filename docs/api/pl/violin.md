@@ -12,6 +12,22 @@ Use `bk.pl.violin` to plot QC/clinical variables from `adata.obs` or gene expres
 Example violin plot showing gene expression across tumor types.
 
 
+## Basic usage
+
+```python
+bk.pl.violin(
+    adata,
+    keys=["CDC20", "ASCL1", "CD3D"],
+    groupby="Project_ID",
+    figsize=(10, 3),
+)
+```
+## Notes
+
+- If a key is found in `adata.obs`, it is treated as metadata.
+- If a key is found in `adata.var_names`, expression is extracted from `layer`.
+- Supports mixed metadata + genes in a single call.
+
 ```{automodule} bullkpy.pl.violin
 :members:
 :undoc-members: false
