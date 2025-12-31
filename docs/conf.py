@@ -30,7 +30,6 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
-    "sphinx_autodoc_typehints",
     "myst_nb",  # this provides MyST markdown support
     "sphinx_copybutton",
     "sphinx_design",
@@ -67,12 +66,15 @@ autodoc_default_options = {
     "undoc-members": False,
     "show-inheritance": False,
 }
-autodoc_typehints = "signature"  
 autodoc_member_order = "bysource"
+autodoc_typehints = "none"  
+autodoc_typehints_format = "short"
+python_use_unqualified_type_names = True
+
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
-napoleon_use_param = True
-napoleon_use_rtype = True
+napoleon_use_param = False
+napoleon_use_rtype = False
 
 # --- theme (Scanpy-like) ---
 html_theme = "pydata_sphinx_theme"

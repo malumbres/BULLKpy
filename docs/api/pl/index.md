@@ -1,4 +1,4 @@
-# Plotting (`bullkpy.pl`)
+# Plotting
 
 ```{toctree}
 :maxdepth: 1

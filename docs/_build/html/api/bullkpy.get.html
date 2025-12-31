@@ -51,7 +51,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="bullkpy.io" href="bullkpy.io.html" />
-    <link rel="prev" title="bullkpy.tl" href="bullkpy.tl.html" />
+    <link rel="prev" title="bullkpy" href="bullkpy.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.0.1" />
@@ -300,11 +300,11 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.html">bullkpy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bullkpy.pp.html">bullkpy.pp</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bullkpy.tl.html">bullkpy.tl</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">bullkpy.get</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.io.html">bullkpy.io</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="pl/index.html">Plotting (<code class="docutils literal notranslate"><span class="pre">bullkpy.pl</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.pp.html">bullkpy.pp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.tl.html">bullkpy.tl</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="pl/index.html">Plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="pl/violin.html">Violin plots</a></li>
 </ul>
 </details></li>
@@ -375,19 +375,16 @@
 :module: bullkpy.get</p>
 <p>Return rank_genes_groups results for one group as a tidy DataFrame.</p>
 <p>Expects <code class="docutils literal notranslate"><span class="pre">bk.tl.rank_genes_groups(...)</span></code> results in <code class="docutils literal notranslate"><span class="pre">adata.uns[key]</span></code>.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame``</p>
 <p>Columns:
 gene, scores, log2FC, pval, qval, mean_group, mean_ref</p>
 <p>.. py:function:: rank_genes_groups_df_all(adata, *, key=’rank_genes_groups’, groups=None, sort_by=’scores’, ascending=None)
 :module: bullkpy.get</p>
 <p>Return rank_genes_groups results for all (or selected) groups as one tidy DataFrame.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame``</p>
 <p>Output columns:
 group, gene, scores, log2FC, pval, qval, mean_group?, mean_ref?</p>
 <p>.. py:function:: vector(adata, key, *, layer=None, allow_obs=True, allow_gene=True)
 :module: bullkpy.get</p>
-<p>Return a 1D numpy vector from AnnData.
-:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~numpy.ndarray``</p>
+<p>Return a 1D numpy vector from AnnData.</p>
 <ul class="simple">
 <li><p>If key is in adata.obs and allow_obs=True -&gt; returns obs column</p></li>
 <li><p>If key is in adata.var_names and allow_gene=True -&gt; returns gene expression
@@ -406,7 +403,7 @@ from <code class="docutils literal notranslate"><span class="pre">layer</span></
 <li><p>an obs column</p></li>
 <li><p>a gene name (from adata.var_names), taken from <code class="docutils literal notranslate"><span class="pre">layer</span></code> if provided</p></li>
 </ul>
-<p>:rtype: pd.DataFrame indexed by adata.obs_names.</p>
+<p>:returns: <em>pd.DataFrame indexed by adata.obs_names.</em></p>
 </section>
 
 
@@ -420,12 +417,12 @@ from <code class="docutils literal notranslate"><span class="pre">layer</span></
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="bullkpy.tl.html"
+       href="bullkpy.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">bullkpy.tl</p>
+        <p class="prev-next-title">bullkpy</p>
       </div>
     </a>
     <a class="right-next"

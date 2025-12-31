@@ -51,7 +51,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="bullkpy.tl" href="bullkpy.tl.html" />
-    <link rel="prev" title="bullkpy" href="bullkpy.html" />
+    <link rel="prev" title="bullkpy.io" href="bullkpy.io.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.0.1" />
@@ -300,11 +300,11 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.html">bullkpy</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">bullkpy.pp</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bullkpy.tl.html">bullkpy.tl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.get.html">bullkpy.get</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.io.html">bullkpy.io</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="pl/index.html">Plotting (<code class="docutils literal notranslate"><span class="pre">bullkpy.pl</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">bullkpy.pp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.tl.html">bullkpy.tl</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="pl/index.html">Plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="pl/violin.html">Violin plots</a></li>
 </ul>
 </details></li>
@@ -374,7 +374,6 @@
 <p>.. py:function:: qc_metrics(adata, *, layer=’counts’, mt_prefix=’MT-’, mt_var_key=None, detection_threshold=0.0, compute_total_counts=True, compute_n_genes=True, compute_pct_mt=True)
 :module: bullkpy.pp</p>
 <p>Compute bulk QC metrics in adata.obs.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>Smart behavior:
 - If <code class="docutils literal notranslate"><span class="pre">layer</span></code> looks like raw counts: compute total_counts, n_genes_detected, pct_counts_mt
 - If <code class="docutils literal notranslate"><span class="pre">layer</span></code> looks non-integer (log/normalized): compute only n_genes_detected using <code class="docutils literal notranslate"><span class="pre">detection_threshold</span></code></p>
@@ -382,25 +381,24 @@
 :module: bullkpy.pp</p>
 <p>Store current adata.X into adata.layers[layer] as raw counts.</p>
 <p>Call this once right after reading counts (before any normalization).</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>.. py:function:: normalize_cpm(adata, *, layer=’counts’, target_sum=1000000.0, out_layer=’cpm’, inplace_X=False, eps=1e-12)
 :module: bullkpy.pp</p>
 <p>CPM normalize counts per sample.</p>
-<p>:type layer: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>str` | :py:obj:`None`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">layer:</span> <span class="pre">Input</span> <span class="pre">layer.</span> <span class="pre">If</span> <span class="pre">None,</span> <span class="pre">uses</span> <span class="pre">adata.X.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">target_sum:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`float`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">target_sum:</span> <span class="pre">Scale</span> <span class="pre">factor</span> <span class="pre">(1e6</span> <span class="pre">=</span> <span class="pre">CPM).</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">out_layer:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">out_layer:</span> <span class="pre">Where</span> <span class="pre">to</span> <span class="pre">write</span> <span class="pre">normalized</span> <span class="pre">values</span> <span class="pre">(adata.layers[out_layer]).</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">inplace_X:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`bool`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">inplace_X:</span> <span class="pre">If</span> <span class="pre">True,</span> <span class="pre">also</span> <span class="pre">write</span> <span class="pre">normalized</span> <span class="pre">values</span> <span class="pre">into</span> <span class="pre">adata.X.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">eps:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`float``
-:param eps: Small constant to avoid division by zero.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
+<p>:Parameters: * <strong>layer</strong> – Input layer. If None, uses adata.X.
+* <strong>target_sum</strong> – Scale factor (1e6 = CPM).
+* <strong>out_layer</strong> – Where to write normalized values (adata.layers[out_layer]).
+* <strong>inplace_X</strong> – If True, also write normalized values into adata.X.
+* <strong>eps</strong> – Small constant to avoid division by zero.</p>
 <p>.. py:function:: log1p(adata, *, layer=’cpm’, out_layer=’log1p_cpm’, inplace_X=False)
 :module: bullkpy.pp</p>
 <p>log1p-transform a layer (default: CPM) and store as a new layer.</p>
 <p>Works with dense or sparse matrices.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>.. py:function:: highly_variable_genes(adata, *, layer=’log1p_cpm’, n_top_genes=2000, n_bins=20, min_mean=0.0, max_mean=inf, min_disp=-inf, key_added=’highly_variable’)
 :module: bullkpy.pp</p>
 <p>Select highly variable genes (bulk-friendly version of HVGs).</p>
 <p>This computes mean and variance across samples on the chosen layer
 and identifies genes with high dispersion relative to genes of similar mean
 (mean-binned z-score of log-dispersion, Scanpy/Seurat spirit).</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>Stores results in <code class="docutils literal notranslate"><span class="pre">adata.var</span></code>:
 - mean, variance, dispersion, dispersion_norm
 - boolean flag <code class="docutils literal notranslate"><span class="pre">adata.var[key_added]</span></code> (default: ‘highly_variable’)</p>
@@ -410,11 +408,9 @@ and identifies genes with high dispersion relative to genes of similar mean
 <p>A gene is “detected” in a sample if expression &gt; min_expr in <code class="docutils literal notranslate"><span class="pre">layer</span></code>.
 Keeps genes detected in at least <code class="docutils literal notranslate"><span class="pre">min_samples</span></code> samples.</p>
 <p>Works for counts (min_expr=0) or log layers (use e.g. min_expr=0.1).</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~anndata._core.anndata.AnnData``</p>
 <p>.. py:function:: filter_samples(adata, *, min_genes=None, min_counts=None, max_pct_mt=None, max_pct_ribo=None, layer=’counts’, expr_threshold_for_genes=0.0, mt_var_key=None, ribo_var_key=None, inplace=True)
 :module: bullkpy.pp</p>
 <p>Filter samples using QC metrics in <code class="docutils literal notranslate"><span class="pre">adata.obs</span></code> if present; otherwise compute from matrix.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~anndata._core.anndata.AnnData``</p>
 <p>No hard requirement that any of these columns exist:
 - total_counts
 - n_genes_detected
@@ -430,12 +426,14 @@ Keeps genes detected in at least <code class="docutils literal notranslate"><spa
 use log-transformed normalized expression (e.g., log1p_cpm), not raw counts.</p></li>
 <li><p>Writes corrected matrix to <code class="docutils literal notranslate"><span class="pre">adata.layers[key_added]</span></code> by default.</p></li>
 </ul>
-<p>:type batch_key: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>str`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">batch_key:</span> <span class="pre">adata.obs</span> <span class="pre">column</span> <span class="pre">with</span> <span class="pre">batch</span> <span class="pre">labels</span> <span class="pre">(categorical</span> <span class="pre">recommended).</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">layer:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str` | :py:obj:`None`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">layer:</span> <span class="pre">Which</span> <span class="pre">matrix</span> <span class="pre">to</span> <span class="pre">correct.</span> <span class="pre">If</span> <span class="pre">None,</span> <span class="pre">uses</span> <span class="pre">adata.X.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">covariates:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:data:`~typing.Optional`\ \[:py:class:`~typing.Sequence`\ \[:py:class:`str`]]<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">covariates:</span> <span class="pre">Optional</span> <span class="pre">adata.obs</span> <span class="pre">columns</span> <span class="pre">to</span> <span class="pre">include</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">design</span> <span class="pre">(biological</span> <span class="pre">covariates</span> <span class="pre">to</span> <span class="pre">preserve).</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">key_added:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">key_added:</span> <span class="pre">Layer</span> <span class="pre">name</span> <span class="pre">to</span> <span class="pre">store</span> <span class="pre">corrected</span> <span class="pre">values</span> <span class="pre">(if</span> <span class="pre">overwrite=False).</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">overwrite:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`bool`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">overwrite:</span> <span class="pre">If</span> <span class="pre">True,</span> <span class="pre">write</span> <span class="pre">corrected</span> <span class="pre">values</span> <span class="pre">back</span> <span class="pre">into</span> <span class="pre">the</span> <span class="pre">selected</span> <span class="pre">layer</span> <span class="pre">/</span> <span class="pre">X.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">inplace:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`bool``
-:param inplace: If True, store results in adata; if False, return corrected matrix (samples x genes).</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~numpy.ndarray` | :py:obj:`None``</p>
+<p>:Parameters: * <strong>batch_key</strong> – adata.obs column with batch labels (categorical recommended).
+* <strong>layer</strong> – Which matrix to correct. If None, uses adata.X.
+* <strong>covariates</strong> – Optional adata.obs columns to include in the design (biological covariates to preserve).
+* <strong>key_added</strong> – Layer name to store corrected values (if overwrite=False).
+* <strong>overwrite</strong> – If True, write corrected values back into the selected layer / X.
+* <strong>inplace</strong> – If True, store results in adata; if False, return corrected matrix (samples x genes).</p>
 <p>.. py:function:: sanitize_metadata(df, *, index_col=None, numeric_min_frac=0.9, category_max_unique=50, category_max_frac=0.2, datetime_min_frac=0.9, drop_high_cardinality_strings=False, high_cardinality_frac=0.5, verbose=True)
 :module: bullkpy.pp</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame``</p>
 <p>.. py:function:: find_bad_obs_cols_by_write(adata)
 :module: bullkpy.pp</p>
 <p>.. py:function:: make_obs_h5ad_safe(adata, cols=None)
@@ -453,12 +451,12 @@ use log-transformed normalized expression (e.g., log1p_cpm), not raw counts.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="bullkpy.html"
+       href="bullkpy.io.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">bullkpy</p>
+        <p class="prev-next-title">bullkpy.io</p>
       </div>
     </a>
     <a class="right-next"

@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/bullkpy.tl';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="bullkpy.get" href="bullkpy.get.html" />
+    <link rel="next" title="Plotting" href="pl/index.html" />
     <link rel="prev" title="bullkpy.pp" href="bullkpy.pp.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -304,11 +304,11 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.html">bullkpy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bullkpy.pp.html">bullkpy.pp</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">bullkpy.tl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.get.html">bullkpy.get</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.io.html">bullkpy.io</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="pl/index.html">Plotting (<code class="docutils literal notranslate"><span class="pre">bullkpy.pl</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.pp.html">bullkpy.pp</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">bullkpy.tl</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="pl/index.html">Plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="pl/violin.html">Violin plots</a></li>
 </ul>
 </details></li>
@@ -391,8 +391,7 @@ method=”wilcoxon”  -&gt; Mann–Whitney U per gene, score = z-like from U (a
 :module: bullkpy.tl</p>
 <p>Compute agreement + quality metrics between known labels and clustering.</p>
 <p>Returns dict with: n_used, ari, nmi, cramers_v, silhouette</p>
-<p>Notes:
-:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>dict`\ \[:py:class:`str`, :py:class:`float`]`</p>
+<p>Notes:</p>
 <ul class="simple">
 <li><p>ARI/NMI/Cramér’s V compare <code class="docutils literal notranslate"><span class="pre">true_key</span></code> vs <code class="docutils literal notranslate"><span class="pre">cluster_key</span></code>.</p></li>
 <li><p>Silhouette measures cluster separation on chosen data:</p>
@@ -408,7 +407,6 @@ method=”wilcoxon”  -&gt; Mann–Whitney U per gene, score = z-like from U (a
 <p>Scan multiple Leiden resolutions and score vs a ground-truth annotation.
 Scan many Leiden resolutions and score against a ‘true’ categorical label
 using ARI / NMI / Cramér’s V.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame``</p>
 <p>.. rubric:: Notes</p>
 <ul class="simple">
 <li><p>Uses bk.tl.neighbors() to build adata.obsp[‘connectivities’] if missing.</p></li>
@@ -418,7 +416,6 @@ using ARI / NMI / Cramér’s V.</p>
 <p>.. py:function:: score_genes(adata, genes, *, score_name=’score’, layer=None, gene_pool=None, ctrl_size=50, n_bins=25, random_state=0, scale=False)
 :module: bullkpy.tl</p>
 <p>Scanpy-like signature scoring (bulk-friendly).</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>Score per sample:
 mean(expression[genes]) - mean(expression[control_genes])</p>
 <p>Control genes are sampled from gene_pool (default: all genes) by matching
@@ -427,13 +424,11 @@ expression bins of signature genes (similar to scanpy.tl.score_genes).</p>
 <p>.. py:function:: score_genes_dict(adata, gene_sets, *, layer=None, prefix=’’, suffix=’_score’, gene_pool=None, ctrl_size=50, n_bins=25, random_state=0, scale=False)
 :module: bullkpy.tl</p>
 <p>Compute multiple signature scores and store each in adata.obs.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>Output column name:
 f”{prefix}{name}{suffix}”</p>
 <p>.. py:function:: score_genes_cell_cycle(adata, *, s_genes, g2m_genes, layer=None, gene_pool=None, ctrl_size=50, n_bins=25, random_state=0, scale=False, s_score=’S_score’, g2m_score=’G2M_score’, phase=’phase’)
 :module: bullkpy.tl</p>
 <p>Score cell cycle phases similar to scanpy.tl.score_genes_cell_cycle.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>Writes to:
 - adata.obs[s_score]   (float)
 - adata.obs[g2m_score] (float)
@@ -446,11 +441,9 @@ f”{prefix}{name}{suffix}”</p>
 :module: bullkpy.tl</p>
 <p>Find strongest gene–gene correlations among a gene set (or all genes if provided).
 Returns long table with (gene1, gene2, r, pval, qval, n).</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame``</p>
 <p>.. py:function:: top_gene_obs_correlations(adata, *, gene, obs=None, obs_keys=None, layer=’log1p_cpm’, method=’pearson’, top_n=50, min_abs_r=None, use_abs=True, batch_key=None, batch_mode=’none’, covariates=None)
 :module: bullkpy.tl</p>
-<p>Correlate one or more genes with numeric obs columns.
-:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame``</p>
+<p>Correlate one or more genes with numeric obs columns.</p>
 <ul class="simple">
 <li><p>obs: restrict to these obs columns</p></li>
 <li><p>obs_keys: alternative explicit numeric obs selection</p></li>
@@ -460,22 +453,18 @@ Returns long table with (gene1, gene2, r, pval, qval, n).</p>
 <p>Strongest correlations between numeric obs columns.
 If against is None: compare focus vs all other numeric obs.
 Returns long table of pairs.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame``</p>
 <p>.. py:function:: gene_gene_correlations(adata, *, gene, genes=None, layer=’log1p_cpm’, method=’pearson’, top_n=50, min_abs_r=None, use_abs=True, batch_key=None, batch_mode=’none’, covariates=None)
 :module: bullkpy.tl</p>
 <p>Correlate one gene with all other genes or a subset.
 Returns table: (gene, r, pval, qval, n).</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame``</p>
 <p>.. py:function:: obs_obs_corr_matrix(adata, *, focus, against=None, obs_keys=None, method=’pearson’, drop_na=True, batch_key=None, batch_mode=’none’, covariates=None, return_p=False, return_q=False)
 :module: bullkpy.tl</p>
 <p>Correlation matrix between numeric obs columns (focus × against).
 Returns wide matrix (rows=focus, cols=against).
 Optionally returns p-values and q-values matrices.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame` | :py:class:`tuple`\ \[:py:class:`~pandas.core.frame.DataFrame`, :py:class:`~pandas.core.frame.DataFrame`] | :py:class:`tuple`\ \[:py:class:`~pandas.core.frame.DataFrame`, :py:class:`~pandas.core.frame.DataFrame`, :py:class:`~pandas.core.frame.DataFrame`]`</p>
 <p>.. py:function:: partial_corr(adata, *, x, y, covariates, method=’pearson’)
 :module: bullkpy.tl</p>
 <p>Partial correlation: residualize x and y on covariates (obs columns) then correlate.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>tuple`\ \[:py:class:`float`, :py:class:`float`, :py:class:`int`]`</p>
 <p>.. py:function:: plot_corr_scatter(adata, *, x, y, hue=None, kind=’obs_obs’, layer=’log1p_cpm’, method=’pearson’, batch_key=None, batch_mode=’none’, covariates=None, figsize=(5.5, 4.5), s=18.0, alpha=0.8, cmap=’viridis’, palette=’tab20’, title=None, show=True)
 :module: bullkpy.tl</p>
 <p>Scatter plot + correlation in title.
@@ -486,17 +475,14 @@ kind=”gene_obs”: x is gene, y is obs numeric (or vice versa)</p>
 <p>Heatmap for a wide correlation matrix (e.g., from obs_obs_corr_matrix).</p>
 <p>.. py:function:: gene_categorical_association(adata, *, groupby, genes=None, layer=’log1p_cpm’, method=’kruskal’, effect_size=’epsilon2’, min_group_size=2, adjust=’fdr_bh’)
 :module: bullkpy.tl</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame``</p>
 <p>A) Association between gene expression (numeric) and a categorical obs column.</p>
 <p>Returns tidy df with columns:
 groupby, gene, statistic, pval, qval, effect, n_groups, n, means (optional columns)</p>
 <p>.. py:function:: obs_categorical_association(adata, *, groupby, obs_keys=None, method=’kruskal’, effect_size=’epsilon2’, min_group_size=2, adjust=’fdr_bh’)
 :module: bullkpy.tl</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame``</p>
 <p>B) Association between numeric obs columns and a categorical obs column.</p>
 <p>.. py:function:: association(adata, *, x, y, layer=’log1p_cpm’, method=’auto’)
 :module: bullkpy.tl</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>object``</p>
 <p>Unified association dispatcher.
 - x gene, y categorical -&gt; gene_categorical_association (single-gene)
 - x numeric obs, y categorical -&gt; obs_categorical_association (single-obs)
@@ -504,20 +490,18 @@ groupby, gene, statistic, pval, qval, effect, n_groups, n, means (optional colum
 <p>.. py:function:: pairwise_posthoc(df, *, group_col=’grp’, value_col=’y’, method=’mwu’, correction=’bh’, dropna=True)
 :module: bullkpy.tl</p>
 <p>Pairwise post-hoc tests between groups.</p>
-<p>:type df: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">df:</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">df:</span> <span class="pre">DataFrame</span> <span class="pre">with</span> <span class="pre">columns</span> <span class="pre">[group_col,</span> <span class="pre">value_col]</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">method:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:data:`~typing.Literal`\ \[``’mwu’``, ``’ttest’``]<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">method:</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">method:</span> <span class="pre">&quot;mwu&quot;</span> <span class="pre">(Mann-Whitney</span> <span class="pre">U,</span> <span class="pre">two-sided)</span> <span class="pre">or</span> <span class="pre">&quot;ttest&quot;</span> <span class="pre">(Welch</span> <span class="pre">t-test)</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">correction:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:data:`~typing.Literal`\ \[``’bh’``]<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">correction:</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">correction:</span> <span class="pre">currently</span> <span class="pre">only</span> <span class="pre">&quot;bh&quot;</span> <span class="pre">(Benjamini-Hochberg)</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">dropna:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`bool``
-:param dropna:
-:type dropna: drop rows with NA in group/value</p>
-<p>:returns: group1, group2, n1, n2, pval, qval, effect, delta_mean, delta_median
-:rtype: DataFrame with columns</p>
+<p>:Parameters: * <strong>df</strong> (<em>DataFrame with columns [group_col, value_col]</em>)
+* <strong>method</strong> (<em>“mwu” (Mann-Whitney U, two-sided) or “ttest” (Welch t-test)</em>)
+* <strong>correction</strong> (<em>currently only “bh” (Benjamini-Hochberg)</em>)
+* <strong>dropna</strong> (<em>drop rows with NA in group/value</em>)</p>
+<p>:returns: <em>DataFrame with columns</em> – group1, group2, n1, n2, pval, qval, effect, delta_mean, delta_median</p>
 <p>.. py:function:: cat_cat_association(adata, *, key1, key2, adjust=’none’)
 :module: bullkpy.tl</p>
 <p>C) Association between two categorical obs columns.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame``
-:returns: key1, key2, chi2, dof, pval, qval, cramers_v, n</p>
+<p>:returns: key1, key2, chi2, dof, pval, qval, cramers_v, n</p>
 <p>.. py:function:: rank_genes_categorical(adata, *, groupby, group=None, reference=’rest’, layer=None, genes=None, method=’mwu’, store_key=None)
 :module: bullkpy.tl</p>
 <p>Scanpy-like (but bulk-friendly) rank of genes associated with a categorical obs.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame``</p>
 <p>Two-group comparison:
 - MWU (default): effect_size = rank-biserial correlation
 - t-test: effect_size = Cohen’s d (approx)
@@ -530,11 +514,9 @@ gene, pval, qval, effect_size, mean_group, mean_ref, log2FC</p>
 <p>For each gene, run pairwise posthoc tests across all categories in <code class="docutils literal notranslate"><span class="pre">groupby</span></code>.
 Returns dict: gene -&gt; DataFrame (pairwise results).</p>
 <p>Requires bk.tl.pairwise_posthoc(df, method=…) to exist.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>dict`\ \[:py:class:`str`, :py:class:`~pandas.core.frame.DataFrame`]`</p>
 <p>.. py:function:: gsea_preranked(adata=None, *, res, gene_sets=’MSigDB_Hallmark_2020’, comparison=None, store_key=’gsea’, results_key=’results’, gene_col=’gene’, score_col=’t’, ascending=False, min_size=5, max_size=1000, permutation_num=1000, seed=6, processes=4, outdir=’gsea’, save_rnk=True, return_pre_res=True, add_comparison_column=True)
 :module: bullkpy.tl</p>
 <p>Run GSEApy prerank and return a tidy results table.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~pandas.core.frame.DataFrame` | :py:class:`tuple`\ \[:py:class:`~pandas.core.frame.DataFrame`, :py:data:`~typing.Any`]`</p>
 </section>
 <section id="key-improvements">
 <h2>Key improvements<a class="headerlink" href="#key-improvements" title="Link to this heading">#</a></h2>
@@ -561,7 +543,6 @@ not h5ad-serializable. Store tables only.</p></li>
 :module: bullkpy.tl</p>
 <p>Return available Enrichr libraries as known by gseapy.
 Useful to discover exact names like ‘MSigDB_Hallmark_2020’.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>list`\ \[:py:class:`str`]`</p>
 <p>.. rubric:: Notes</p>
 <ul class="simple">
 <li><p>Requires internet access (Enrichr).</p></li>
@@ -570,19 +551,16 @@ Useful to discover exact names like ‘MSigDB_Hallmark_2020’.</p>
 <p>.. py:module:: bullkpy.tl</p>
 <p>.. py:function:: pca(adata, *, layer=’log1p_cpm’, n_comps=50, center=True, scale=False, use_highly_variable=False, key_added=’pca’)
 :module: bullkpy.tl</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>.. py:function:: neighbors(adata, *, n_neighbors=15, n_pcs=20, use_rep=’X_pca’, metric=’euclidean’, key_added=’neighbors’)
 :module: bullkpy.tl</p>
 <p>Compute kNN graph on samples (obs) using PCA representation.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>Stores:
 - adata.obsp[“distances”] (CSR sparse)
 - adata.obsp[“connectivities”] (CSR sparse; Gaussian kernel)
 - adata.uns[key_added] with parameters</p>
 <p>.. py:function:: cluster(adata, *, method=’leiden’, key_added=’clusters’, resolution=1.0, n_clusters=8, use_rep=’X_pca’, n_pcs=20, random_state=0)
 :module: bullkpy.tl</p>
-<p>Cluster samples.
-:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
+<p>Cluster samples.</p>
 <ul class="simple">
 <li><p>Leiden: uses <code class="docutils literal notranslate"><span class="pre">adata.obsp['connectivities']</span></code> (requires igraph + leidenalg).</p></li>
 <li><p>KMeans fallback: clusters in PCA space (no extra deps).</p></li>
@@ -592,14 +570,12 @@ Useful to discover exact names like ‘MSigDB_Hallmark_2020’.</p>
 <p>Compute UMAP embedding from a representation (default: PCA).</p>
 <p>This mirrors Scanpy practice: UMAP is computed from <code class="docutils literal notranslate"><span class="pre">X_pca</span></code> with
 <code class="docutils literal notranslate"><span class="pre">n_neighbors</span></code>/<code class="docutils literal notranslate"><span class="pre">min_dist</span></code>, consistent with the neighbors graph settings.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>Stores:
 - adata.obsm[‘X_umap’]
 - adata.uns[‘umap’]</p>
 <p>.. py:function:: umap_graph(adata, *, graph_key=’connectivities’, use_rep=’X_pca’, n_pcs=20, min_dist=0.5, spread=1.0, n_components=2, random_state=0, init=’spectral’, negative_sample_rate=5, n_epochs=None)
 :module: bullkpy.tl</p>
 <p>Compute UMAP embedding strictly from a precomputed neighbor graph.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>Requires:
 - adata.obsp[graph_key]  (typically ‘connectivities’ from bk.tl.neighbors)</p>
 <p>Uses:
@@ -610,7 +586,6 @@ Useful to discover exact names like ‘MSigDB_Hallmark_2020’.</p>
 <p>.. py:function:: de(adata, *, groupby, group, reference, method=’welch_ttest’, layer_counts=’counts’, layer_expr=’log1p_cpm’, key_added=’de’, alpha=0.05, shrink_dispersion=True, prior_df=10.0)
 :module: bullkpy.tl</p>
 <p>Two-group differential expression.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>Stores results in:
 adata.uns[key_added][f”{groupby}:_{group}<em>vs</em>{reference}”] = DataFrame-like dict</p>
 <p>.. method:: welch_ttest:</p>
@@ -625,7 +600,6 @@ adata.uns[key_added][f”{groupby}:_{group}<em>vs</em>{reference}”] = DataFram
 <p>.. py:function:: de_glm(adata, *, formula, contrast=None, layer_counts=’counts’, shrink_dispersion=True, prior_df=10.0, key_added=’de_glm’, add_intercept=True)
 :module: bullkpy.tl</p>
 <p>NB-GLM DE with design matrix from a formula and a contrast.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>.. rubric:: Example</p>
 <p>bk.tl.de_glm(adata, formula=”~ Subtype + Batch”, contrast=(“Subtype”,”Basal”,”Luminal”))</p>
 <p>Stores:
@@ -636,15 +610,25 @@ adata.uns[key_added][contrast_name] = dict(method/params/results)</p>
 <p>Assumes PCA results like:
 - adata.varm[loadings_key] == array (n_vars x n_comps)
 - adata.uns[key] contains PCA params (optional)</p>
-<p>:type pcs: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:data\:\</span></code>~typing.Optional`\ \[:py:class:`~typing.Sequence`\ \[:py:class:`int`]]<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">pcs:</span> <span class="pre">PCs</span> <span class="pre">to</span> <span class="pre">process,</span> <span class="pre">1-based</span> <span class="pre">indexing</span> <span class="pre">(e.g.</span> <span class="pre">[1,2,3]).</span> <span class="pre">If</span> <span class="pre">None</span> <span class="pre">-&gt;</span> <span class="pre">all</span> <span class="pre">available.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">n_top:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`int`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">n_top:</span> <span class="pre">Number</span> <span class="pre">of</span> <span class="pre">top</span> <span class="pre">genes</span> <span class="pre">to</span> <span class="pre">return</span> <span class="pre">per</span> <span class="pre">PC</span> <span class="pre">(and</span> <span class="pre">per</span> <span class="pre">sign</span> <span class="pre">if</span> <span class="pre">include_negative=True</span> <span class="pre">and</span> <span class="pre">use_abs=False).</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">use_abs:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`bool`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">use_abs:</span> <span class="pre">If</span> <span class="pre">True:</span> <span class="pre">rank</span> <span class="pre">by</span> <span class="pre">absolute</span> <span class="pre">loading</span> <span class="pre">(single</span> <span class="pre">list</span> <span class="pre">per</span> <span class="pre">PC).</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">If</span> <span class="pre">False:</span> <span class="pre">returns</span> <span class="pre">positive</span> <span class="pre">top</span> <span class="pre">list</span> <span class="pre">(and</span> <span class="pre">negative</span> <span class="pre">list</span> <span class="pre">if</span> <span class="pre">include_negative=True).</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">include_negative:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`bool`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">include_negative:</span> <span class="pre">Only</span> <span class="pre">used</span> <span class="pre">when</span> <span class="pre">use_abs=False.</span> <span class="pre">If</span> <span class="pre">True</span> <span class="pre">returns</span> <span class="pre">both</span> <span class="pre">pos/neg</span> <span class="pre">lists.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">export:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:data:`~typing.Union`\ \[:py:class:`str`, :py:class:`~pathlib.Path`, :py:obj:`None`]<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">export:</span> <span class="pre">If</span> <span class="pre">provided,</span> <span class="pre">writes</span> <span class="pre">a</span> <span class="pre">long-format</span> <span class="pre">table</span> <span class="pre">(PC,</span> <span class="pre">sign,</span> <span class="pre">gene,</span> <span class="pre">loading,</span> <span class="pre">rank).</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">Also</span> <span class="pre">writes</span> <span class="pre">a</span> <span class="pre">wide-format</span> <span class="pre">file</span> <span class="pre">alongside:</span> <span class="pre">&quot;&lt;stem&gt;.wide&lt;suffix&gt;&quot;.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">export_gmt:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:data:`~typing.Union`\ \[:py:class:`str`, :py:class:`~pathlib.Path`, :py:obj:`None`]<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">export_gmt:</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">If</span> <span class="pre">provided,</span> <span class="pre">writes</span> <span class="pre">GMT</span> <span class="pre">gene</span> <span class="pre">sets:</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">PC1_pos,</span> <span class="pre">PC1_neg,</span> <span class="pre">PC2_pos,</span> <span class="pre">...</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">If</span> <span class="pre">use_abs=True:</span> <span class="pre">PC1_abs,</span> <span class="pre">PC2_abs,</span> <span class="pre">...</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">min_abs_loading:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:data:`~typing.Optional`\ \[:py:class:`float`]`
-:param min_abs_loading: Optional filter: only keep genes with abs(loading) &gt;= threshold.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>dict`\ \[:py:class:`str`, :py:class:`~pandas.core.frame.DataFrame`]`
-:returns: * <em>dict mapping keys like “PC1_pos”, “PC1_neg”, “PC1_abs” -&gt; DataFrame.</em>
+<p>:Parameters: * <strong>pcs</strong> – PCs to process, 1-based indexing (e.g. [1,2,3]). If None -&gt; all available.
+* <strong>n_top</strong> – Number of top genes to return per PC (and per sign if include_negative=True and use_abs=False).
+* <strong>use_abs</strong> – If True: rank by absolute loading (single list per PC).
+If False: returns positive top list (and negative list if include_negative=True).
+* <strong>include_negative</strong> – Only used when use_abs=False. If True returns both pos/neg lists.
+* <strong>export</strong> – If provided, writes a long-format table (PC, sign, gene, loading, rank).
+Also writes a wide-format file alongside: “<stem>.wide<suffix>”.
+* <strong>export_gmt</strong> –</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>              If provided, writes GMT gene sets:
+                PC1_pos, PC1_neg, PC2_pos, ...
+              If use_abs=True: PC1_abs, PC2_abs, ...
+            * **min_abs_loading** -- Optional filter: only keep genes with abs(loading) &gt;= threshold.
+</pre></div>
+</div>
+<p>:returns: * <em>dict mapping keys like “PC1_pos”, “PC1_neg”, “PC1_abs” -&gt; DataFrame.</em>
 * <em>Also stores results in adata.uns[store_key].</em></p>
 <p>.. py:function:: rank_genes_groups(adata, *, groupby, groups=None, reference=’rest’, layer=’log1p_cpm’, method=’t-test’, corr_method=’benjamini-hochberg’, use_abs=False, n_genes=100, key_added=’rank_genes_groups’)
 :module: bullkpy.tl</p>
 <p>Scanpy-like ranking of genes per group.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 </section>
 
 
@@ -667,11 +651,11 @@ adata.uns[key_added][contrast_name] = dict(method/params/results)</p>
       </div>
     </a>
     <a class="right-next"
-       href="bullkpy.get.html"
+       href="pl/index.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">bullkpy.get</p>
+        <p class="prev-next-title">Plotting</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

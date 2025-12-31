@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/bullkpy';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="bullkpy.pp" href="bullkpy.pp.html" />
+    <link rel="next" title="bullkpy.get" href="bullkpy.get.html" />
     <link rel="prev" title="API reference" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -300,11 +300,11 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">bullkpy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bullkpy.pp.html">bullkpy.pp</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bullkpy.tl.html">bullkpy.tl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.get.html">bullkpy.get</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.io.html">bullkpy.io</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="pl/index.html">Plotting (<code class="docutils literal notranslate"><span class="pre">bullkpy.pl</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.pp.html">bullkpy.pp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.tl.html">bullkpy.tl</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="pl/index.html">Plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="pl/violin.html">Violin plots</a></li>
 </ul>
 </details></li>
@@ -377,35 +377,38 @@
 <p>.. py:function:: read_counts(filename, *, sep=’\t’, orientation=’genes_by_samples’, dtype=’int64’)
 :module: bullkpy</p>
 <p>Read a bulk RNA-seq count matrix and return an AnnData object.</p>
-<p>:type filename: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>str` | :py:class:`~pathlib.Path`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">filename:</span> <span class="pre">Path</span> <span class="pre">to</span> <span class="pre">counts</span> <span class="pre">file</span> <span class="pre">(tsv/csv).</span> <span class="pre">Rows</span> <span class="pre">or</span> <span class="pre">columns</span> <span class="pre">must</span> <span class="pre">be</span> <span class="pre">gene</span> <span class="pre">IDs.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">sep:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">sep:</span> <span class="pre">Column</span> <span class="pre">separator</span> <span class="pre">(default:</span> <span class="pre">tab).</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">orientation:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:data:`~typing.Literal`\ \[``’genes_by_samples’``, ``’samples_by_genes’``]<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">orientation:</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">-</span> <span class="pre">&quot;genes_by_samples&quot;:</span> <span class="pre">genes</span> <span class="pre">in</span> <span class="pre">rows,</span> <span class="pre">samples</span> <span class="pre">in</span> <span class="pre">columns</span> <span class="pre">(common</span> <span class="pre">output</span> <span class="pre">of</span> <span class="pre">HTSeq,</span> <span class="pre">featureCounts)</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">-</span> <span class="pre">&quot;samples_by_genes&quot;:</span> <span class="pre">samples</span> <span class="pre">in</span> <span class="pre">rows,</span> <span class="pre">genes</span> <span class="pre">in</span> <span class="pre">columns</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">dtype:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str` | :py:obj:`None``
-:param dtype: Cast count matrix to dtype (default: int64). Set to None to disable casting.</p>
-<p>:returns: AnnData object with samples in <code class="docutils literal notranslate"><span class="pre">.obs</span></code> and genes in <code class="docutils literal notranslate"><span class="pre">.var</span></code>.
-:rtype: AnnData</p>
+<p>:Parameters: * <strong>filename</strong> – Path to counts file (tsv/csv). Rows or columns must be gene IDs.
+* <strong>sep</strong> – Column separator (default: tab).
+* <strong>orientation</strong> –</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>              - &quot;genes_by_samples&quot;: genes in rows, samples in columns (common output of HTSeq, featureCounts)
+              - &quot;samples_by_genes&quot;: samples in rows, genes in columns
+            * **dtype** -- Cast count matrix to dtype (default: int64). Set to None to disable casting.
+</pre></div>
+</div>
+<p>:returns: <em>AnnData</em> – AnnData object with samples in <code class="docutils literal notranslate"><span class="pre">.obs</span></code> and genes in <code class="docutils literal notranslate"><span class="pre">.var</span></code>.</p>
 <p>.. py:function:: add_metadata(adata, metadata_file, *, index_col, sep=’\t’, how=’left’)
 :module: bullkpy</p>
 <p>Add sample metadata to an AnnData object.</p>
-<p>:type adata: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~anndata._core.anndata.AnnData`<code class="docutils literal notranslate">&#160;&#160; <span class="pre">:param</span> <span class="pre">adata:</span> <span class="pre">AnnData</span> <span class="pre">object</span> <span class="pre">with</span> <span class="pre">samples</span> <span class="pre">in</span></code>.obs<code class="docutils literal notranslate"><span class="pre">.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">metadata_file:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str` | :py:class:`~pathlib.Path`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">metadata_file:</span> <span class="pre">Path</span> <span class="pre">to</span> <span class="pre">metadata</span> <span class="pre">file</span> <span class="pre">(tsv,</span> <span class="pre">csv,</span> <span class="pre">or</span> <span class="pre">xlsx).</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">index_col:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str`<code class="docutils literal notranslate">&#160;&#160; <span class="pre">:param</span> <span class="pre">index_col:</span> <span class="pre">Column</span> <span class="pre">in</span> <span class="pre">metadata</span> <span class="pre">that</span> <span class="pre">matches</span></code>adata.obs_names<code class="docutils literal notranslate"><span class="pre">.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">sep:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">sep:</span> <span class="pre">Column</span> <span class="pre">separator</span> <span class="pre">for</span> <span class="pre">tsv/csv</span> <span class="pre">files.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">how:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:data:`~typing.Literal`\ \[``’left’``, ``’inner’``]`
-:param how: Merge strategy:
+<p>:Parameters: * <strong>adata</strong> – AnnData object with samples in <code class="docutils literal notranslate"><span class="pre">.obs</span></code>.
+* <strong>metadata_file</strong> – Path to metadata file (tsv, csv, or xlsx).
+* <strong>index_col</strong> – Column in metadata that matches <code class="docutils literal notranslate"><span class="pre">adata.obs_names</span></code>.
+* <strong>sep</strong> – Column separator for tsv/csv files.
+* <strong>how</strong> – Merge strategy:
 - “left”: keep all samples in adata (default)
 - “inner”: keep only samples present in metadata</p>
-<p>:returns: The same AnnData object with updated <code class="docutils literal notranslate"><span class="pre">.obs</span></code>.
-:rtype: AnnData</p>
+<p>:returns: <em>AnnData</em> – The same AnnData object with updated <code class="docutils literal notranslate"><span class="pre">.obs</span></code>.</p>
 <p>.. py:function:: info(msg)
 :module: bullkpy</p>
 <p>Log an info-level message.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>.. py:function:: warn(msg)
 :module: bullkpy</p>
 <p>Log a warning-level message.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>.. py:function:: debug(msg)
 :module: bullkpy</p>
 <p>Log a debug-level message.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 <p>.. py:function:: error(msg)
 :module: bullkpy</p>
 <p>Log an error-level message.</p>
-<p>:rtype: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:obj\:\</span></code>None``</p>
 </section>
 
 
@@ -428,11 +431,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="bullkpy.pp.html"
+       href="bullkpy.get.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">bullkpy.pp</p>
+        <p class="prev-next-title">bullkpy.get</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
