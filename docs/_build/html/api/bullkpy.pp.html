@@ -1,0 +1,617 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>bullkpy.pp &#8212; BULLKpy 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=f539c95a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/bullkpy.pp';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="bullkpy.tl" href="bullkpy.tl.html" />
+    <link rel="prev" title="bullkpy" href="bullkpy.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">BULLKpy 0.0.1 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../notebooks/index.html">
+    Tutorials (notebooks)
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/malumbres/BULLKpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../notebooks/index.html">
+    Tutorials (notebooks)
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/malumbres/BULLKpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.html">bullkpy</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">bullkpy.pp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.tl.html">bullkpy.tl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.pl.html">bullkpy.pl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.get.html">bullkpy.get</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.io.html">bullkpy.io</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">API reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">bullkpy.pp</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="bullkpy-pp">
+<h1>bullkpy.pp<a class="headerlink" href="#bullkpy-pp" title="Link to this heading">#</a></h1>
+<p>.. py:module:: bullkpy.pp</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+.. py:function:: qc_metrics(adata, *, layer=&#39;counts&#39;, mt_prefix=&#39;MT-&#39;, mt_var_key=None, detection_threshold=0.0, compute_total_counts=True, compute_n_genes=True, compute_pct_mt=True)
+   :module: bullkpy.pp
+
+   Compute bulk QC metrics in adata.obs.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+   Smart behavior:
+     - If `layer` looks like raw counts: compute total_counts, n_genes_detected, pct_counts_mt
+     - If `layer` looks non-integer (log/normalized): compute only n_genes_detected using `detection_threshold`
+
+
+.. py:function:: set_raw_counts(adata, *, layer=&#39;counts&#39;, overwrite=False)
+   :module: bullkpy.pp
+
+   Store current adata.X into adata.layers[layer] as raw counts.
+
+   Call this once right after reading counts (before any normalization).
+
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+
+.. py:function:: normalize_cpm(adata, *, layer=&#39;counts&#39;, target_sum=1000000.0, out_layer=&#39;cpm&#39;, inplace_X=False, eps=1e-12)
+   :module: bullkpy.pp
+
+   CPM normalize counts per sample.
+
+   :type layer: :sphinx_autodoc_typehints_type:`\:py\:class\:\`str\` \| \:py\:obj\:\`None\``
+   :param layer: Input layer. If None, uses adata.X.
+   :type target_sum: :sphinx_autodoc_typehints_type:`\:py\:class\:\`float\``
+   :param target_sum: Scale factor (1e6 = CPM).
+   :type out_layer: :sphinx_autodoc_typehints_type:`\:py\:class\:\`str\``
+   :param out_layer: Where to write normalized values (adata.layers[out_layer]).
+   :type inplace_X: :sphinx_autodoc_typehints_type:`\:py\:class\:\`bool\``
+   :param inplace_X: If True, also write normalized values into adata.X.
+   :type eps: :sphinx_autodoc_typehints_type:`\:py\:class\:\`float\``
+   :param eps: Small constant to avoid division by zero.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+
+.. py:function:: log1p(adata, *, layer=&#39;cpm&#39;, out_layer=&#39;log1p_cpm&#39;, inplace_X=False)
+   :module: bullkpy.pp
+
+   log1p-transform a layer (default: CPM) and store as a new layer.
+
+   Works with dense or sparse matrices.
+
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+
+.. py:function:: highly_variable_genes(adata, *, layer=&#39;log1p_cpm&#39;, n_top_genes=2000, n_bins=20, min_mean=0.0, max_mean=inf, min_disp=-inf, key_added=&#39;highly_variable&#39;)
+   :module: bullkpy.pp
+
+   Select highly variable genes (bulk-friendly version of HVGs).
+
+   This computes mean and variance across samples on the chosen layer
+   and identifies genes with high dispersion relative to genes of similar mean
+   (mean-binned z-score of log-dispersion, Scanpy/Seurat spirit).
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+   Stores results in `adata.var`:
+     - mean, variance, dispersion, dispersion_norm
+     - boolean flag `adata.var[key_added]` (default: &#39;highly_variable&#39;)
+
+
+.. py:function:: filter_genes(adata, *, layer=&#39;counts&#39;, min_samples=3, min_expr=0.0, inplace=True)
+   :module: bullkpy.pp
+
+   Filter genes by detection across samples.
+
+   A gene is &quot;detected&quot; in a sample if expression &gt; min_expr in `layer`.
+   Keeps genes detected in at least `min_samples` samples.
+
+   Works for counts (min_expr=0) or log layers (use e.g. min_expr=0.1).
+
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~anndata.\_core.anndata.AnnData\``
+
+
+.. py:function:: filter_samples(adata, *, min_genes=None, min_counts=None, max_pct_mt=None, max_pct_ribo=None, layer=&#39;counts&#39;, expr_threshold_for_genes=0.0, mt_var_key=None, ribo_var_key=None, inplace=True)
+   :module: bullkpy.pp
+
+   Filter samples using QC metrics in `adata.obs` if present; otherwise compute from matrix.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~anndata.\_core.anndata.AnnData\``
+
+   No hard requirement that any of these columns exist:
+     - total_counts
+     - n_genes_detected
+     - pct_counts_mt
+     - pct_counts_ribo
+
+   If a requested threshold is provided but cannot be computed, it will be skipped with a warning.
+
+
+.. py:function:: batch_correct_combat(adata, *, batch_key, layer=&#39;log1p_cpm&#39;, covariates=None, key_added=&#39;combat&#39;, overwrite=False, inplace=True)
+   :module: bullkpy.pp
+
+   ComBat batch correction (Johnson et al.) for bulk expression.
+
+   .. rubric:: Notes
+
+   - ComBat is intended for approximately Gaussian data:
+     use log-transformed normalized expression (e.g., log1p_cpm), not raw counts.
+   - Writes corrected matrix to `adata.layers[key_added]` by default.
+
+   :type batch_key: :sphinx_autodoc_typehints_type:`\:py\:class\:\`str\``
+   :param batch_key: adata.obs column with batch labels (categorical recommended).
+   :type layer: :sphinx_autodoc_typehints_type:`\:py\:class\:\`str\` \| \:py\:obj\:\`None\``
+   :param layer: Which matrix to correct. If None, uses adata.X.
+   :type covariates: :sphinx_autodoc_typehints_type:`\:py\:data\:\`\~typing.Optional\`\\ \\\[\:py\:class\:\`\~typing.Sequence\`\\ \\\[\:py\:class\:\`str\`\]\]`
+   :param covariates: Optional adata.obs columns to include in the design (biological covariates to preserve).
+   :type key_added: :sphinx_autodoc_typehints_type:`\:py\:class\:\`str\``
+   :param key_added: Layer name to store corrected values (if overwrite=False).
+   :type overwrite: :sphinx_autodoc_typehints_type:`\:py\:class\:\`bool\``
+   :param overwrite: If True, write corrected values back into the selected layer / X.
+   :type inplace: :sphinx_autodoc_typehints_type:`\:py\:class\:\`bool\``
+   :param inplace: If True, store results in adata; if False, return corrected matrix (samples x genes).
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~numpy.ndarray\` \| \:py\:obj\:\`None\``
+
+
+.. py:function:: sanitize_metadata(df, *, index_col=None, numeric_min_frac=0.9, category_max_unique=50, category_max_frac=0.2, datetime_min_frac=0.9, drop_high_cardinality_strings=False, high_cardinality_frac=0.5, verbose=True)
+   :module: bullkpy.pp
+
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\``
+
+
+.. py:function:: find_bad_obs_cols_by_write(adata)
+   :module: bullkpy.pp
+
+
+.. py:function:: make_obs_h5ad_safe(adata, cols=None)
+   :module: bullkpy.pp
+
+</pre></div>
+</div>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="bullkpy.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">bullkpy</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="bullkpy.tl.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">bullkpy.tl</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/bullkpy.pp.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Marcos Malumbres.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

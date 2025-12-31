@@ -1,0 +1,916 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>bullkpy.tl &#8212; BULLKpy 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=f539c95a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/bullkpy.tl';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="bullkpy.pl" href="bullkpy.pl.html" />
+    <link rel="prev" title="bullkpy.pp" href="bullkpy.pp.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">BULLKpy 0.0.1 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../notebooks/index.html">
+    Tutorials (notebooks)
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/malumbres/BULLKpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../notebooks/index.html">
+    Tutorials (notebooks)
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/malumbres/BULLKpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.html">bullkpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.pp.html">bullkpy.pp</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">bullkpy.tl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.pl.html">bullkpy.pl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.get.html">bullkpy.get</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bullkpy.io.html">bullkpy.io</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">API reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">bullkpy.tl</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="bullkpy-tl">
+<h1>bullkpy.tl<a class="headerlink" href="#bullkpy-tl" title="Link to this heading">#</a></h1>
+<p>.. py:module:: bullkpy.tl</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+.. py:function:: pca(adata, *, layer=&#39;log1p_cpm&#39;, n_comps=50, center=True, scale=False, use_highly_variable=False, key_added=&#39;pca&#39;)
+   :module: bullkpy.tl
+
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+
+.. py:function:: neighbors(adata, *, n_neighbors=15, n_pcs=20, use_rep=&#39;X_pca&#39;, metric=&#39;euclidean&#39;, key_added=&#39;neighbors&#39;)
+   :module: bullkpy.tl
+
+   Compute kNN graph on samples (obs) using PCA representation.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+   Stores:
+     - adata.obsp[&quot;distances&quot;] (CSR sparse)
+     - adata.obsp[&quot;connectivities&quot;] (CSR sparse; Gaussian kernel)
+     - adata.uns[key_added] with parameters
+
+
+.. py:function:: cluster(adata, *, method=&#39;leiden&#39;, key_added=&#39;clusters&#39;, resolution=1.0, n_clusters=8, use_rep=&#39;X_pca&#39;, n_pcs=20, random_state=0)
+   :module: bullkpy.tl
+
+   Cluster samples.
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+
+   - Leiden: uses `adata.obsp[&#39;connectivities&#39;]` (requires igraph + leidenalg).
+   - KMeans fallback: clusters in PCA space (no extra deps).
+
+
+.. py:function:: umap(adata, *, n_neighbors=15, n_pcs=20, use_rep=&#39;X_pca&#39;, min_dist=0.5, spread=1.0, n_components=2, metric=&#39;euclidean&#39;, random_state=0, init=&#39;spectral&#39;)
+   :module: bullkpy.tl
+
+   Compute UMAP embedding from a representation (default: PCA).
+
+   This mirrors Scanpy practice: UMAP is computed from `X_pca` with
+   `n_neighbors`/`min_dist`, consistent with the neighbors graph settings.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+   Stores:
+     - adata.obsm[&#39;X_umap&#39;]
+     - adata.uns[&#39;umap&#39;]
+
+
+.. py:function:: umap_graph(adata, *, graph_key=&#39;connectivities&#39;, use_rep=&#39;X_pca&#39;, n_pcs=20, min_dist=0.5, spread=1.0, n_components=2, random_state=0, init=&#39;spectral&#39;, negative_sample_rate=5, n_epochs=None)
+   :module: bullkpy.tl
+
+   Compute UMAP embedding strictly from a precomputed neighbor graph.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+   Requires:
+     - adata.obsp[graph_key]  (typically &#39;connectivities&#39; from bk.tl.neighbors)
+
+   Uses:
+     - adata.obsm[use_rep] only for initialization (spectral/random), not for graph construction.
+
+   Stores:
+     - adata.obsm[&#39;X_umap_graph&#39;]
+     - adata.uns[&#39;umap_graph&#39;]
+
+
+.. py:function:: de(adata, *, groupby, group, reference, method=&#39;welch_ttest&#39;, layer_counts=&#39;counts&#39;, layer_expr=&#39;log1p_cpm&#39;, key_added=&#39;de&#39;, alpha=0.05, shrink_dispersion=True, prior_df=10.0)
+   :module: bullkpy.tl
+
+   Two-group differential expression.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+   Stores results in:
+     adata.uns[key_added][f&quot;{groupby}:_{group}_vs_{reference}&quot;] = DataFrame-like dict
+
+   .. method:: welch_ttest:
+
+      Fast, exploratory; runs Welch t-test on `layer_expr` (default log1p_cpm).
+
+   .. method:: nb_glm:
+
+      Proper bulk model; NB GLM on raw counts (layer_counts) with log(libsize) offset.
+      Requires statsmodels.
+
+
+
+.. py:function:: de_glm(adata, *, formula, contrast=None, layer_counts=&#39;counts&#39;, shrink_dispersion=True, prior_df=10.0, key_added=&#39;de_glm&#39;, add_intercept=True)
+   :module: bullkpy.tl
+
+   NB-GLM DE with design matrix from a formula and a contrast.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+   .. rubric:: Example
+
+   bk.tl.de_glm(adata, formula=&quot;~ Subtype + Batch&quot;, contrast=(&quot;Subtype&quot;,&quot;Basal&quot;,&quot;Luminal&quot;))
+
+   Stores:
+     adata.uns[key_added][contrast_name] = dict(method/params/results)
+
+
+.. py:function:: pca_loadings(adata, *, key=&#39;pca&#39;, loadings_key=&#39;PCs&#39;, pcs=None, n_top=50, use_abs=False, include_negative=True, dropna=True, gene_col=&#39;gene&#39;, store_key=&#39;pca_loadings&#39;, export=None, export_sep=&#39;\\t&#39;, export_gmt=None, min_abs_loading=None)
+   :module: bullkpy.tl
+
+   Rank genes by PCA loadings per PC and (optionally) export for enrichment.
+
+   Assumes PCA results like:
+     - adata.varm[loadings_key] == array (n_vars x n_comps)
+     - adata.uns[key] contains PCA params (optional)
+
+   :type pcs: :sphinx_autodoc_typehints_type:`\:py\:data\:\`\~typing.Optional\`\\ \\\[\:py\:class\:\`\~typing.Sequence\`\\ \\\[\:py\:class\:\`int\`\]\]`
+   :param pcs: PCs to process, 1-based indexing (e.g. [1,2,3]). If None -&gt; all available.
+   :type n_top: :sphinx_autodoc_typehints_type:`\:py\:class\:\`int\``
+   :param n_top: Number of top genes to return per PC (and per sign if include_negative=True and use_abs=False).
+   :type use_abs: :sphinx_autodoc_typehints_type:`\:py\:class\:\`bool\``
+   :param use_abs: If True: rank by absolute loading (single list per PC).
+                   If False: returns positive top list (and negative list if include_negative=True).
+   :type include_negative: :sphinx_autodoc_typehints_type:`\:py\:class\:\`bool\``
+   :param include_negative: Only used when use_abs=False. If True returns both pos/neg lists.
+   :type export: :sphinx_autodoc_typehints_type:`\:py\:data\:\`\~typing.Union\`\\ \\\[\:py\:class\:\`str\`\, \:py\:class\:\`\~pathlib.Path\`\, \:py\:obj\:\`None\`\]`
+   :param export: If provided, writes a long-format table (PC, sign, gene, loading, rank).
+                  Also writes a wide-format file alongside: &quot;&lt;stem&gt;.wide&lt;suffix&gt;&quot;.
+   :type export_gmt: :sphinx_autodoc_typehints_type:`\:py\:data\:\`\~typing.Union\`\\ \\\[\:py\:class\:\`str\`\, \:py\:class\:\`\~pathlib.Path\`\, \:py\:obj\:\`None\`\]`
+   :param export_gmt:
+                      If provided, writes GMT gene sets:
+                        PC1_pos, PC1_neg, PC2_pos, ...
+                      If use_abs=True: PC1_abs, PC2_abs, ...
+   :type min_abs_loading: :sphinx_autodoc_typehints_type:`\:py\:data\:\`\~typing.Optional\`\\ \\\[\:py\:class\:\`float\`\]`
+   :param min_abs_loading: Optional filter: only keep genes with abs(loading) &gt;= threshold.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`dict\`\\ \\\[\:py\:class\:\`str\`\, \:py\:class\:\`\~pandas.core.frame.DataFrame\`\]`
+   :returns: * *dict mapping keys like &quot;PC1_pos&quot;, &quot;PC1_neg&quot;, &quot;PC1_abs&quot; -&gt; DataFrame.*
+             * *Also stores results in adata.uns[store_key].*
+
+
+.. py:function:: rank_genes_groups(adata, *, groupby, groups=None, reference=&#39;rest&#39;, layer=&#39;log1p_cpm&#39;, method=&#39;t-test&#39;, corr_method=&#39;benjamini-hochberg&#39;, use_abs=False, n_genes=100, key_added=&#39;rank_genes_groups&#39;)
+   :module: bullkpy.tl
+
+   Scanpy-like ranking of genes per group.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+   Statistics
+   ----------
+   method=&quot;t-test&quot;    -&gt; Welch t-test per gene, score = t statistic
+   method=&quot;wilcoxon&quot;  -&gt; Mann–Whitney U per gene, score = z-like from U (approx)
+
+   Output
+   ------
+   Stores results in adata.uns[key_added] with:
+     - params
+     - names[group], scores[group], logfoldchanges[group], pvals[group], pvals_adj[group]
+     - mean_group[group], mean_ref[group] (extra, useful for bulk)
+
+
+.. py:function:: adjusted_rand_index(adata, *, true_key, pred_key)
+   :module: bullkpy.tl
+
+
+.. py:function:: cluster_metrics(adata, *, true_key, cluster_key=&#39;leiden&#39;, use_rep=&#39;X_pca&#39;, layer=None, n_pcs=None, silhouette_on=&#39;rep&#39;, metric=&#39;euclidean&#39;, dropna=True)
+   :module: bullkpy.tl
+
+   Compute agreement + quality metrics between known labels and clustering.
+
+   Returns dict with: n_used, ari, nmi, cramers_v, silhouette
+
+   Notes:
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`dict\`\\ \\\[\:py\:class\:\`str\`\, \:py\:class\:\`float\`\]`
+
+   - ARI/NMI/Cramér’s V compare `true_key` vs `cluster_key`.
+   - Silhouette measures cluster separation on chosen data:
+       * silhouette_on=&quot;rep&quot;: adata.obsm[use_rep] (recommended)
+       * silhouette_on=&quot;X&quot;: adata.X
+       * silhouette_on=&quot;layer&quot;: adata.layers[layer]
+
+
+.. py:function:: leiden_resolution_scan(adata, *, true_key, resolutions=None, base_key=&#39;leiden&#39;, store_key=&#39;leiden_scan&#39;, use_rep=&#39;X_pca&#39;, n_pcs=20, n_neighbors=15, metric=&#39;euclidean&#39;, recompute_neighbors=False, inplace=True, random_state=0)
+   :module: bullkpy.tl
+
+   Scan multiple Leiden resolutions and score vs a ground-truth annotation.
+   Scan many Leiden resolutions and score against a &#39;true&#39; categorical label
+   using ARI / NMI / Cramér’s V.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\``
+
+   .. rubric:: Notes
+
+   - Uses bk.tl.neighbors() to build adata.obsp[&#39;connectivities&#39;] if missing.
+   - Uses bk.tl.cluster(method=&#39;leiden&#39;) to compute clusters for each resolution.
+   - Computes ARI, NMI (if sklearn available) + Cramér&#39;s V (always).
+
+
+.. py:function:: score_genes(adata, genes, *, score_name=&#39;score&#39;, layer=None, gene_pool=None, ctrl_size=50, n_bins=25, random_state=0, scale=False)
+   :module: bullkpy.tl
+
+   Scanpy-like signature scoring (bulk-friendly).
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+   Score per sample:
+       mean(expression[genes]) - mean(expression[control_genes])
+
+   Control genes are sampled from gene_pool (default: all genes) by matching
+   expression bins of signature genes (similar to scanpy.tl.score_genes).
+
+   Stores result in: adata.obs[score_name]
+
+
+.. py:function:: score_genes_dict(adata, gene_sets, *, layer=None, prefix=&#39;&#39;, suffix=&#39;_score&#39;, gene_pool=None, ctrl_size=50, n_bins=25, random_state=0, scale=False)
+   :module: bullkpy.tl
+
+   Compute multiple signature scores and store each in adata.obs.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+   Output column name:
+       f&quot;{prefix}{name}{suffix}&quot;
+
+
+.. py:function:: score_genes_cell_cycle(adata, *, s_genes, g2m_genes, layer=None, gene_pool=None, ctrl_size=50, n_bins=25, random_state=0, scale=False, s_score=&#39;S_score&#39;, g2m_score=&#39;G2M_score&#39;, phase=&#39;phase&#39;)
+   :module: bullkpy.tl
+
+   Score cell cycle phases similar to scanpy.tl.score_genes_cell_cycle.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:obj\:\`None\``
+
+   Writes to:
+     - adata.obs[s_score]   (float)
+     - adata.obs[g2m_score] (float)
+     - adata.obs[phase]     (category: &quot;S&quot;, &quot;G2M&quot;, &quot;G1&quot;)
+
+   Phase calling rule (Scanpy-like):
+     - if S_score &gt; G2M_score and S_score &gt; 0 -&gt; &quot;S&quot;
+     - elif G2M_score &gt; S_score and G2M_score &gt; 0 -&gt; &quot;G2M&quot;
+     - else -&gt; &quot;G1&quot;
+
+
+.. py:function:: top_gene_gene_correlations(adata, *, genes=None, layer=&#39;log1p_cpm&#39;, method=&#39;pearson&#39;, top_n=200, min_abs_r=None, use_abs=True, batch_key=None, batch_mode=&#39;none&#39;, covariates=None)
+   :module: bullkpy.tl
+
+   Find strongest gene–gene correlations among a gene set (or all genes if provided).
+   Returns long table with (gene1, gene2, r, pval, qval, n).
+
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\``
+
+
+.. py:function:: top_gene_obs_correlations(adata, *, gene, obs=None, obs_keys=None, layer=&#39;log1p_cpm&#39;, method=&#39;pearson&#39;, top_n=50, min_abs_r=None, use_abs=True, batch_key=None, batch_mode=&#39;none&#39;, covariates=None)
+   :module: bullkpy.tl
+
+   Correlate one or more genes with numeric obs columns.
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\``
+
+
+   - obs: restrict to these obs columns
+   - obs_keys: alternative explicit numeric obs selection
+
+
+.. py:function:: top_obs_obs_correlations(adata, *, focus, against=None, obs_keys=None, method=&#39;pearson&#39;, top_n=100, min_abs_r=None, use_abs=True, batch_key=None, batch_mode=&#39;none&#39;, covariates=None)
+   :module: bullkpy.tl
+
+   Strongest correlations between numeric obs columns.
+   If against is None: compare focus vs all other numeric obs.
+   Returns long table of pairs.
+
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\``
+
+
+.. py:function:: gene_gene_correlations(adata, *, gene, genes=None, layer=&#39;log1p_cpm&#39;, method=&#39;pearson&#39;, top_n=50, min_abs_r=None, use_abs=True, batch_key=None, batch_mode=&#39;none&#39;, covariates=None)
+   :module: bullkpy.tl
+
+   Correlate one gene with all other genes or a subset.
+   Returns table: (gene, r, pval, qval, n).
+
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\``
+
+
+.. py:function:: obs_obs_corr_matrix(adata, *, focus, against=None, obs_keys=None, method=&#39;pearson&#39;, drop_na=True, batch_key=None, batch_mode=&#39;none&#39;, covariates=None, return_p=False, return_q=False)
+   :module: bullkpy.tl
+
+   Correlation matrix between numeric obs columns (focus × against).
+   Returns wide matrix (rows=focus, cols=against).
+   Optionally returns p-values and q-values matrices.
+
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\` \| \:py\:class\:\`tuple\`\\ \\\[\:py\:class\:\`\~pandas.core.frame.DataFrame\`\, \:py\:class\:\`\~pandas.core.frame.DataFrame\`\] \| \:py\:class\:\`tuple\`\\ \\\[\:py\:class\:\`\~pandas.core.frame.DataFrame\`\, \:py\:class\:\`\~pandas.core.frame.DataFrame\`\, \:py\:class\:\`\~pandas.core.frame.DataFrame\`\]`
+
+
+.. py:function:: partial_corr(adata, *, x, y, covariates, method=&#39;pearson&#39;)
+   :module: bullkpy.tl
+
+   Partial correlation: residualize x and y on covariates (obs columns) then correlate.
+
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`tuple\`\\ \\\[\:py\:class\:\`float\`\, \:py\:class\:\`float\`\, \:py\:class\:\`int\`\]`
+
+
+.. py:function:: plot_corr_scatter(adata, *, x, y, hue=None, kind=&#39;obs_obs&#39;, layer=&#39;log1p_cpm&#39;, method=&#39;pearson&#39;, batch_key=None, batch_mode=&#39;none&#39;, covariates=None, figsize=(5.5, 4.5), s=18.0, alpha=0.8, cmap=&#39;viridis&#39;, palette=&#39;tab20&#39;, title=None, show=True)
+   :module: bullkpy.tl
+
+   Scatter plot + correlation in title.
+   kind=&quot;obs_obs&quot;: x,y are obs numeric columns
+   kind=&quot;gene_obs&quot;: x is gene, y is obs numeric (or vice versa)
+
+
+.. py:function:: plot_corr_heatmap(mat, *, figsize=(7.5, 4.5), cmap=&#39;vlag&#39;, center=0.0, vmin=None, vmax=None, annot=False, fmt=&#39;.2f&#39;, title=None, show=True)
+   :module: bullkpy.tl
+
+   Heatmap for a wide correlation matrix (e.g., from obs_obs_corr_matrix).
+
+
+.. py:function:: gene_categorical_association(adata, *, groupby, genes=None, layer=&#39;log1p_cpm&#39;, method=&#39;kruskal&#39;, effect_size=&#39;epsilon2&#39;, min_group_size=2, adjust=&#39;fdr_bh&#39;)
+   :module: bullkpy.tl
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\``
+
+   A) Association between gene expression (numeric) and a categorical obs column.
+
+   Returns tidy df with columns:
+     groupby, gene, statistic, pval, qval, effect, n_groups, n, means (optional columns)
+
+
+.. py:function:: obs_categorical_association(adata, *, groupby, obs_keys=None, method=&#39;kruskal&#39;, effect_size=&#39;epsilon2&#39;, min_group_size=2, adjust=&#39;fdr_bh&#39;)
+   :module: bullkpy.tl
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\``
+
+   B) Association between numeric obs columns and a categorical obs column.
+
+
+.. py:function:: association(adata, *, x, y, layer=&#39;log1p_cpm&#39;, method=&#39;auto&#39;)
+   :module: bullkpy.tl
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`object\``
+
+   Unified association dispatcher.
+     - x gene, y categorical -&gt; gene_categorical_association (single-gene)
+     - x numeric obs, y categorical -&gt; obs_categorical_association (single-obs)
+     - x categorical, y categorical -&gt; categorical_association
+
+
+.. py:function:: pairwise_posthoc(df, *, group_col=&#39;grp&#39;, value_col=&#39;y&#39;, method=&#39;mwu&#39;, correction=&#39;bh&#39;, dropna=True)
+   :module: bullkpy.tl
+
+   Pairwise post-hoc tests between groups.
+
+   :type df: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\``
+   :param df:
+   :type df: DataFrame with columns [group_col, value_col]
+   :type method: :sphinx_autodoc_typehints_type:`\:py\:data\:\`\~typing.Literal\`\\ \\\[\`\`\&#39;mwu\&#39;\`\`\, \`\`\&#39;ttest\&#39;\`\`\]`
+   :param method:
+   :type method: &quot;mwu&quot; (Mann-Whitney U, two-sided) or &quot;ttest&quot; (Welch t-test)
+   :type correction: :sphinx_autodoc_typehints_type:`\:py\:data\:\`\~typing.Literal\`\\ \\\[\`\`\&#39;bh\&#39;\`\`\]`
+   :param correction:
+   :type correction: currently only &quot;bh&quot; (Benjamini-Hochberg)
+   :type dropna: :sphinx_autodoc_typehints_type:`\:py\:class\:\`bool\``
+   :param dropna:
+   :type dropna: drop rows with NA in group/value
+
+   :returns: group1, group2, n1, n2, pval, qval, effect, delta_mean, delta_median
+   :rtype: DataFrame with columns
+
+
+.. py:function:: cat_cat_association(adata, *, key1, key2, adjust=&#39;none&#39;)
+   :module: bullkpy.tl
+
+   C) Association between two categorical obs columns.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\``
+   :returns: key1, key2, chi2, dof, pval, qval, cramers_v, n
+
+
+.. py:function:: rank_genes_categorical(adata, *, groupby, group=None, reference=&#39;rest&#39;, layer=None, genes=None, method=&#39;mwu&#39;, store_key=None)
+   :module: bullkpy.tl
+
+   Scanpy-like (but bulk-friendly) rank of genes associated with a categorical obs.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\``
+
+   Two-group comparison:
+     - MWU (default): effect_size = rank-biserial correlation
+     - t-test: effect_size = Cohen&#39;s d (approx)
+   Multi-group comparison:
+     - Kruskal or ANOVA: effect_size = (rough) eta^2
+
+   Returns a DataFrame with:
+     gene, pval, qval, effect_size, mean_group, mean_ref, log2FC
+
+
+.. py:function:: posthoc_per_gene(adata, *, genes, groupby, layer=None, method=&#39;mwu&#39;)
+   :module: bullkpy.tl
+
+   For each gene, run pairwise posthoc tests across all categories in `groupby`.
+   Returns dict: gene -&gt; DataFrame (pairwise results).
+
+   Requires bk.tl.pairwise_posthoc(df, method=...) to exist.
+
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`dict\`\\ \\\[\:py\:class\:\`str\`\, \:py\:class\:\`\~pandas.core.frame.DataFrame\`\]`
+
+
+.. py:function:: gsea_preranked(adata=None, *, res, gene_sets=&#39;MSigDB_Hallmark_2020&#39;, comparison=None, store_key=&#39;gsea&#39;, results_key=&#39;results&#39;, gene_col=&#39;gene&#39;, score_col=&#39;t&#39;, ascending=False, min_size=5, max_size=1000, permutation_num=1000, seed=6, processes=4, outdir=&#39;gsea&#39;, save_rnk=True, return_pre_res=True, add_comparison_column=True)
+   :module: bullkpy.tl
+
+   Run GSEApy prerank and return a tidy results table.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~pandas.core.frame.DataFrame\` \| \:py\:class\:\`tuple\`\\ \\\[\:py\:class\:\`\~pandas.core.frame.DataFrame\`\, \:py\:data\:\`\~typing.Any\`\]`
+
+   Key improvements
+   ----------------
+   1) Writes to outdir/&lt;comparison&gt;/ (folder created with parents=True)
+   2) Adds a &#39;comparison&#39; column to the returned results
+   3) gene_sets can be:
+        - Enrichr library name, e.g. &quot;MSigDB_Hallmark_2020&quot;
+        - .gmt path
+        - dict of gene sets
+        - convenience aliases: &quot;hallmark(s)&quot;, &quot;c2&quot;/&quot;curated&quot;
+        - list of libraries/paths (mix allowed)
+   4) Optionally returns the raw gseapy &#39;pre_res&#39; object so you can plot later.
+
+   .. rubric:: Notes
+
+   - The returned &#39;pre_res&#39; is NOT stored in adata.uns by default, because it is
+     not h5ad-serializable. Store tables only.
+
+
+.. py:function:: list_enrichr_libraries()
+   :module: bullkpy.tl
+
+   Return available Enrichr libraries as known by gseapy.
+   Useful to discover exact names like &#39;MSigDB_Hallmark_2020&#39;.
+
+   :rtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`list\`\\ \\\[\:py\:class\:\`str\`\]`
+
+   .. rubric:: Notes
+
+   - Requires internet access (Enrichr).
+
+</pre></div>
+</div>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="bullkpy.pp.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">bullkpy.pp</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="bullkpy.pl.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">bullkpy.pl</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/bullkpy.tl.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, Marcos Malumbres.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
