@@ -80,7 +80,9 @@ html_favicon = None
 
 html_theme_options = {
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
+    "navigation_depth": 4,
     "navigation_with_keys": True,
+    "secondary_sidebar_items": ["page-toc"],
     "show_toc_level": 2,
     "icon_links": [
         {
