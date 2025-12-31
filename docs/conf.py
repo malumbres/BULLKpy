@@ -67,7 +67,7 @@ autodoc_default_options = {
     "undoc-members": False,
     "show-inheritance": False,
 }
-autodoc_typehints = "description"  # move hints to description
+autodoc_typehints = "signature"  
 autodoc_member_order = "bysource"
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
