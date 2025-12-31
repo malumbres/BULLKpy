@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/bullkpy.io';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Tutorials (notebooks)" href="../notebooks/index.html" />
+    <link rel="next" title="Plotting (bullkpy.pl)" href="pl/index.html" />
     <link rel="prev" title="bullkpy.get" href="bullkpy.get.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -209,10 +209,6 @@
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
 </div>
 
     </header>
@@ -306,9 +302,12 @@
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.html">bullkpy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.pp.html">bullkpy.pp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.tl.html">bullkpy.tl</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bullkpy.pl.html">bullkpy.pl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bullkpy.get.html">bullkpy.get</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">bullkpy.io</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="pl/index.html">Plotting (<code class="docutils literal notranslate"><span class="pre">bullkpy.pl</span></code>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="pl/violin.html">Violin plots</a></li>
+</ul>
+</details></li>
 </ul>
 </div>
 </nav></div>
@@ -372,50 +371,22 @@
   <section id="bullkpy-io">
 <h1>bullkpy.io<a class="headerlink" href="#bullkpy-io" title="Link to this heading">#</a></h1>
 <p>.. py:module:: bullkpy.io</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
-.. py:function:: read_counts(filename, *, sep=&#39;\\t&#39;, orientation=&#39;genes_by_samples&#39;, dtype=&#39;int64&#39;)
-   :module: bullkpy.io
-
-   Read a bulk RNA-seq count matrix and return an AnnData object.
-
-   :type filename: :sphinx_autodoc_typehints_type:`\:py\:class\:\`str\` \| \:py\:class\:\`\~pathlib.Path\``
-   :param filename: Path to counts file (tsv/csv). Rows or columns must be gene IDs.
-   :type sep: :sphinx_autodoc_typehints_type:`\:py\:class\:\`str\``
-   :param sep: Column separator (default: tab).
-   :type orientation: :sphinx_autodoc_typehints_type:`\:py\:data\:\`\~typing.Literal\`\\ \\\[\`\`\&#39;genes\_by\_samples\&#39;\`\`\, \`\`\&#39;samples\_by\_genes\&#39;\`\`\]`
-   :param orientation:
-                       - &quot;genes_by_samples&quot;: genes in rows, samples in columns (common output of HTSeq, featureCounts)
-                       - &quot;samples_by_genes&quot;: samples in rows, genes in columns
-   :type dtype: :sphinx_autodoc_typehints_type:`\:py\:class\:\`str\` \| \:py\:obj\:\`None\``
-   :param dtype: Cast count matrix to dtype (default: int64). Set to None to disable casting.
-
-   :returns: AnnData object with samples in `.obs` and genes in `.var`.
-   :rtype: AnnData
-
-
-.. py:function:: add_metadata(adata, metadata_file, *, index_col, sep=&#39;\\t&#39;, how=&#39;left&#39;)
-   :module: bullkpy.io
-
-   Add sample metadata to an AnnData object.
-
-   :type adata: :sphinx_autodoc_typehints_type:`\:py\:class\:\`\~anndata.\_core.anndata.AnnData\``
-   :param adata: AnnData object with samples in `.obs`.
-   :type metadata_file: :sphinx_autodoc_typehints_type:`\:py\:class\:\`str\` \| \:py\:class\:\`\~pathlib.Path\``
-   :param metadata_file: Path to metadata file (tsv, csv, or xlsx).
-   :type index_col: :sphinx_autodoc_typehints_type:`\:py\:class\:\`str\``
-   :param index_col: Column in metadata that matches `adata.obs_names`.
-   :type sep: :sphinx_autodoc_typehints_type:`\:py\:class\:\`str\``
-   :param sep: Column separator for tsv/csv files.
-   :type how: :sphinx_autodoc_typehints_type:`\:py\:data\:\`\~typing.Literal\`\\ \\\[\`\`\&#39;left\&#39;\`\`\, \`\`\&#39;inner\&#39;\`\`\]`
-   :param how: Merge strategy:
-               - &quot;left&quot;: keep all samples in adata (default)
-               - &quot;inner&quot;: keep only samples present in metadata
-
-   :returns: The same AnnData object with updated `.obs`.
-   :rtype: AnnData
-
-</pre></div>
-</div>
+<p>.. py:function:: read_counts(filename, *, sep=’\t’, orientation=’genes_by_samples’, dtype=’int64’)
+:module: bullkpy.io</p>
+<p>Read a bulk RNA-seq count matrix and return an AnnData object.</p>
+<p>:type filename: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>str` | :py:class:`~pathlib.Path`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">filename:</span> <span class="pre">Path</span> <span class="pre">to</span> <span class="pre">counts</span> <span class="pre">file</span> <span class="pre">(tsv/csv).</span> <span class="pre">Rows</span> <span class="pre">or</span> <span class="pre">columns</span> <span class="pre">must</span> <span class="pre">be</span> <span class="pre">gene</span> <span class="pre">IDs.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">sep:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">sep:</span> <span class="pre">Column</span> <span class="pre">separator</span> <span class="pre">(default:</span> <span class="pre">tab).</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">orientation:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:data:`~typing.Literal`\ \[``’genes_by_samples’``, ``’samples_by_genes’``]<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">orientation:</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">-</span> <span class="pre">&quot;genes_by_samples&quot;:</span> <span class="pre">genes</span> <span class="pre">in</span> <span class="pre">rows,</span> <span class="pre">samples</span> <span class="pre">in</span> <span class="pre">columns</span> <span class="pre">(common</span> <span class="pre">output</span> <span class="pre">of</span> <span class="pre">HTSeq,</span> <span class="pre">featureCounts)</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">-</span> <span class="pre">&quot;samples_by_genes&quot;:</span> <span class="pre">samples</span> <span class="pre">in</span> <span class="pre">rows,</span> <span class="pre">genes</span> <span class="pre">in</span> <span class="pre">columns</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">dtype:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str` | :py:obj:`None``
+:param dtype: Cast count matrix to dtype (default: int64). Set to None to disable casting.</p>
+<p>:returns: AnnData object with samples in <code class="docutils literal notranslate"><span class="pre">.obs</span></code> and genes in <code class="docutils literal notranslate"><span class="pre">.var</span></code>.
+:rtype: AnnData</p>
+<p>.. py:function:: add_metadata(adata, metadata_file, *, index_col, sep=’\t’, how=’left’)
+:module: bullkpy.io</p>
+<p>Add sample metadata to an AnnData object.</p>
+<p>:type adata: :sphinx_autodoc_typehints_type:<code class="docutils literal notranslate"><span class="pre">\:py\:class\:\</span></code>~anndata._core.anndata.AnnData`<code class="docutils literal notranslate">&#160;&#160; <span class="pre">:param</span> <span class="pre">adata:</span> <span class="pre">AnnData</span> <span class="pre">object</span> <span class="pre">with</span> <span class="pre">samples</span> <span class="pre">in</span></code>.obs<code class="docutils literal notranslate"><span class="pre">.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">metadata_file:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str` | :py:class:`~pathlib.Path`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">metadata_file:</span> <span class="pre">Path</span> <span class="pre">to</span> <span class="pre">metadata</span> <span class="pre">file</span> <span class="pre">(tsv,</span> <span class="pre">csv,</span> <span class="pre">or</span> <span class="pre">xlsx).</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">index_col:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str`<code class="docutils literal notranslate">&#160;&#160; <span class="pre">:param</span> <span class="pre">index_col:</span> <span class="pre">Column</span> <span class="pre">in</span> <span class="pre">metadata</span> <span class="pre">that</span> <span class="pre">matches</span></code>adata.obs_names<code class="docutils literal notranslate"><span class="pre">.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">sep:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:class:`str`<code class="docutils literal notranslate">&#160;&#160;&#160; <span class="pre">:param</span> <span class="pre">sep:</span> <span class="pre">Column</span> <span class="pre">separator</span> <span class="pre">for</span> <span class="pre">tsv/csv</span> <span class="pre">files.</span>&#160;&#160;&#160; <span class="pre">:type</span> <span class="pre">how:</span> <span class="pre">:sphinx_autodoc_typehints_type:</span></code>:py:data:`~typing.Literal`\ \[``’left’``, ``’inner’``]`
+:param how: Merge strategy:
+- “left”: keep all samples in adata (default)
+- “inner”: keep only samples present in metadata</p>
+<p>:returns: The same AnnData object with updated <code class="docutils literal notranslate"><span class="pre">.obs</span></code>.
+:rtype: AnnData</p>
 </section>
 
 
@@ -438,11 +409,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="../notebooks/index.html"
+       href="pl/index.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Tutorials (notebooks)</p>
+        <p class="prev-next-title">Plotting (<code class="docutils literal notranslate"><span class="pre">bullkpy.pl</span></code>)</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -452,21 +423,6 @@
             </div>
             
             
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/api/bullkpy.io.md.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
-
-</div></div>
               
             
           </div>
