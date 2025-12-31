@@ -209,6 +209,10 @@
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -380,6 +384,24 @@
 </a>
 </figure>
 <p>Example violin plot showing gene expression across tumor types.</p>
+<section id="basic-usage">
+<h2>Basic usage<a class="headerlink" href="#basic-usage" title="Link to this heading">#</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">violin</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CDC20&quot;</span><span class="p">,</span> <span class="s2">&quot;ASCL1&quot;</span><span class="p">,</span> <span class="s2">&quot;CD3D&quot;</span><span class="p">],</span>
+    <span class="n">groupby</span><span class="o">=</span><span class="s2">&quot;Project_ID&quot;</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>If a key is found in <code class="docutils literal notranslate"><span class="pre">adata.obs</span></code>, it is treated as metadata.</p></li>
+<li><p>If a key is found in <code class="docutils literal notranslate"><span class="pre">adata.var_names</span></code>, expression is extracted from <code class="docutils literal notranslate"><span class="pre">layer</span></code>.</p></li>
+<li><p>Supports mixed metadata + genes in a single call.</p></li>
+</ul>
 <p>.. py:module:: bullkpy.pl.violin</p>
 <p>.. py:function:: violin(adata, *, keys, groupby, layer=’log1p_cpm’, figsize=(8, 4), panel_size=None, show_points=True, point_size=2.0, point_alpha=0.35, palette=None, order=None, rotate_xticks=45, inner=’quartile’, cut=0.0, save=None, show=True)
 :module: bullkpy.pl.violin</p>
@@ -434,6 +456,7 @@
 </div></blockquote>
 </div></blockquote>
 </section>
+</section>
 
 
                 </article>
@@ -469,6 +492,25 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-usage">Basic usage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes">Notes</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

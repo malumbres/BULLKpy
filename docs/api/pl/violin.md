@@ -3,7 +3,7 @@
 Use `bk.pl.violin` to plot QC/clinical variables from `adata.obs` or gene expression
 (from `adata.var_names`) across groups.
 
-```{figure} ../../_static/violin_genes_example.png
+```{figure} /_static/violin_genes_example.png
 :alt: Violin plot example
 :width: 500px
 :align: center
