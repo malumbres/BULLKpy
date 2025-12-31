@@ -71,6 +71,8 @@ autodoc_typehints = "description"  # move hints to description
 autodoc_member_order = "bysource"
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
+napoleon_use_param = True
+napoleon_use_rtype = True
 
 # --- theme (Scanpy-like) ---
 html_theme = "pydata_sphinx_theme"
