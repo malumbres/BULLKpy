@@ -18,7 +18,6 @@ results/
 # ===============================
 figs/
 my_figures/
-*.png
 *.pdf
 *.svg
 
