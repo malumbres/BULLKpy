@@ -59,8 +59,14 @@ nb_output_stderr = "remove"
 
 # --- autosummary ---
 autosummary_generate = True
+autosummary_imported_members = True
 
 # --- autodoc ---
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": False,
+    "show-inheritance": False,
+}
 autodoc_typehints = "description"  # move hints to description
 autodoc_member_order = "bysource"
 napoleon_google_docstring = True
