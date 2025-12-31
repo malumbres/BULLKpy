@@ -4,9 +4,9 @@
 :maxdepth: 2
 
 bullkpy
-bullkpy.pp
-bullkpy.tl
 bullkpy.get
 bullkpy.io
+bullkpy.pp
+bullkpy.tl
 pl/index
 ```
