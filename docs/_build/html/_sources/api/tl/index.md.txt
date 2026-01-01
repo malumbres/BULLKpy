@@ -3,5 +3,23 @@
 ```{toctree}
 :maxdepth: 1
 
-
+association
+categorical_association
+de
+gene_categorical_association
+gene_gene_correlations
+gsea_preranked
+leiden_resolution_scan
+list_enrichr_libraries
+obs_categorical_association
+obs_obs_corr_matrix
+pairwise_posthoc
+partial_corr
+plot_corr_heatmap
+plot_corr_scatter
+posthoc_per_gene
+rank_genes_categorical
+top_gene_gene_correlations
+top_gene_obs_correlations
+top_obs_obs_correlations
 ```
