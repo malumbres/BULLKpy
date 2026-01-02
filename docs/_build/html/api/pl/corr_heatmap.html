@@ -1,0 +1,728 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Correlation heatmap &#8212; BULLKpy 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=f539c95a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/pl/corr_heatmap';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Dotplot association" href="dotplot_association.html" />
+    <link rel="prev" title="Categorical confusion" href="categorical_confusion.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">BULLKpy 0.0.1 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../notebooks/index.html">
+    Tutorials (notebooks)
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/malumbres/BULLKpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../notebooks/index.html">
+    Tutorials (notebooks)
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/malumbres/BULLKpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../bullkpy.html">bullkpy</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../io/index.html">Input Output</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../io/read_counts.html">Read counts</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../io/add_metadata.html">Add metadata</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../pp/index.html">Pre-processing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../pp/batch_correct_combat.html">Batch correction with Combat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/filter_genes.html">Filter genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/filter_samples.html">Filter samples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/find_bad_obs_cols_by_write.html">Find bad Obs columns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/highly_variable_genes.html">Highly variable genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/log1p.html">log1p</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/make_obs_h5ad_safe.html">Make Obs .h5ad safe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/normalize_cpm.html">Normalize cpm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/qc_metrics.html">QC metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/sanitize_metadata.html">Sanitize metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/set_raw_counts.html">Set raw counts</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tl/index.html">Tools</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tl/association.html">Association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/categorical_association.html">Categorical association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/de.html">Differential expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/gene_categorical_association.html">Gene-Category association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/gene_gene_correlations.html">Gene-gene correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/gsea_preranked.html">GSEA preranked</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/leiden_resolution_scan.html">Leiden resolution scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/list_enrichr_libraries.html">List enrichr libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/obs_categorical_association.html">Obs-Category association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/obs_obs_corr_matrix.html">Obs-Obs correlation matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/pairwise_posthoc.html">Pairwise postdoc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/partial_corr.html">Partial correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/plot_corr_heatmap.html">Plot Correlation heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/plot_corr_scatter.html">Plot Correlation scatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/posthoc_per_gene.html">Posthoc per gene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/rank_genes_categorical.html">Rank genes categorical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/top_gene_gene_correlations.html">Top gene-gene correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/top_gene_obs_correlations.html">Top Gene-Obs correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/top_obs_obs_correlations.html">Top Obs-Obs correlations</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Plotting</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ari_resolution_heatmap.html">ARI resolution heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="association_heatmap.html">Association heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boxplot_with_stats.html">Boxplot with statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="categorical_confusion.html">Categorical confusion</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Correlation heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dotplot_association.html">Dotplot association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="heatmap_association.html">Heatmap association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ma.html">MA plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rankplot.html">Rankplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rankplot_association.html">Rankplot association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="violin.html">Violin plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="volcano.html">Volcano plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="volcano_categorical.html">Volcano for categorial comparisons</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">API reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Plotting</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Correlation heatmap</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="correlation-heatmap">
+<h1>Correlation heatmap<a class="headerlink" href="#correlation-heatmap" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="bullkpy.pl.corr_heatmap">
+<span class="sig-prename descclassname"><span class="pre">bullkpy.pl.</span></span><span class="sig-name descname"><span class="pre">corr_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log1p_cpm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pearson'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'samples'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'vlag'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dendrogram</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/bullkpy/pl/corr_heatmap.html#corr_heatmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bullkpy.pl.corr_heatmap" title="Link to this definition">#</a></dt>
+<dd><p>Correlation heatmap for sample QC (or gene-gene if use=”genes”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>use</strong> – “samples” -&gt; correlation between samples (obs x obs) [default, QC]
+“genes”   -&gt; correlation between genes (var x var)</p></li>
+<li><p><strong>groupby / groups</strong> – If provided, subset and order samples by adata.obs[groupby].</p></li>
+<li><p><strong>col_colors</strong> – obs key(s) used to annotate columns (and rows, since it’s symmetric) when plotting samples.
+Values are mapped to colors automatically.</p></li>
+<li><p><strong>dendrogram</strong> – If True, uses seaborn clustermap. If False, uses heatmap without clustering.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Correlation heatmap for <strong>sample–sample</strong> similarity (QC) or <strong>gene–gene</strong> similarity.</p>
+<p>This function computes a correlation matrix from an expression matrix (typically a log-normalized layer)
+and visualizes it as a heatmap. When <code class="docutils literal notranslate"><span class="pre">use=&quot;samples&quot;</span></code> (default), it is a convenient QC plot to detect:</p>
+<ul class="simple">
+<li><p>batch structure</p></li>
+<li><p>outlier samples</p></li>
+<li><p>mislabeled groups</p></li>
+<li><p>strong technical gradients</p></li>
+</ul>
+<p>When <code class="docutils literal notranslate"><span class="pre">use=&quot;genes&quot;</span></code>, it produces a gene–gene correlation heatmap (useful for small gene panels).</p>
+<section id="what-it-does">
+<h2>What it does<a class="headerlink" href="#what-it-does" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Extracts a matrix from adata.layers[layer] (or adata.X if layer=None)</p></li>
+<li><p>Computes a correlation matrix using Pearson or Spearman</p></li>
+<li><p>Optionally subsets and orders samples using groupby / groups</p></li>
+<li><p>Optionally annotates columns/rows with color bars from one or more obs keys (col_colors)</p></li>
+<li><p>Plots either:
+•	a clustered heatmap (seaborn clustermap) if dendrogram=True
+•	a standard heatmap if dendrogram=False</p></li>
+</ul>
+<p>Dependency: requires seaborn for plotting.</p>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<section id="core">
+<h3>Core<a class="headerlink" href="#core" title="Link to this heading">#</a></h3>
+<p><strong>adata</strong><br />
+AnnData object containing expression matrix and annotations.</p>
+<p><strong>layer</strong> (default: “log1p_cpm”)<br />
+Layer to use for correlations.<br />
+Use log-scale normalized expression for best behavior.</p>
+<p><strong>method</strong> (default: “pearson”)<br />
+Correlation metric:
+•	“pearson” – linear correlation (fast)
+•	“spearman” – rank correlation (more robust to non-linearity / outliers)</p>
+<p><strong>use</strong> (default: “samples”)<br />
+Which correlation matrix to compute:
+•	“samples” – sample × sample correlation (QC use-case)
+•	“genes” – gene × gene correlation (for smaller panels)</p>
+</section>
+<section id="subsetting-ordering-samples-only">
+<h3>Subsetting / ordering (samples only)<a class="headerlink" href="#subsetting-ordering-samples-only" title="Link to this heading">#</a></h3>
+<p><strong>groupby</strong><br />
+Categorical obs key used to subset and order samples.</p>
+<p><strong>groups</strong><br />
+Optional list of groups to keep (and define ordering).<br />
+If provided, only those groups are used and ordered as given.</p>
+</section>
+<section id="annotations-samples-only">
+<h3>Annotations (samples only)<a class="headerlink" href="#annotations-samples-only" title="Link to this heading">#</a></h3>
+<p><strong>col_colors</strong><br />
+One or more obs keys used to draw color annotations aligned to samples.<br />
+Values are converted to categorical strings and mapped to colors automatically.<br />
+Examples:<br />
+•	col_colors=”batch”
+•	col_colors=[“batch”, “sex”, “tumor_type”]</p>
+</section>
+<section id="plot-appearance">
+<h3>Plot appearance<a class="headerlink" href="#plot-appearance" title="Link to this heading">#</a></h3>
+<p><strong>cmap, center, vmin, vmax</strong><br />
+Control heatmap colormap and scaling.</p>
+<p><strong>figsize</strong><br />
+Figure size in inches. If None, chosen automatically based on matrix size.</p>
+<p><strong>show_labels</strong><br />
+Whether to show row/column labels (off by default for readability).</p>
+<p><strong>dendrogram</strong> (default: True)<br />
+If True, performs hierarchical clustering and shows dendrograms.</p>
+<p><strong>save</strong><br />
+Path to save the plot.</p>
+<p><strong>show</strong><br />
+Whether to display the plot.</p>
+</section>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">#</a></h2>
+<p>When dendrogram=True (default):</p>
+<ul class="simple">
+<li><p>cg — seaborn ClusterGrid object (contains cg.fig, cg.ax_heatmap, etc.)</p></li>
+</ul>
+<p>When dendrogram=False:</p>
+<ul class="simple">
+<li><p>(fig, ax) — matplotlib Figure and Axes</p></li>
+</ul>
+<p>Tip: if you want a consistent return type, keep dendrogram=True.</p>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Sample–sample QC correlation heatmap (default)</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">corr_heatmap</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Spearman correlation (robust to outliers)</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">corr_heatmap</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;spearman&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Subset/order samples by group and annotate batch</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">corr_heatmap</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">groupby</span><span class="o">=</span><span class="s2">&quot;condition&quot;</span><span class="p">,</span>
+    <span class="n">groups</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;control&quot;</span><span class="p">,</span> <span class="s2">&quot;treated&quot;</span><span class="p">],</span>
+    <span class="n">col_colors</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">,</span>
+    <span class="n">show_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Multiple annotation bars (batch + clinical)</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">corr_heatmap</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">col_colors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;batch&quot;</span><span class="p">,</span> <span class="s2">&quot;sex&quot;</span><span class="p">,</span> <span class="s2">&quot;tumor_stage&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>Gene–gene correlation heatmap (small gene panel)</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">corr_heatmap</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">use</span><span class="o">=</span><span class="s2">&quot;genes&quot;</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;pearson&quot;</span><span class="p">,</span>
+    <span class="n">show_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>For use=”genes”, consider filtering adata beforehand to a manageable number of genes.</p>
+<ol class="arabic simple" start="6">
+<li><p>Disable clustering (plain heatmap)</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">corr_heatmap</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">dendrogram</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">show_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="notes-recommendations">
+<h2>Notes / recommendations<a class="headerlink" href="#notes-recommendations" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Use log-scale expression (e.g. log1p_cpm) for meaningful correlations.</p></li>
+<li><p>Spearman can be preferable when expression distributions are heavy-tailed or have outliers.</p></li>
+<li><p>For large datasets, correlation matrices can become visually dense; consider:
+•	subsetting to relevant groups
+•	turning labels off (show_labels=False)
+•	using groupby to enforce interpretable ordering
+•	reducing to representative samples (or averaging within groups)</p></li>
+</ul>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Link to this heading">#</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>•	pl.plot_corr_heatmap (for plotting a precomputed correlation matrix)
+•	tl.leiden_resolution_scan + pl.ari_resolution_heatmap (cluster-quality diagnostics)
+•	pl.categorical_confusion (compare categorical labels)
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="categorical_confusion.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Categorical confusion</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="dotplot_association.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Dotplot association</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bullkpy.pl.corr_heatmap"><code class="docutils literal notranslate"><span class="pre">corr_heatmap()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-it-does">What it does</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#core">Core</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#subsetting-ordering-samples-only">Subsetting / ordering (samples only)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#annotations-samples-only">Annotations (samples only)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-appearance">Plot appearance</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#returns">Returns</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes-recommendations">Notes / recommendations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#see-also">See also</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Marcos Malumbres.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -326,7 +326,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../pp/set_raw_counts.html">Set raw counts</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../tl/index.html">TL</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tl/index.html">Tools</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tl/association.html">Association</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tl/categorical_association.html">Categorical association</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tl/de.html">Differential expression</a></li>
@@ -349,8 +349,16 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Plotting</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ari_resolution_heatmap.html">ARI resolution heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="association_heatmap.html">Association heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boxplot_with_stats.html">Boxplot with statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="categorical_confusion.html">Categorical confusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="corr_heatmap.html">Correlation heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dotplot_association.html">Dotplot association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="heatmap_association.html">Heatmap association</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ma.html">MA plot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rankplot.html">Rankplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rankplot_association.html">Rankplot association</a></li>
 <li class="toctree-l2"><a class="reference internal" href="violin.html">Violin plots</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Volcano plot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="volcano_categorical.html">Volcano for categorial comparisons</a></li>
@@ -445,6 +453,11 @@
 <p>This function visualizes log2 fold changes against statistical significance,
 highlighting up- and down-regulated genes and optionally labeling selected
 features.</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../_images/volcano.png"><img alt="Volcano example" src="../../_images/volcano.png" style="width: 400px;" />
+</a>
+</figure>
+<p>Example volcano plot.</p>
 <section id="what-it-does">
 <h2>What it does<a class="headerlink" href="#what-it-does" title="Link to this heading">#</a></h2>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>•	Plots log2 fold change vs −log10(p-value or q-value)

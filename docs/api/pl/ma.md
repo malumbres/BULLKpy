@@ -15,6 +15,13 @@ An MA plot shows:
 This is especially useful to detect **large fold-changes at moderate expression** and to
 spot genes with strong effects that would be missed if you only looked at p-values.
 
+```{figure} /_static/ma.png
+:alt: MA example
+:width: 400px
+:align: center
+```
+Example `bk.pl.ma()`.
+
 ## What it does. 
 
 Given a DE results table, this function:  

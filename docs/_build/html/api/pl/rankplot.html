@@ -50,7 +50,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/pl/rankplot';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Violin plots" href="violin.html" />
+    <link rel="next" title="Rankplot association" href="rankplot_association.html" />
     <link rel="prev" title="MA plot" href="ma.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -326,7 +326,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../pp/set_raw_counts.html">Set raw counts</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../tl/index.html">TL</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tl/index.html">Tools</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tl/association.html">Association</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tl/categorical_association.html">Categorical association</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tl/de.html">Differential expression</a></li>
@@ -349,8 +349,16 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Plotting</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ari_resolution_heatmap.html">ARI resolution heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="association_heatmap.html">Association heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boxplot_with_stats.html">Boxplot with statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="categorical_confusion.html">Categorical confusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="corr_heatmap.html">Correlation heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dotplot_association.html">Dotplot association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="heatmap_association.html">Heatmap association</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ma.html">MA plot</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Rankplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rankplot_association.html">Rankplot association</a></li>
 <li class="toctree-l2"><a class="reference internal" href="violin.html">Violin plots</a></li>
 <li class="toctree-l2"><a class="reference internal" href="volcano.html">Volcano plot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="volcano_categorical.html">Volcano for categorial comparisons</a></li>
@@ -441,6 +449,11 @@ from a DE result table (typically produced by <code class="docutils literal notr
 <li><p><strong>Downregulated bars:</strong> blue</p></li>
 <li><p>Supports ranking by <strong>q-value</strong>, <strong>p-value</strong>, or <strong>log2FC</strong>.</p></li>
 </ul>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../_images/rankplot.png"><img alt="Rankplot example" src="../../_images/rankplot.png" style="width: 400px;" />
+</a>
+</figure>
+<p>Example rankplot.</p>
 <section id="what-it-does">
 <h2>What it does<a class="headerlink" href="#what-it-does" title="Link to this heading">#</a></h2>
 <ul class="simple">
@@ -610,11 +623,11 @@ If True, calls plt.show().</p>
       </div>
     </a>
     <a class="right-next"
-       href="violin.html"
+       href="rankplot_association.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Violin plots</p>
+        <p class="prev-next-title">Rankplot association</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

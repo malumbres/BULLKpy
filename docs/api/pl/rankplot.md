@@ -14,6 +14,13 @@ from a DE result table (typically produced by `bk.tl.de()`).
 - **Downregulated bars:** blue  
 - Supports ranking by **q-value**, **p-value**, or **log2FC**.
 
+```{figure} /_static/rankplot.png
+:alt: Rankplot example
+:width: 400px
+:align: center
+```
+Example rankplot.
+
 ## What it does
 - Selects the top genes according to:
 - Significance (default: sort_by="qval"), or
