@@ -14,4 +14,5 @@ normalize_cpm
 qc_metrics
 sanitize_metadata
 set_raw_counts
+_is_integerish
 ```

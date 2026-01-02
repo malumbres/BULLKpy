@@ -3,23 +3,36 @@
 ```{toctree}
 :maxdepth: 1
 
+adjusted_rand_index
 association
 categorical_association
+cluster
+cluster_metrics
 de
+de_glm
 gene_categorical_association
 gene_gene_correlations
 gsea_preranked
 leiden_resolution_scan
 list_enrichr_libraries
+neighbors
 obs_categorical_association
 obs_obs_corr_matrix
 pairwise_posthoc
 partial_corr
+pca
+pca_loadings
 plot_corr_heatmap
 plot_corr_scatter
 posthoc_per_gene
 rank_genes_categorical
+rank_genes_groups
+score_genes
+score_genes_cell_cycle
+score_genes_dict
 top_gene_gene_correlations
 top_gene_obs_correlations
 top_obs_obs_correlations
+umap
+umap_graph
 ```

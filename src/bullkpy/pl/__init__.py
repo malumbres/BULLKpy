@@ -8,17 +8,14 @@ from .qc import (
 from ._style import set_style, _savefig, get_palette
 from .qc_pairplot import qc_pairplot
 from .qc_group import qc_by_group
-from .pca_scatter import pca_scatter
+from .pca import pca_scatter, pca_variance_ratio
 from .umap import umap
 from .de import volcano, rankplot, ma
 from .dotplot import dotplot
-#from .heatmap import heatmap_de                    #MM
 from .heatmap_de import heatmap_de
 from .violin import violin
-from .pca import pca_variance_ratio
 from .corr_heatmap import corr_heatmap
-from .pca_loadings_bar import pca_loadings_bar
-from .pca_loadings_heatmap import pca_loadings_heatmap
+from .pca_loadings import pca_loadings_bar, pca_loadings_heatmap
 from .gene_plot import gene_plot
 from .rank_genes_groups import rank_genes_groups
 from .rank_genes_groups_dotplot import rank_genes_groups_dotplot
@@ -31,8 +28,7 @@ from .association import association_heatmap, boxplot_with_stats, categorical_co
 from .association_rankplots import (
     rankplot_association, dotplot_association, heatmap_association,
     )
-from .gene_association import gene_association
-from .gene_association_volcano import gene_association_volcano
+from .gene_association import gene_association, gene_association_volcano
 from .volcano_categorical import volcano_categorical
 from .gsea_leading_edge import (gsea_leading_edge_heatmap, leading_edge_jaccard_heatmap,
     leading_edge_overlap_matrix)
@@ -59,8 +55,7 @@ __all__ = ["qc_metrics", "library_size_vs_genes",
            "ari_resolution_heatmap", "corrplot_obs",
            "association_heatmap", "boxplot_with_stats", "categorical_confusion",
            "rankplot_association", "dotplot_association", "heatmap_association",
-           "gene_association", "volcano_categorical",
-           "gene_association_volcano",
+           "gene_association", "volcano_categorical", "gene_association_volcano",
            "gsea_leading_edge_heatmap", "leading_edge_jaccard_heatmap",
            "leading_edge_overlap_matrix",
            "oncoprint", "gsea_bubbleplot",

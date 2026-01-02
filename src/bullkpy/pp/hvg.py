@@ -20,6 +20,8 @@ def highly_variable_genes(
     key_added: str = "highly_variable",
 ) -> None:
     """
+    
+
     Select highly variable genes (bulk-friendly version of HVGs).
 
     This computes mean and variance across samples on the chosen layer
