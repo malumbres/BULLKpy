@@ -9,6 +9,15 @@ Developed and used for TCGA and large-scale cancer transcriptomics analyses.
 
 ---
 
+## 📄 Documentation
+
+BULLKpY documentation in Read The Docs:
+
+https://bullkpy.readthedocs.io/en/latest/    
+
+
+--- 
+
 ## 📦 Project structure
 
 ```bash
@@ -23,6 +32,7 @@ bullkpy-skeleton/
 │
 ├── notebooks/          # analysis notebooks (examples, use cases)
 ├── data/               # large input datasets (NOT tracked by git)
+├── docs/		# Read the Docs at `https://bullkpy.readthedocs.io/en/latest/` 
 ├── results/            # analysis outputs (NOT tracked by git)
 │
 ├── pyproject.toml      # package configuration
