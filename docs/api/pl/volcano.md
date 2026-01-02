@@ -11,6 +11,13 @@ This function visualizes log2 fold changes against statistical significance,
 highlighting up- and down-regulated genes and optionally labeling selected
 features.
 
+```{figure} /_static/volcano.png
+:alt: Volcano example
+:width: 400px
+:align: center
+```
+Example volcano plot.
+
 ## What it does
 	•	Plots log2 fold change vs −log10(p-value or q-value)
 	•	Colors genes by significance and direction:
@@ -21,7 +28,6 @@ features.
 	•	Adds optional threshold lines
 	•	Labels top significant genes or user-specified genes
 	•	Returns (fig, ax) for further customization
-
 
 ## Expected input
 
