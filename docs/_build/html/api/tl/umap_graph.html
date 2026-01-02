@@ -1,0 +1,725 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>UMAP graph &#8212; BULLKpy 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=f539c95a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/tl/umap_graph';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Plotting" href="../pl/index.html" />
+    <link rel="prev" title="UMAP embedding" href="umap.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">BULLKpy 0.0.1 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../notebooks/index.html">
+    Tutorials (notebooks)
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/malumbres/BULLKpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../notebooks/index.html">
+    Tutorials (notebooks)
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/malumbres/BULLKpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../bullkpy.html">bullkpy</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../io/index.html">Input Output</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../io/read_counts.html">Read counts</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../io/add_metadata.html">Add metadata</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../pp/index.html">Pre-processing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../pp/batch_correct_combat.html">Batch correction with Combat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/filter_genes.html">Filter genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/filter_samples.html">Filter samples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/find_bad_obs_cols_by_write.html">Find bad Obs columns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/highly_variable_genes.html">Highly variable genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/log1p.html">log1p</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/make_obs_h5ad_safe.html">Make Obs .h5ad safe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/normalize_cpm.html">Normalize cpm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/qc_metrics.html">QC metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/sanitize_metadata.html">Sanitize metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/set_raw_counts.html">Set raw counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/_is_integerish.html">Is integerish</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Tools</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="adjusted_rand_index.html">Adjusted rand index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="association.html">Association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="categorical_association.html">Categorical association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cluster.html">Clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cluster_metrics.html">Cluster metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="de.html">Differential expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="de_glm.html">Negative binomial GLM differential expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_categorical_association.html">Gene-Category association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_gene_correlations.html">Gene-gene correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gsea_preranked.html">GSEA preranked</a></li>
+<li class="toctree-l2"><a class="reference internal" href="leiden_resolution_scan.html">Leiden resolution scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="list_enrichr_libraries.html">List enrichr libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="neighbors.html">Neighbors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="obs_categorical_association.html">Obs-Category association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="obs_obs_corr_matrix.html">Obs-Obs correlation matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pairwise_posthoc.html">Pairwise postdoc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="partial_corr.html">Partial correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pca.html">Principal Component Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pca_loadings.html">PCA loadings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_corr_heatmap.html">Plot Correlation heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_corr_scatter.html">Plot Correlation scatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="posthoc_per_gene.html">Posthoc per gene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rank_genes_categorical.html">Rank genes categorical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rank_genes_groups.html">Rank genes groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="score_genes.html">Score genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="score_genes_cell_cycle.html">Score cell cycle genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="score_genes_dict.html">Score genes from a dictionary of genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="top_gene_gene_correlations.html">Top gene-gene correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="top_gene_obs_correlations.html">Top Gene-Obs correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="top_obs_obs_correlations.html">Top Obs-Obs correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="umap.html">UMAP embedding</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">UMAP graph</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../pl/index.html">Plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../pl/ari_resolution_heatmap.html">ARI resolution heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/association_heatmap.html">Association heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/boxplot_with_stats.html">Boxplot with statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/categorical_confusion.html">Categorical confusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/corr_heatmap.html">Correlation heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/corrplot_obs.html">Correlation plot Observations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/dotplot.html">Dotplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/dotplot_association.html">Dotplot association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/gene_association.html">Gene Association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/gene_association_volcano.html">Gene Association Volcano</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/gene_plot.html">Gene Plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/gsea_bubbleplot.html">GSEA bubbleplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/gsea_leading_edge_heatmap.html">GSEA Leading edge heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/heatmap_association.html">Heatmap association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/heatmap_de.html">Heatmap Differential Expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/leading_edge_jaccard_heatmap.html">Leading edge Jaccard heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/leading_edge_overlap_matrix.html">Leading edge overlap matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/library_size_vs_genes.html">Library size versus genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/ma.html">MA plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/oncoprint.html">oncoprint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/pca_loadings_bar.html">PCA loadings bar plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/pca_loadings_heatmap.html">PCA loadings heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/rankplot.html">Rankplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/rankplot_association.html">Rankplot association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/violin.html">Violin plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/volcano.html">Volcano plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/volcano_categorical.html">Volcano for categorial comparisons</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">API reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Tools</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">UMAP graph</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="umap-graph">
+<h1>UMAP graph<a class="headerlink" href="#umap-graph" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="bullkpy.tl.umap_graph">
+<span class="sig-prename descclassname"><span class="pre">bullkpy.tl.</span></span><span class="sig-name descname"><span class="pre">umap_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'connectivities'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_rep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'X_pca'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_pcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spread</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spectral'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_sample_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/bullkpy/tl/umap.html#umap_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bullkpy.tl.umap_graph" title="Link to this definition">#</a></dt>
+<dd><p>Compute UMAP embedding strictly from a precomputed neighbor graph.</p>
+<dl class="simple">
+<dt>Requires:</dt><dd><ul class="simple">
+<li><p>adata.obsp[graph_key]  (typically ‘connectivities’ from bk.tl.neighbors)</p></li>
+</ul>
+</dd>
+<dt>Uses:</dt><dd><ul class="simple">
+<li><p>adata.obsm[use_rep] only for initialization (spectral/random), not for graph construction.</p></li>
+</ul>
+</dd>
+<dt>Stores:</dt><dd><ul class="simple">
+<li><p>adata.obsm[‘X_umap_graph’]</p></li>
+<li><p>adata.uns[‘umap_graph’]</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Compute a <strong>UMAP embedding strictly from a precomputed neighbor graph</strong> (e.g. Leiden/UMAP workflow where the graph is fixed and you want the embedding to reflect that exact graph).</p>
+<p>Unlike <code class="docutils literal notranslate"><span class="pre">bk.tl.umap</span></code>, which embeds directly from a representation (e.g. PCA), <strong><code class="docutils literal notranslate"><span class="pre">umap_graph</span></code> uses <code class="docutils literal notranslate"><span class="pre">adata.obsp[graph_key]</span></code> as the source of neighborhood structure</strong>. The chosen representation in <code class="docutils literal notranslate"><span class="pre">adata.obsm[use_rep]</span></code> is used <strong>only for initialization</strong>.</p>
+<section id="when-to-use">
+<h2>When to use<a class="headerlink" href="#when-to-use" title="Link to this heading">#</a></h2>
+<p>Use umap_graph when you want:</p>
+<ul class="simple">
+<li><p>a UMAP embedding that matches a specific neighbors graph already computed (e.g. after tuning n_neighbors, metric, batch correction, etc.)</p></li>
+<li><p>reproducible embeddings from a stored graph (the structure is fixed in obsp)</p></li>
+<li><p>Scanpy-like consistency: neighbors → clustering → umap where UMAP is “based on the graph”</p></li>
+</ul>
+</section>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">#</a></h2>
+<p>This function requires:</p>
+<ul class="simple">
+<li><p>adata.obsp[graph_key] exists.<br />
+Typically created by bk.tl.neighbors(adata) as “connectivities”.</p></li>
+<li><p>adata.obsm[use_rep] exists.<br />
+Typically created by bk.tl.pca(adata) as “X_pca” (used only for init).</p></li>
+<li><p>umap-learn installed:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">umap</span><span class="o">-</span><span class="n">learn</span>
+</pre></div>
+</div>
+<p>If any requirement is missing, a clear KeyError/ImportError is raised.</p>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<section id="graph-and-initialization">
+<h3>Graph and initialization<a class="headerlink" href="#graph-and-initialization" title="Link to this heading">#</a></h3>
+<p><strong>graph_key</strong><br />
+Key in adata.obsp containing the neighbor graph.<br />
+Default: “connectivities”.</p>
+<p><strong>use_rep</strong><br />
+Key in adata.obsm used only to initialize the embedding.<br />
+Default: “X_pca”.</p>
+<p><strong>n_pcs</strong><br />
+Number of dimensions from use_rep to use for initialization.<br />
+Default: 20.</p>
+</section>
+<section id="umap-layout-parameters">
+<h3>UMAP layout parameters<a class="headerlink" href="#umap-layout-parameters" title="Link to this heading">#</a></h3>
+<p><strong>min_dist</strong><br />
+Minimum spacing between points in the embedding.<br />
+Smaller → tighter clusters.<br />
+Default: 0.5.</p>
+<p><strong>spread</strong><br />
+Overall scale of the embedding.<br />
+Default: 1.0.</p>
+<p><strong>n_components</strong><br />
+Output dimensionality (2D or 3D).<br />
+Default: 2.</p>
+<p><strong>init</strong>.<br />
+Initialization method:</p>
+<ul class="simple">
+<li><p>“spectral” (recommended, graph/structure-aware)</p></li>
+<li><p>“random”.
+Default: “spectral”.</p></li>
+</ul>
+<p><strong>random_state</strong><br />
+Random seed for reproducibility.<br />
+Default: 0.</p>
+</section>
+<section id="optimization-controls">
+<h3>Optimization controls<a class="headerlink" href="#optimization-controls" title="Link to this heading">#</a></h3>
+<p><strong>negative_sample_rate</strong><br />
+UMAP optimization parameter; larger can improve separation at cost of speed.<br />
+Default: 5.</p>
+<p><strong>n_epochs</strong><br />
+Number of training epochs.<br />
+If None, umap-learn chooses a default; this implementation falls back to a safe default in some versions.<br />
+Default: None.</p>
+</section>
+</section>
+<section id="output">
+<h2>Output<a class="headerlink" href="#output" title="Link to this heading">#</a></h2>
+<p>After running, the following are created:</p>
+<ul class="simple">
+<li><p>adata.obsm[“X_umap_graph”].
+Array of shape (n_obs, n_components) with graph-based UMAP coordinates.</p></li>
+<li><p>adata.uns[“umap_graph”].
+Stores parameters for provenance, e.g.:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;graph&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;graph_key&quot;</span><span class="p">:</span> <span class="s2">&quot;connectivities&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;use_rep_init&quot;</span><span class="p">:</span> <span class="s2">&quot;X_pca&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;n_pcs_init&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="s2">&quot;min_dist&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="s2">&quot;spread&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;n_components&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;random_state&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;init&quot;</span><span class="p">:</span> <span class="s2">&quot;spectral&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;negative_sample_rate&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s2">&quot;n_epochs&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="notes-caveats">
+<h2>Notes / caveats<a class="headerlink" href="#notes-caveats" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>The graph is treated as fixed: changing use_rep or n_pcs changes only the initialization, not which neighbors exist.</p></li>
+<li><p>This implementation uses some umap-learn internals (<em>fit_embed_data, graph</em>) for compatibility across versions. If you upgrade umap-learn and see errors, pinning a known working version may help.</p></li>
+<li><p>Ensure adata.obsp[graph_key] is a proper sparse connectivities matrix (CSR recommended). The function will coerce to CSR and remove explicit zeros.</p></li>
+</ul>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<p>Standard neighbors → UMAP-from-graph</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">n_pcs</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">umap_graph</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Tighter embedding, more optimization</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">umap_graph</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">min_dist</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">negative_sample_rate</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">n_epochs</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>3D graph UMAP</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">umap_graph</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="umap.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">UMAP embedding</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../pl/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Plotting</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bullkpy.tl.umap_graph"><code class="docutils literal notranslate"><span class="pre">umap_graph()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-to-use">When to use</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#graph-and-initialization">Graph and initialization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#umap-layout-parameters">UMAP layout parameters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-controls">Optimization controls</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#output">Output</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes-caveats">Notes / caveats</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Marcos Malumbres.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

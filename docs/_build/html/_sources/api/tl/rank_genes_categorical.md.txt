@@ -42,19 +42,21 @@ Used when:
 
 Supported methods:
 
-**Method - Test - Effect size**  
-"mwu" (default) - Mann–Whitney U - Rank-biserial correlation  
-"ttest" - Welch’s t-test - Cohen’s d (approx.)    
-"kruskal" - Kruskal–Wallis - η² (rough)    
-"anova" - One-way ANOVA - η² (rough)
+| Method | Test | Effect size |
+| -------- | ------------- | -------------------- |
+| "mwu" (default) | Mann–Whitney U | Rank-biserial correlation |
+| "ttest" | Welch’s t-test | Cohen’s d (approx.) |    
+| "kruskal" | Kruskal–Wallis | η² (rough) |    
+| "anova" | One-way ANOVA | η² (rough) |
 
 #### Multi-group comparison
 
 Used when groupby has >2 categories and a global test is requested:     
 
-*Method - Test - Effect size*    
-"kruskal" - Kruskal–Wallis - η² (rough)     
-"anova" - One-way ANOVA - η² (rough)    
+| Method | Test | Effect size |
+| --------- | ---------------- | -------------- |   
+| "kruskal" | Kruskal–Wallis | η² (rough) |    
+|"anova" | One-way ANOVA | η² (rough) |   
 
 ## Returned columns
 

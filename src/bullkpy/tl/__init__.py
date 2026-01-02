@@ -1,11 +1,9 @@
-from .pca import pca
+from .pca import pca, pca_loadings
 from .neighbors import neighbors
 from .clustering import cluster
-from .umap import umap
-from .umap_graph import umap_graph
+from .umap import umap, umap_graph
 from .de import de
 from .de_glm import de_glm
-from .pca_loadings import pca_loadings
 from .rank_genes_groups import rank_genes_groups
 from .adjusted_rand_index import adjusted_rand_index
 from .cluster_metrics import cluster_metrics

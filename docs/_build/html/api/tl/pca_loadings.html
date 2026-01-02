@@ -1,0 +1,833 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>PCA loadings &#8212; BULLKpy 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=f539c95a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/tl/pca_loadings';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Plot Correlation heatmap" href="plot_corr_heatmap.html" />
+    <link rel="prev" title="Principal Component Analysis" href="pca.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">BULLKpy 0.0.1 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../notebooks/index.html">
+    Tutorials (notebooks)
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/malumbres/BULLKpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../notebooks/index.html">
+    Tutorials (notebooks)
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/malumbres/BULLKpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../bullkpy.html">bullkpy</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../io/index.html">Input Output</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../io/read_counts.html">Read counts</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../io/add_metadata.html">Add metadata</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../pp/index.html">Pre-processing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../pp/batch_correct_combat.html">Batch correction with Combat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/filter_genes.html">Filter genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/filter_samples.html">Filter samples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/find_bad_obs_cols_by_write.html">Find bad Obs columns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/highly_variable_genes.html">Highly variable genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/log1p.html">log1p</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/make_obs_h5ad_safe.html">Make Obs .h5ad safe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/normalize_cpm.html">Normalize cpm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/qc_metrics.html">QC metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/sanitize_metadata.html">Sanitize metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/set_raw_counts.html">Set raw counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/_is_integerish.html">Is integerish</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Tools</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="adjusted_rand_index.html">Adjusted rand index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="association.html">Association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="categorical_association.html">Categorical association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cluster.html">Clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cluster_metrics.html">Cluster metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="de.html">Differential expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="de_glm.html">Negative binomial GLM differential expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_categorical_association.html">Gene-Category association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_gene_correlations.html">Gene-gene correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gsea_preranked.html">GSEA preranked</a></li>
+<li class="toctree-l2"><a class="reference internal" href="leiden_resolution_scan.html">Leiden resolution scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="list_enrichr_libraries.html">List enrichr libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="neighbors.html">Neighbors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="obs_categorical_association.html">Obs-Category association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="obs_obs_corr_matrix.html">Obs-Obs correlation matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pairwise_posthoc.html">Pairwise postdoc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="partial_corr.html">Partial correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pca.html">Principal Component Analysis</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">PCA loadings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_corr_heatmap.html">Plot Correlation heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_corr_scatter.html">Plot Correlation scatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="posthoc_per_gene.html">Posthoc per gene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rank_genes_categorical.html">Rank genes categorical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rank_genes_groups.html">Rank genes groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="score_genes.html">Score genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="score_genes_cell_cycle.html">Score cell cycle genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="score_genes_dict.html">Score genes from a dictionary of genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="top_gene_gene_correlations.html">Top gene-gene correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="top_gene_obs_correlations.html">Top Gene-Obs correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="top_obs_obs_correlations.html">Top Obs-Obs correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="umap.html">UMAP embedding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="umap_graph.html">UMAP graph</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../pl/index.html">Plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../pl/ari_resolution_heatmap.html">ARI resolution heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/association_heatmap.html">Association heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/boxplot_with_stats.html">Boxplot with statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/categorical_confusion.html">Categorical confusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/corr_heatmap.html">Correlation heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/corrplot_obs.html">Correlation plot Observations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/dotplot.html">Dotplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/dotplot_association.html">Dotplot association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/gene_association.html">Gene Association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/gene_association_volcano.html">Gene Association Volcano</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/gene_plot.html">Gene Plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/gsea_bubbleplot.html">GSEA bubbleplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/gsea_leading_edge_heatmap.html">GSEA Leading edge heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/heatmap_association.html">Heatmap association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/heatmap_de.html">Heatmap Differential Expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/leading_edge_jaccard_heatmap.html">Leading edge Jaccard heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/leading_edge_overlap_matrix.html">Leading edge overlap matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/library_size_vs_genes.html">Library size versus genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/ma.html">MA plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/oncoprint.html">oncoprint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/pca_loadings_bar.html">PCA loadings bar plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/pca_loadings_heatmap.html">PCA loadings heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/rankplot.html">Rankplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/rankplot_association.html">Rankplot association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/violin.html">Violin plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/volcano.html">Volcano plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pl/volcano_categorical.html">Volcano for categorial comparisons</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">API reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Tools</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">PCA loadings</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="pca-loadings">
+<h1>PCA loadings<a class="headerlink" href="#pca-loadings" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="bullkpy.tl.pca_loadings">
+<span class="sig-prename descclassname"><span class="pre">bullkpy.tl.</span></span><span class="sig-name descname"><span class="pre">pca_loadings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pca'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loadings_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'PCs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_abs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_negative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropna</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gene'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pca_loadings'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\t'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_gmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_abs_loading</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/bullkpy/tl/pca.html#pca_loadings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bullkpy.tl.pca_loadings" title="Link to this definition">#</a></dt>
+<dd><p>Rank genes by PCA loadings per PC and (optionally) export for enrichment.</p>
+<dl class="simple">
+<dt>Assumes PCA results like:</dt><dd><ul class="simple">
+<li><p>adata.varm[loadings_key] == array (n_vars x n_comps)</p></li>
+<li><p>adata.uns[key] contains PCA params (optional)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul>
+<li><p><strong>pcs</strong> – PCs to process, 1-based indexing (e.g. [1,2,3]). If None -&gt; all available.</p></li>
+<li><p><strong>n_top</strong> – Number of top genes to return per PC (and per sign if include_negative=True and use_abs=False).</p></li>
+<li><p><strong>use_abs</strong> – If True: rank by absolute loading (single list per PC).
+If False: returns positive top list (and negative list if include_negative=True).</p></li>
+<li><p><strong>include_negative</strong> – Only used when use_abs=False. If True returns both pos/neg lists.</p></li>
+<li><p><strong>export</strong> – If provided, writes a long-format table (PC, sign, gene, loading, rank).
+Also writes a wide-format file alongside: “&lt;stem&gt;.wide&lt;suffix&gt;”.</p></li>
+<li><p><strong>export_gmt</strong> –</p>
+<dl class="simple">
+<dt>If provided, writes GMT gene sets:</dt><dd><p>PC1_pos, PC1_neg, PC2_pos, …</p>
+</dd>
+</dl>
+<p>If use_abs=True: PC1_abs, PC2_abs, …</p>
+</li>
+<li><p><strong>min_abs_loading</strong> – Optional filter: only keep genes with abs(loading) &gt;= threshold.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>dict mapping keys like “PC1_pos”, “PC1_neg”, “PC1_abs” -&gt; DataFrame.</em></p></li>
+<li><p><em>Also stores results in adata.uns[store_key].</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Rank genes by <strong>PCA loadings</strong> for one or more principal components (PCs), and optionally export the results for downstream enrichment analysis (e.g., GSEA/Enrichr).</p>
+<p>This is a bulk-friendly utility that assumes PCA has already been computed with <code class="docutils literal notranslate"><span class="pre">bk.tl.pca</span></code>, producing:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">adata.varm[&quot;PCs&quot;]</span></code> (or your chosen <code class="docutils literal notranslate"><span class="pre">loadings_key</span></code>) with shape <code class="docutils literal notranslate"><span class="pre">(n_genes,</span> <span class="pre">n_comps)</span></code></p></li>
+<li><p>(optionally) <code class="docutils literal notranslate"><span class="pre">adata.uns[&quot;pca&quot;]</span></code> (or your chosen <code class="docutils literal notranslate"><span class="pre">key</span></code>) containing PCA metadata</p></li>
+</ul>
+<p>The function returns per-PC gene rankings (positive / negative or absolute), stores them in <code class="docutils literal notranslate"><span class="pre">adata.uns</span></code>, and can export them as TSV/CSV and/or GMT.</p>
+<section id="what-it-does">
+<h2>What it does<a class="headerlink" href="#what-it-does" title="Link to this heading">#</a></h2>
+<p>For each requested PC:</p>
+<ul class="simple">
+<li><p>Extract the loading vector (one value per gene).</p></li>
+<li><p>Optionally drop NaNs and/or filter by min_abs_loading.</p></li>
+<li><p>Rank genes by:</p>
+<ul>
+<li><p>absolute loading (use_abs=True) → one list per PC, or</p></li>
+<li><p>signed loading (use_abs=False) → top positive list, plus optional top negative list</p></li>
+</ul>
+</li>
+<li><p>Store results in adata.uns[store_key].</p></li>
+<li><p>Optionally export:</p>
+<ul>
+<li><p>a long table (PC, sign, rank, gene, loading)</p></li>
+<li><p>a wide table (one column per PC/sign, rows are genes)</p></li>
+<li><p>a GMT file (gene sets per PC/sign).</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<section id="inputs-keys">
+<h3>Inputs / keys<a class="headerlink" href="#inputs-keys" title="Link to this heading">#</a></h3>
+<p><strong>adata</strong><br />
+AnnData with PCA loadings stored in adata.varm[loadings_key].</p>
+<p><strong>key</strong><br />
+PCA metadata key in adata.uns (not strictly required, mostly used for provenance strings).<br />
+Default: “pca”.</p>
+<p><strong>loadings_key</strong><br />
+Where PCA loadings are stored in adata.varm.<br />
+Default: “PCs”.</p>
+</section>
+<section id="pc-selection-and-ranking-behavior">
+<h3>PC selection and ranking behavior<a class="headerlink" href="#pc-selection-and-ranking-behavior" title="Link to this heading">#</a></h3>
+<p><strong>pcs</strong><br />
+PCs to process using 1-based indexing (e.g. [1, 2, 3]).<br />
+If None, processes all PCs available in the loadings matrix.</p>
+<p><strong>n_top</strong><br />
+Number of genes to return per PC.</p>
+<ul class="simple">
+<li><p>If use_abs=True: returns n_top genes per PC.</p></li>
+<li><p>If use_abs=False and include_negative=True: returns up to n_top positive + up to n_top negative per PC.</p></li>
+</ul>
+<p><strong>use_abs</strong><br />
+If True, rank by abs(loading) and return a single list per PC.<br />
+Output keys look like: PC1_abs, PC2_abs, ….</p>
+<p><strong>include_negative</strong><br />
+Only used when use_abs=False.<br />
+If True, returns both positive and negative gene lists per PC:</p>
+<ul class="simple">
+<li><p>PC1_pos = highest positive loadings</p></li>
+<li><p>PC1_neg = most negative loadings</p></li>
+</ul>
+</section>
+<section id="filtering-formatting">
+<h3>Filtering / formatting<a class="headerlink" href="#filtering-formatting" title="Link to this heading">#</a></h3>
+<p><strong>dropna</strong><br />
+If True, drop genes with NaN loadings before ranking.</p>
+<p><strong>gene_col</strong><br />
+Column name used for the gene identifier in output tables.<br />
+Default: “gene”.</p>
+<p><strong>min_abs_loading</strong><br />
+Optional threshold: keep only genes with abs(loading) &gt;= min_abs_loading.<br />
+Useful to avoid exporting near-zero loadings.</p>
+</section>
+<section id="storage-and-export">
+<h3>Storage and export<a class="headerlink" href="#storage-and-export" title="Link to this heading">#</a></h3>
+<p><strong>store_key</strong><br />
+Where results are stored in adata.uns.<br />
+Default: “pca_loadings”.</p>
+<p><strong>export</strong><br />
+If provided, writes:</p>
+<ul class="simple">
+<li><ol class="arabic simple">
+<li><p>a long-format table to this path, and</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="2">
+<li><p>a wide-format table next to it named:
+“<stem>.wide<suffix>”</p></li>
+</ol>
+</li>
+</ul>
+<p><strong>export_sep</strong><br />
+Delimiter for export. Either “\t” or “,”.<br />
+Default: “\t”.</p>
+<p><strong>export_gmt</strong><br />
+If provided, writes a GMT file where each PC/sign is a gene set:</p>
+<ul class="simple">
+<li><p>If use_abs=False: PC1_pos, PC1_neg, …</p></li>
+<li><p>If use_abs=True: PC1_abs, PC2_abs, …</p></li>
+</ul>
+</section>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">#</a></h2>
+<p>A dictionary mapping set keys → DataFrames.</p>
+<p>Keys are one of:</p>
+<ul class="simple">
+<li><p>Signed mode (use_abs=False):</p>
+<ul>
+<li><p>“PC1_pos”, “PC1_neg”, “PC2_pos”, …</p></li>
+</ul>
+</li>
+<li><p>Absolute mode (use_abs=True):</p>
+<ul>
+<li><p>“PC1_abs”, “PC2_abs”, ….</p></li>
+</ul>
+</li>
+</ul>
+<p>Each DataFrame contains:</p>
+<ul class="simple">
+<li><p>pc (e.g., “PC1”)</p></li>
+<li><p>sign (“pos”, “neg”, or “abs”)</p></li>
+<li><p>rank (1..N)</p></li>
+<li><p>&lt;gene_col&gt; (gene name)</p></li>
+<li><p>loading (raw loading value)</p></li>
+</ul>
+<section id="stored-in-adata-uns">
+<h3>Stored in adata.uns<a class="headerlink" href="#stored-in-adata-uns" title="Link to this heading">#</a></h3>
+<p>Results are stored under:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="n">store_key</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Structure:</p>
+<ul class="simple">
+<li><p>params: run parameters (pcs, n_top, use_abs, include_negative, etc.)</p></li>
+<li><p>results: dict of per-set tables (same as return value)</p></li>
+<li><p>table: concatenated long-format table across all PCs/signs.</p></li>
+</ul>
+</section>
+</section>
+<section id="exports">
+<h2>Exports<a class="headerlink" href="#exports" title="Link to this heading">#</a></h2>
+<p><strong>Long table (export)</strong>.</p>
+<p>Columns: pc, sign, rank, gene, loading.</p>
+<p>This is convenient for:</p>
+<ul class="simple">
+<li><p>auditing loadings</p></li>
+<li><p>making plots</p></li>
+<li><p>joining with annotations</p></li>
+</ul>
+<p><strong>Wide table (<stem>.wide<suffix>)</strong>.</p>
+<p>Each column is a PC/sign set and rows are ranked gene names:</p>
+<ul class="simple">
+<li><p>PC1_pos, PC1_neg, …</p></li>
+</ul>
+<p>Useful for quick inspection or manual copy/paste.</p>
+<p><strong>GMT (export_gmt)</strong>.</p>
+<p>Each line is a gene set:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">set_name</span><span class="o">&lt;</span><span class="n">TAB</span><span class="o">&gt;</span><span class="n">description</span><span class="o">&lt;</span><span class="n">TAB</span><span class="o">&gt;</span><span class="n">gene1</span><span class="o">&lt;</span><span class="n">TAB</span><span class="o">&gt;</span><span class="n">gene2</span><span class="o">...</span>
+</pre></div>
+</div>
+<p>Description is set to “{key}:{loadings_key}” (e.g. “pca:PCs”).</p>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<p>Get top positive/negative genes for first 3 PCs</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">out</span> <span class="o">=</span> <span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">pca_loadings</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">pcs</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+    <span class="n">n_top</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">use_abs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">include_negative</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Rank by absolute loadings (single list per PC)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">out</span> <span class="o">=</span> <span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">pca_loadings</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">pcs</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+    <span class="n">use_abs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">n_top</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Filter weak loadings and export TSV + GMT</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">pca_loadings</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">pcs</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+    <span class="n">n_top</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">include_negative</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">min_abs_loading</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+    <span class="n">export</span><span class="o">=</span><span class="s2">&quot;results/pca_loadings.tsv&quot;</span><span class="p">,</span>
+    <span class="n">export_gmt</span><span class="o">=</span><span class="s2">&quot;results/pca_loadings.gmt&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Access the stored long table</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s2">&quot;pca_loadings&quot;</span><span class="p">][</span><span class="s2">&quot;table&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="notes-tips">
+<h2>Notes / tips<a class="headerlink" href="#notes-tips" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>PC indexing is 1-based (pcs=[1,2] means PC1 and PC2).</p></li>
+<li><p>If you ran PCA using only HVGs, non-used genes may have NaN loadings in adata.varm[“PCs”].</p>
+<ul>
+<li><p>Keep dropna=True (default) to avoid empty/garbage ranks.</p></li>
+</ul>
+</li>
+<li><p>For enrichment, signed sets (PC1_pos vs PC1_neg) are often more interpretable than absolute sets.</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="pca.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Principal Component Analysis</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="plot_corr_heatmap.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Plot Correlation heatmap</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bullkpy.tl.pca_loadings"><code class="docutils literal notranslate"><span class="pre">pca_loadings()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-it-does">What it does</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inputs-keys">Inputs / keys</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pc-selection-and-ranking-behavior">PC selection and ranking behavior</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#filtering-formatting">Filtering / formatting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#storage-and-export">Storage and export</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#returns">Returns</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stored-in-adata-uns">Stored in adata.uns</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exports">Exports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes-tips">Notes / tips</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Marcos Malumbres.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,770 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>oncoprint &#8212; BULLKpy 0.0.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=f539c95a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/pl/oncoprint';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="PCA loadings bar plot" href="pca_loadings_bar.html" />
+    <link rel="prev" title="MA plot" href="ma.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">BULLKpy 0.0.1 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../notebooks/index.html">
+    Tutorials (notebooks)
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/malumbres/BULLKpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../notebooks/index.html">
+    Tutorials (notebooks)
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/malumbres/BULLKpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../bullkpy.html">bullkpy</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../io/index.html">Input Output</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../io/read_counts.html">Read counts</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../io/add_metadata.html">Add metadata</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../pp/index.html">Pre-processing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../pp/batch_correct_combat.html">Batch correction with Combat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/filter_genes.html">Filter genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/filter_samples.html">Filter samples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/find_bad_obs_cols_by_write.html">Find bad Obs columns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/highly_variable_genes.html">Highly variable genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/log1p.html">log1p</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/make_obs_h5ad_safe.html">Make Obs .h5ad safe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/normalize_cpm.html">Normalize cpm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/qc_metrics.html">QC metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/sanitize_metadata.html">Sanitize metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/set_raw_counts.html">Set raw counts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pp/_is_integerish.html">Is integerish</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tl/index.html">Tools</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tl/adjusted_rand_index.html">Adjusted rand index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/association.html">Association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/categorical_association.html">Categorical association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/cluster.html">Clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/cluster_metrics.html">Cluster metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/de.html">Differential expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/de_glm.html">Negative binomial GLM differential expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/gene_categorical_association.html">Gene-Category association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/gene_gene_correlations.html">Gene-gene correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/gsea_preranked.html">GSEA preranked</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/leiden_resolution_scan.html">Leiden resolution scan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/list_enrichr_libraries.html">List enrichr libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/neighbors.html">Neighbors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/obs_categorical_association.html">Obs-Category association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/obs_obs_corr_matrix.html">Obs-Obs correlation matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/pairwise_posthoc.html">Pairwise postdoc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/partial_corr.html">Partial correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/pca.html">Principal Component Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/pca_loadings.html">PCA loadings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/plot_corr_heatmap.html">Plot Correlation heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/plot_corr_scatter.html">Plot Correlation scatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/posthoc_per_gene.html">Posthoc per gene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/rank_genes_categorical.html">Rank genes categorical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/rank_genes_groups.html">Rank genes groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/score_genes.html">Score genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/score_genes_cell_cycle.html">Score cell cycle genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/score_genes_dict.html">Score genes from a dictionary of genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/top_gene_gene_correlations.html">Top gene-gene correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/top_gene_obs_correlations.html">Top Gene-Obs correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/top_obs_obs_correlations.html">Top Obs-Obs correlations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/umap.html">UMAP embedding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tl/umap_graph.html">UMAP graph</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Plotting</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ari_resolution_heatmap.html">ARI resolution heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="association_heatmap.html">Association heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boxplot_with_stats.html">Boxplot with statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="categorical_confusion.html">Categorical confusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="corr_heatmap.html">Correlation heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="corrplot_obs.html">Correlation plot Observations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dotplot.html">Dotplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dotplot_association.html">Dotplot association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_association.html">Gene Association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_association_volcano.html">Gene Association Volcano</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gene_plot.html">Gene Plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gsea_bubbleplot.html">GSEA bubbleplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gsea_leading_edge_heatmap.html">GSEA Leading edge heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="heatmap_association.html">Heatmap association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="heatmap_de.html">Heatmap Differential Expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="leading_edge_jaccard_heatmap.html">Leading edge Jaccard heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="leading_edge_overlap_matrix.html">Leading edge overlap matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="library_size_vs_genes.html">Library size versus genes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ma.html">MA plot</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">oncoprint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pca_loadings_bar.html">PCA loadings bar plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pca_loadings_heatmap.html">PCA loadings heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rankplot.html">Rankplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rankplot_association.html">Rankplot association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="violin.html">Violin plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="volcano.html">Volcano plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="volcano_categorical.html">Volcano for categorial comparisons</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">API reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Plotting</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">oncoprint</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="oncoprint">
+<h1>oncoprint<a class="headerlink" href="#oncoprint" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="bullkpy.pl.oncoprint">
+<span class="sig-prename descclassname"><span class="pre">bullkpy.pl.</span></span><span class="sig-name descname"><span class="pre">oncoprint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr_genes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log1p_cpm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_genes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mut_first'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_all_wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_blocks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">within_group_sort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mut_first'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_sample_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mut_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#222222'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#FFFFFF'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0.85'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr_cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr_vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr_vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr_zscore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.35</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr_row_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_annotation_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.35</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pixels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/bullkpy/pl/oncoprint.html#oncoprint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bullkpy.pl.oncoprint" title="Link to this definition">#</a></dt>
+<dd><p>Binary oncoprint (mut vs wt) from adata.obs 0/1 columns.
+Implements mutation-first sample ordering and optional group blocks.</p>
+</dd></dl>
+
+<p>Binary <strong>oncoprint</strong> (mutation vs wild-type) built from 0/1 indicator columns in <code class="docutils literal notranslate"><span class="pre">adata.obs</span></code>, with Scanpy-like conveniences:</p>
+<ul class="simple">
+<li><p><strong>Mutation matrix</strong>: <code class="docutils literal notranslate"><span class="pre">samples</span> <span class="pre">×</span> <span class="pre">genes</span></code> from <code class="docutils literal notranslate"><span class="pre">mut_cols</span></code> (obs columns).</p></li>
+<li><p><strong>Sample ordering</strong>: mutation-first or mutation burden.</p></li>
+<li><p><strong>Optional group blocks</strong>: keep groups contiguous (e.g., subtype blocks) and optionally sort within each group.</p></li>
+<li><p><strong>Optional expression tracks</strong>: add a heatmap of expression for selected <code class="docutils literal notranslate"><span class="pre">expr_genes</span></code> beneath the mutation grid.</p></li>
+<li><p><strong>Safe saving</strong>: automatically reduces DPI if the resulting pixel dimensions would be enormous.</p></li>
+</ul>
+<p>Returns a Matplotlib <code class="docutils literal notranslate"><span class="pre">(fig,</span> <span class="pre">ax)</span></code>; <code class="docutils literal notranslate"><span class="pre">ax</span></code> is the main mutation panel.</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../_images/oncoprint.png"><img alt="Oncoprint" src="../../_images/oncoprint.png" style="width: 600px;" />
+</a>
+</figure>
+<p>Example Oncoprint for mutations in the selected genes</p>
+<section id="what-it-does">
+<h2>What it does<a class="headerlink" href="#what-it-does" title="Link to this heading">#</a></h2>
+<p><strong>Mutation panel (main oncoprint)</strong><br />
+Reads a binary mutation matrix from adata.obs[mut_cols].</p>
+<ul class="simple">
+<li><p>Each column in mut_cols should encode mutation status for a gene/feature across samples (0/1).<br />
+Plots a grid:</p></li>
+<li><p>Rows = genes/features (from mut_cols)</p></li>
+<li><p>Columns = samples</p></li>
+<li><p>Black (by default) = mutated (1)</p></li>
+<li><p>White (by default) = wild-type (0).</p></li>
+</ul>
+<p>Adds a frequency bar at the right: per-gene mutation frequency across displayed samples.</p>
+<p><strong>Group strip (optional)</strong>.</p>
+<p>If groupby is provided and group_blocks=True, a colored strip is drawn on top:</p>
+<ul class="simple">
+<li><p>Groups are kept contiguous.</p></li>
+<li><p>Vertical separators are drawn at group boundaries.</p></li>
+<li><p>A legend is added for the groups.</p></li>
+</ul>
+<p><strong>Expression tracks (optional)</strong>.</p>
+<p>If expr_genes is provided:</p>
+<ul class="simple">
+<li><p>Extracts expression for those genes (from layer if present, else adata.X).</p></li>
+<li><p>Adds an expression heatmap below the mutation panel.</p></li>
+<li><p>If expr_zscore=True, expression is z-scored per gene across samples before plotting.</p></li>
+</ul>
+<p><strong>Output safety (saving)</strong>.</p>
+<p>When save is set, the function estimates the output image size in pixels and reduces DPI if necessary so dimensions stay under max_pixels in either direction (prevents Matplotlib “too large image” errors).</p>
+</section>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<section id="core-inputs">
+<h3>Core inputs.<a class="headerlink" href="#core-inputs" title="Link to this heading">#</a></h3>
+<p><strong>adata</strong>: AnnData.<br />
+Data container. Mutation status is read from adata.obs. Expression tracks use layer/adata.X.</p>
+<p><strong>mut_cols</strong>: Sequence[str].<br />
+Names of adata.obs columns encoding mutation status (expected 0/1 or boolean-like).</p>
+<p><strong>expr_genes</strong>: Sequence[str] | None.<br />
+Optional genes to show as an expression heatmap track under the mutation panel.</p>
+<p><strong>layer</strong>: str | None.<br />
+Expression layer used for expr_genes (default “log1p_cpm”). If missing, falls back to adata.X.</p>
+</section>
+<section id="ordering-and-filtering">
+<h3>Ordering and filtering.<a class="headerlink" href="#ordering-and-filtering" title="Link to this heading">#</a></h3>
+<p><strong>drop_all_wt</strong>: bool.
+If True, removes samples with no mutations in any of mut_cols. Raises if none remain.</p>
+<p><strong>sort_genes</strong>: bool.<br />
+If True, sorts genes by mutation frequency (most frequent first).</p>
+<p><strong>sort_samples</strong>: {“mut_first”, “burden”, “none”}.<br />
+How to order samples when not using group blocks:</p>
+<ul class="simple">
+<li><p>“mut_first”: lexicographic “mutation-first” ordering across genes (Scanpy/oncoprint-style)</p></li>
+<li><p>“burden”: sort by total mutation count per sample (descending)</p></li>
+<li><p>“none”: keep current order.</p></li>
+</ul>
+<p><strong>max_samples</strong>: int | None.<br />
+If set and too many samples remain, truncates to the first max_samples after filtering.</p>
+<p>####Group blocks.</p>
+<p><strong>groupby</strong>: str | None.
+Categorical obs key used to define sample blocks (e.g. subtype).</p>
+<p><strong>group_order</strong>: Sequence[str] | None.<br />
+If provided, orders group blocks in this exact order.</p>
+<p><strong>group_blocks</strong>: bool.
+If True (and groupby provided), keeps groups contiguous and sorts within each group using within_group_sort.</p>
+<p><strong>within_group_sort</strong>: {“mut_first”, “burden”, “none”}.
+Ordering applied within each group block.</p>
+<p>####Styling and sizing.</p>
+<p><strong>show_sample_labels</strong>: bool.
+If True, show sample names along the x-axis (can get crowded).</p>
+<p><strong>mut_color / wt_color</strong>: str.
+Colors for mutated / wild-type cells.</p>
+<p><strong>grid_color</strong>: str.
+Minor gridline color.</p>
+<p><strong>expr_cmap</strong>: str.
+Colormap for expression track.</p>
+<p><strong>expr_vmin / expr_vmax</strong>: float | None.
+Manual bounds for expression color scaling.</p>
+<p><strong>expr_zscore</strong>: bool.
+If True, z-score each expression gene across samples before plotting.</p>
+<p><strong>cell_size</strong>: float | None.<br />
+Inches per sample (column). If None, chosen automatically to keep width manageable.</p>
+<p><strong>row_height</strong>: float.<br />
+Inches per mutation row (gene) in the mutation panel.</p>
+<p><strong>expr_row_height</strong>: float.<br />
+Inches per expression-row (gene) in the expression track.</p>
+<p><strong>top_annotation_height</strong>: float.<br />
+Height (in inches) of the group strip when groupby is used.</p>
+<p><strong>title</strong>: str | None.<br />
+Plot title (default: “Oncoprint”).</p>
+<p>##Output</p>
+<p><strong>save</strong>: str | Path | None.<br />
+If provided, saves the figure to this path (creates parent directories).</p>
+<p><strong>save_dpi</strong>: int | None.<br />
+Override DPI used for saving. If too large, may be reduced to satisfy max_pixels.</p>
+<p><strong>max_pixels</strong>: int.<br />
+Maximum allowed pixel dimension (width or height) when saving.</p>
+<p><strong>show</strong>: bool.<br />
+If True, calls plt.show().</p>
+</section>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>fig: matplotlib.figure.Figure</p></li>
+<li><p>ax: matplotlib.axes.Axes.
+The main mutation-panel axis.</p></li>
+</ul>
+</section>
+<section id="raises">
+<h2>Raises<a class="headerlink" href="#raises" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>KeyError if groupby is set but not present in adata.obs.</p></li>
+<li><p>ValueError if drop_all_wt=True and no samples have any mutations in mut_cols.</p></li>
+</ul>
+<p>(Other helper functions may raise if mutation columns are not interpretable as binary.).</p>
+<p>##Expected input format for mut_cols</p>
+<p>Each mut_cols entry should be an obs column representing mutation status per sample, e.g.:</p>
+<ul class="simple">
+<li><p>integers: 0/1</p></li>
+<li><p>booleans: False/True</p></li>
+<li><p>string-ish encodings are not recommended unless _binary_from_obs supports them.</p></li>
+</ul>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Basic oncoprint from obs mutation calls</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">oncoprint</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">mut_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;TP53_mut&quot;</span><span class="p">,</span> <span class="s2">&quot;KRAS_mut&quot;</span><span class="p">,</span> <span class="s2">&quot;EGFR_mut&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Mutation-first ordering + subtype blocks</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">oncoprint</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">mut_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;TP53_mut&quot;</span><span class="p">,</span> <span class="s2">&quot;RB1_mut&quot;</span><span class="p">,</span> <span class="s2">&quot;PIK3CA_mut&quot;</span><span class="p">],</span>
+    <span class="n">groupby</span><span class="o">=</span><span class="s2">&quot;Subtype&quot;</span><span class="p">,</span>
+    <span class="n">group_blocks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">within_group_sort</span><span class="o">=</span><span class="s2">&quot;mut_first&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Add expression tracks for marker genes</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">oncoprint</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">mut_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;TP53_mut&quot;</span><span class="p">,</span> <span class="s2">&quot;RB1_mut&quot;</span><span class="p">,</span> <span class="s2">&quot;KRAS_mut&quot;</span><span class="p">],</span>
+    <span class="n">expr_genes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;MKI67&quot;</span><span class="p">,</span> <span class="s2">&quot;EPCAM&quot;</span><span class="p">,</span> <span class="s2">&quot;VIM&quot;</span><span class="p">],</span>
+    <span class="n">layer</span><span class="o">=</span><span class="s2">&quot;log1p_cpm&quot;</span><span class="p">,</span>
+    <span class="n">expr_zscore</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<figure class="align-center">
+<a class="reference internal image-reference" href="_static/oncoprint_plus_exp.png"><img alt="Oncoprint" src="_static/oncoprint_plus_exp.png" style="width: 600px;" />
+</a>
+</figure>
+<p>Oncoprint plus expression of selected genes.</p>
+<ol class="arabic simple" start="4">
+<li><p>Cap samples for very large cohorts and save safely</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">oncoprint</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">mut_cols</span><span class="o">=</span><span class="n">mut_cols</span><span class="p">,</span>
+    <span class="n">max_samples</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">save</span><span class="o">=</span><span class="s2">&quot;oncoprint.png&quot;</span><span class="p">,</span>
+    <span class="n">save_dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="ma.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">MA plot</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="pca_loadings_bar.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">PCA loadings bar plot</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bullkpy.pl.oncoprint"><code class="docutils literal notranslate"><span class="pre">oncoprint()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-it-does">What it does</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#core-inputs">Core inputs.</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ordering-and-filtering">Ordering and filtering.</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#returns">Returns</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#raises">Raises</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Marcos Malumbres.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
