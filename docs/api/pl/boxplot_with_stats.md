@@ -26,9 +26,9 @@ Example Boxplot with statistics
 - Supports boxplot or violin styles
 - Optionally overlays individual sample points
 - Computes and displays a global p-value:
-	•	2 groups → Mann–Whitney U test
-	•	>2 groups → Kruskal–Wallis test
-- Adds the p-value directly to the plot title
+	-- 2 groups → Mann–Whitney U test. 
+	-- >2 groups → Kruskal–Wallis test. 
+- Adds the p-value directly to the plot title. 
 
 This mirrors common Scanpy QC/metadata plots but avoids heavy dependencies.
 
@@ -48,8 +48,8 @@ Figure size in inches.
 
 **kind**    
 Plot type:
-	•	"violin" (default)
-	•	"box"
+- "violin" (default)
+- "box"
 
 **show_points**   
 Overlay individual sample points with jitter.
@@ -74,8 +74,8 @@ Whether to display the plot.
 ```python
 (fig, ax)
 ```
-	•	fig — matplotlib Figure
-	•	ax — matplotlib Axes
+- **fig**: matplotlib Figure
+- **ax**: matplotlib Axes.  
 
 ## Statistical testing
 
@@ -130,10 +130,10 @@ bk.pl.boxplot_with_stats(
 ```
 
 ## Notes
-	•	Missing values are automatically dropped.
-	•	Groups with no valid observations are ignored.
-	•	Jitter for points is deterministic (fixed random seed).
-	•	This function is intended for exploration, not publication-grade inference.
+- Missing values are automatically dropped.
+- Groups with no valid observations are ignored.
+- Jitter for points is deterministic (fixed random seed).
+- This function is intended for exploration, not publication-grade inference.
 
 ## See also
 	•	pl.violin

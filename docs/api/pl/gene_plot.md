@@ -11,7 +11,7 @@ with **violin/box overlays**, optional **jittered points**, and optional **stati
 
 
 ```{figure} /_static/gene_plot.png
-:alt: Violin plot example
+:alt: Gene plot
 :width: 500px
 :align: center
 ```
@@ -25,10 +25,10 @@ Example Gene plot
 Uses _get_vector(adata, gene, layer) to get a per-sample expression vector.  
 
 **2. Selects and orders groups**    
-- Reads categories from adata.obs[groupby] (converted to str).
+- Reads categories from `adata.obs[groupby]` (converted to str).
 - Optionally subsets samples with groups=[...].
 - Category order:
-	- If order is None: uses sorted(unique(groups))
+	- If order is None: uses `sorted(unique(groups))
 	- Else: uses order filtered to those present in the data.  
 
 **3. Builds a tidy DataFrame**   
@@ -143,9 +143,9 @@ If True, calls plt.show().
 fig, ax, stats_dict
 ```
 
-- fig: Matplotlib Figure
-- ax: Matplotlib Axes
-- stats_dict: dictionary with test metadata:  
+- **fig**: Matplotlib Figure
+- **ax**: Matplotlib Axes
+- **stats_dict**: dictionary with test metadata:  
 	-- {"test": str|None, "pvalue": float|None, "compare": list[str]|None}
 
 ## Notes / interpretation

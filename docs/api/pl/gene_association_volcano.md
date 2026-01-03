@@ -30,18 +30,18 @@ Example Gene Association Volcano plot
 ## What it does
 
 **Group masks**     
-- m1: samples where adata.obs[groupby] == group
+- m1: samples where `adata.obs[groupby] == group`
 - m2: samples where:
 	- reference is None → all samples not in group (“rest”)
-	- otherwise adata.obs[groupby] == reference
+	- otherwise `adata.obs[groupby] == reference`
 
 Requires ≥ 2 samples in both m1 and m2.  
 
 **Input matrix**   
 
 Expression values are taken from: 
-- adata.layers[layer] if layer is not None and exists
-- otherwise adata.X. 
+- `adata.layers[layer]` if layer is not None and exists
+- otherwise `adata.X`. 
 
 If genes is provided, it restricts to those genes (must exist in adata.var_names).  
 
@@ -53,11 +53,11 @@ This yields a raw pval per gene.
 **Effect size for plotting**   
 
 Pick one:  
-- effect="delta_mean":
+- `effect="delta_mean"`:  
 [  
 \Delta = \mathrm{mean}(x_1) - \mathrm{mean}(x_2)    
 ]   
-- effect="delta_median":   
+- `effect="delta_median"`:   
 [  
 \Delta = \mathrm{median}(x_1) - \mathrm{median}(x_2)    
 ]   
@@ -128,8 +128,8 @@ Save to file and/or display the plot.
 (fig, ax, df)
 ```
 
-- fig, ax: Matplotlib objects
-- df: tidy results table with columns:
+- **fig, ax**: Matplotlib objects
+- **df**: tidy results table with columns:
 	- gene
 	- effect
 	- pval
@@ -140,7 +140,7 @@ Sorted by qval (best first).
 
 ## Notes / tips
 - Use a normalized/log layer for layer (e.g. "log1p_cpm") so effect sizes are comparable across samples.
-- If you want a more “DE-like” effect, consider using effect="delta_median" for robustness.
+- If you want a more “DE-like” effect, consider using `effect="delta_median"` for robustness.
 - For proper DE with covariates, batch correction, and count models, use your GLM/NB-DE functions instead of this scan.
 
 ## Examples

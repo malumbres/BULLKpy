@@ -89,8 +89,8 @@ Whether to display the plot immediately.
 ```python
 (fig, ax)
 ```
-	•	fig — matplotlib Figure
-	•	ax — matplotlib Axes
+- **fig**: matplotlib Figure
+- **ax**: matplotlib Axes.  
 
 ## Examples
 
@@ -143,9 +143,9 @@ bk.pl.dotplot_association(
 Rows are ordered by feature name; columns correspond to contrasts/groupby runs.
 
 ## Notes
-	•	Dot sizes are scaled globally across the plot for comparability.
-	•	The plot works even with a single contrast, but is most informative with ≥2.
-	•	Effect sizes should be signed for meaningful color interpretation.
+- Dot sizes are scaled globally across the plot for comparability.
+- The plot works even with a single contrast, but is most informative with ≥2.
+- Effect sizes should be signed for meaningful color interpretation.
 
 ## See also
 	•	pl.rankplot_association

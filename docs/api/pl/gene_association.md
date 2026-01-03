@@ -20,26 +20,25 @@ Example Gene Association plot
 ## What it does
 
 **1) Selects groups**   
-- Uses adata.obs[groupby] converted to strings.
+- Uses `adata.obs[groupby]` converted to strings.
 - Category order:
 	- If order is None: uses the categorical order from pd.Categorical(grp).categories
 	- Else: uses order exactly (as strings). 
 
 **2) Extracts expression for each gene**   
 
-For each gene panel, it calls:
-	- _get_gene_vector(adata, g, layer=layer). 
+For each gene panel, it calls: _get_gene_vector(adata, g, layer=layer). 
 
 Expression is then plotted per category.
 
 **3) Plots distribution per group**   
 
 Using seaborn:  
-- kind="violin" → sns.violinplot(..., cut=0, inner="quartile")
-- kind="box" → sns.boxplot(...)
+- kind="violin" → `sns.violinplot(..., cut=0, inner="quartile")`
+- kind="box" → `sns.boxplot(...)`
 
 Optional points overlay:  
-- sns.stripplot(..., jitter=0.25, color="k")
+- `sns.stripplot(..., jitter=0.25, color="k")`
 
 Axis formatting:  
 - Title = gene name
@@ -148,8 +147,8 @@ If True, calls plt.show().
 (fig, axes)
 ```
 
-- fig: Matplotlib Figure
-- axes: np.ndarray of Axes (even if only one gene)
+- **fig**: Matplotlib Figure
+- **axes**: np.ndarray of Axes (even if only one gene). 
 
 ## Output interpretation
 - Each panel shows the distribution of expression across groups.
