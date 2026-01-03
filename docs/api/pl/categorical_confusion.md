@@ -45,10 +45,10 @@ Second categorical obs column (columns of the heatmap).
 
 **normalize**   
 Normalization mode for the contingency table:
-	•	"none" – raw counts
-	•	"row" (default) – rows sum to 1
-	•	"col" – columns sum to 1
-	•	"all" – global normalization (sum = 1)
+- "none" – raw counts
+- "row" (default) – rows sum to 1
+- "col" – columns sum to 1
+- "all" – global normalization (sum = 1)
 
 **cmap**  
 Matplotlib colormap for the heatmap.
@@ -71,8 +71,8 @@ Whether to display the plot.
 ```python
 (fig, ax)
 ```
-	•	fig — matplotlib Figure
-	•	ax — matplotlib Axes
+- **fig**: matplotlib Figure
+- **ax**: matplotlib Axes.  
 
 ## Normalization modes
 
@@ -127,9 +127,9 @@ bk.pl.categorical_confusion(
 ```
 
 ## Notes
-	•	Missing values are dropped before computing the contingency table.
-	•	Metrics are computed on the un-normalized table.
-	•	This is a global diagnostic plot; it does not perform per-cell significance tests.
+- Missing values are dropped before computing the contingency table.
+- Metrics are computed on the un-normalized table.
+- This is a global diagnostic plot; it does not perform per-cell significance tests.
 
 ## See also
 	•	tl.categorical_association

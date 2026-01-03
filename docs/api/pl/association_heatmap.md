@@ -25,12 +25,12 @@ Example Association heatmap
 
 ## What it does
 
-	•	Pivots a tidy DataFrame into a wide matrix
-	•	Aggregates values when multiple entries map to the same cell
-	•	Displays the result as a matplotlib heatmap
-	•	Works with any association output (effect sizes, statistics, −log10(q), etc.)
+- Pivots a tidy DataFrame into a wide matrix
+- Aggregates values when multiple entries map to the same cell
+- Displays the result as a matplotlib heatmap
+- Works with any association output (effect sizes, statistics, −log10(q), etc.). 
 
-This is a low-level plotting helper, intentionally flexible and minimal.
+This is a low-level plotting helper, intentionally flexible and minimal.  
 
 ## Parameters
 
@@ -72,10 +72,10 @@ Whether to display the plot.
 ```python
 (fig, ax)
 ```
-	•	fig — matplotlib Figure
-	•	ax — matplotlib Axes
+- **fig**: matplotlib Figure.  
+- **ax**: matplotlib Axes.  
 
-Examples
+## Examples
 
 1) Gene × category heatmap (effect size)
 ```python
@@ -122,9 +122,9 @@ bk.pl.association_heatmap(
 | rankplot_association | Ranked view of strongest associations |
 
 ## Notes
-	•	No clustering is applied.
-	•	Feature ordering follows pivot table output.
-	•	Missing combinations appear as empty cells.
+- No clustering is applied.
+- Feature ordering follows pivot table output.
+- Missing combinations appear as empty cells.
 
 This function is designed as a building block for custom association visualizations.
 

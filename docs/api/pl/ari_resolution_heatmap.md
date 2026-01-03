@@ -19,13 +19,12 @@ stable or optimal resolutions based on clustering quality metrics.
 Example ARI resolution heatmap
 
 ## What it does
-	•	Displays clustering quality (e.g. ARI, NMI, or Cramér’s V) as a
-single-row heatmap across Leiden resolutions
-	•	Optionally adds a second row showing the number of clusters
-	•	Annotates each cell with the metric value (and cluster count)
-	•	Designed to be compact, readable, and Scanpy-like
+Displays clustering quality (e.g. ARI, NMI, or Cramér’s V) as a single-row heatmap across Leiden resolutions. 
+- Optionally adds a second row showing the number of clusters
+- Annotates each cell with the metric value (and cluster count)
+- Designed to be compact, readable, and Scanpy-like. 
 
-This plot is ideal for resolution selection and reporting.
+This plot is ideal for resolution selection and reporting.  
 
 ## Expected input
 
@@ -56,18 +55,18 @@ if df is not provided.
 
 **df**   
 DataFrame with resolution scan results.  
-If None, adata.uns[store_key] is used.  
+If None, `adata.uns[store_key]` is used.  
 
 **store_key**   
-Key in adata.uns where resolution scan results are stored   
+Key in `adata.uns` where resolution scan results are stored   
 (default: "leiden_scan").
 
 **metric**   
 Clustering quality metric to visualize.  
 Supported values:  
-	•	"ARI"
-	•	"NMI"
-	•	"cramers_v"
+- "ARI"
+- "NMI"
+- "cramers_v"
 
 **show_n_clusters**   
 If True and n_clusters is present, adds a second row
@@ -96,8 +95,8 @@ Whether to immediately display the plot.
 ```python
 (fig, ax)
 ```
-	•	fig — matplotlib Figure
-	•	ax — matplotlib Axes
+- **fig**: matplotlib Figure.  
+- **ax**: matplotlib Axes.  
 
 ## Examples
 
@@ -146,10 +145,9 @@ bk.pl.ari_resolution_heatmap(
 ```
 
 ## Notes
-	•	This function does not recompute clustering; it only visualizes results.
-	•	Designed for bulk and pseudobulk workflows, but works for single-cell too.
-	•	If sklearn was not available during the scan, ARI/NMI values may be NaN
-(Cramér’s V is always computed).
+- This function does not recompute clustering; it only visualizes results.
+- Designed for bulk and pseudobulk workflows, but works for single-cell too.
+- If sklearn was not available during the scan, ARI/NMI values may be NaN (Cramér’s V is always computed).
 
 ## See also
 	•	tl.leiden_resolution_scan
