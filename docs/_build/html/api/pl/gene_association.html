@@ -492,7 +492,7 @@
 <h2>What it does<a class="headerlink" href="#what-it-does" title="Link to this heading">#</a></h2>
 <p><strong>1) Selects groups</strong></p>
 <ul class="simple">
-<li><p>Uses adata.obs[groupby] converted to strings.</p></li>
+<li><p>Uses <code class="docutils literal notranslate"><span class="pre">adata.obs[groupby]</span></code> converted to strings.</p></li>
 <li><p>Category order:</p>
 <ul>
 <li><p>If order is None: uses the categorical order from pd.Categorical(grp).categories</p></li>
@@ -501,18 +501,17 @@
 </li>
 </ul>
 <p><strong>2) Extracts expression for each gene</strong></p>
-<p>For each gene panel, it calls:
-- _get_gene_vector(adata, g, layer=layer).</p>
+<p>For each gene panel, it calls: _get_gene_vector(adata, g, layer=layer).</p>
 <p>Expression is then plotted per category.</p>
 <p><strong>3) Plots distribution per group</strong></p>
 <p>Using seaborn:</p>
 <ul class="simple">
-<li><p>kind=”violin” → sns.violinplot(…, cut=0, inner=”quartile”)</p></li>
-<li><p>kind=”box” → sns.boxplot(…)</p></li>
+<li><p>kind=”violin” → <code class="docutils literal notranslate"><span class="pre">sns.violinplot(...,</span> <span class="pre">cut=0,</span> <span class="pre">inner=&quot;quartile&quot;)</span></code></p></li>
+<li><p>kind=”box” → <code class="docutils literal notranslate"><span class="pre">sns.boxplot(...)</span></code></p></li>
 </ul>
 <p>Optional points overlay:</p>
 <ul class="simple">
-<li><p>sns.stripplot(…, jitter=0.25, color=”k”)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sns.stripplot(...,</span> <span class="pre">jitter=0.25,</span> <span class="pre">color=&quot;k&quot;)</span></code></p></li>
 </ul>
 <p>Axis formatting:</p>
 <ul class="simple">
@@ -611,8 +610,8 @@ If True, calls plt.show().</p>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>fig: Matplotlib Figure</p></li>
-<li><p>axes: np.ndarray of Axes (even if only one gene)</p></li>
+<li><p><strong>fig</strong>: Matplotlib Figure</p></li>
+<li><p><strong>axes</strong>: np.ndarray of Axes (even if only one gene).</p></li>
 </ul>
 </section>
 <section id="output-interpretation">

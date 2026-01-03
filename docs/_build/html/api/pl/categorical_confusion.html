@@ -511,11 +511,13 @@ First categorical obs column (rows of the heatmap).</p>
 <p><strong>key2</strong><br />
 Second categorical obs column (columns of the heatmap).</p>
 <p><strong>normalize</strong><br />
-Normalization mode for the contingency table:
-•	“none” – raw counts
-•	“row” (default) – rows sum to 1
-•	“col” – columns sum to 1
-•	“all” – global normalization (sum = 1)</p>
+Normalization mode for the contingency table:</p>
+<ul class="simple">
+<li><p>“none” – raw counts</p></li>
+<li><p>“row” (default) – rows sum to 1</p></li>
+<li><p>“col” – columns sum to 1</p></li>
+<li><p>“all” – global normalization (sum = 1)</p></li>
+</ul>
 <p><strong>cmap</strong><br />
 Matplotlib colormap for the heatmap.</p>
 <p><strong>figsize</strong><br />
@@ -534,10 +536,10 @@ Whether to display the plot.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>•	fig — matplotlib Figure
-•	ax — matplotlib Axes
-</pre></div>
-</div>
+<ul class="simple">
+<li><p><strong>fig</strong>: matplotlib Figure</p></li>
+<li><p><strong>ax</strong>: matplotlib Axes.</p></li>
+</ul>
 </section>
 <section id="normalization-modes">
 <h2>Normalization modes<a class="headerlink" href="#normalization-modes" title="Link to this heading">#</a></h2>
@@ -612,11 +614,11 @@ Measures shared information between labelings (if sklearn available)</p>
 </section>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Link to this heading">#</a></h2>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>•	Missing values are dropped before computing the contingency table.
-•	Metrics are computed on the un-normalized table.
-•	This is a global diagnostic plot; it does not perform per-cell significance tests.
-</pre></div>
-</div>
+<ul class="simple">
+<li><p>Missing values are dropped before computing the contingency table.</p></li>
+<li><p>Metrics are computed on the un-normalized table.</p></li>
+<li><p>This is a global diagnostic plot; it does not perform per-cell significance tests.</p></li>
+</ul>
 </section>
 <section id="see-also">
 <h2>See also<a class="headerlink" href="#see-also" title="Link to this heading">#</a></h2>

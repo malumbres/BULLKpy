@@ -488,7 +488,7 @@
 with <strong>violin/box overlays</strong>, optional <strong>jittered points</strong>, and optional <strong>statistical testing</strong>
 (either an overall test across all groups, or a pairwise comparison with a bracket).</p>
 <figure class="align-center">
-<a class="reference internal image-reference" href="../../_images/gene_plot.png"><img alt="Violin plot example" src="../../_images/gene_plot.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="../../_images/gene_plot.png"><img alt="Gene plot" src="../../_images/gene_plot.png" style="width: 500px;" />
 </a>
 </figure>
 <p>Example Gene plot</p>
@@ -498,11 +498,11 @@ with <strong>violin/box overlays</strong>, optional <strong>jittered points</str
 <p>Uses _get_vector(adata, gene, layer) to get a per-sample expression vector.</p>
 <p><strong>2. Selects and orders groups</strong></p>
 <ul class="simple">
-<li><p>Reads categories from adata.obs[groupby] (converted to str).</p></li>
+<li><p>Reads categories from <code class="docutils literal notranslate"><span class="pre">adata.obs[groupby]</span></code> (converted to str).</p></li>
 <li><p>Optionally subsets samples with groups=[…].</p></li>
 <li><p>Category order:</p>
 <ul>
-<li><p>If order is None: uses sorted(unique(groups))</p></li>
+<li><p>If order is None: uses `sorted(unique(groups))</p></li>
 <li><p>Else: uses order filtered to those present in the data.</p></li>
 </ul>
 </li>
@@ -621,9 +621,9 @@ If True, calls plt.show().</p>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>fig: Matplotlib Figure</p></li>
-<li><p>ax: Matplotlib Axes</p></li>
-<li><p>stats_dict: dictionary with test metadata:<br />
+<li><p><strong>fig</strong>: Matplotlib Figure</p></li>
+<li><p><strong>ax</strong>: Matplotlib Axes</p></li>
+<li><p><strong>stats_dict</strong>: dictionary with test metadata:<br />
 – {“test”: str|None, “pvalue”: float|None, “compare”: list[str]|None}</p></li>
 </ul>
 </section>

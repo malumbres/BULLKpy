@@ -505,8 +505,8 @@ and visualizes it as a heatmap. When <code class="docutils literal notranslate">
 <li><p>Optionally subsets and orders samples using groupby / groups</p></li>
 <li><p>Optionally annotates columns/rows with color bars from one or more obs keys (col_colors)</p></li>
 <li><p>Plots either:
-•	a clustered heatmap (seaborn clustermap) if dendrogram=True
-•	a standard heatmap if dendrogram=False</p></li>
+– a clustered heatmap (seaborn clustermap) if dendrogram=True
+– a standard heatmap if dendrogram=False.</p></li>
 </ul>
 <p>Dependency: requires seaborn for plotting.</p>
 </section>
@@ -520,13 +520,17 @@ AnnData object containing expression matrix and annotations.</p>
 Layer to use for correlations.<br />
 Use log-scale normalized expression for best behavior.</p>
 <p><strong>method</strong> (default: “pearson”)<br />
-Correlation metric:
-•	“pearson” – linear correlation (fast)
-•	“spearman” – rank correlation (more robust to non-linearity / outliers)</p>
+Correlation metric:</p>
+<ul class="simple">
+<li><p>“pearson” – linear correlation (fast)</p></li>
+<li><p>“spearman” – rank correlation (more robust to non-linearity / outliers)</p></li>
+</ul>
 <p><strong>use</strong> (default: “samples”)<br />
-Which correlation matrix to compute:
-•	“samples” – sample × sample correlation (QC use-case)
-•	“genes” – gene × gene correlation (for smaller panels)</p>
+Which correlation matrix to compute:</p>
+<ul class="simple">
+<li><p>“samples”: sample × sample correlation (QC use-case)</p></li>
+<li><p>“genes”: gene × gene correlation (for smaller panels).</p></li>
+</ul>
 </section>
 <section id="subsetting-ordering-samples-only">
 <h3>Subsetting / ordering (samples only)<a class="headerlink" href="#subsetting-ordering-samples-only" title="Link to this heading">#</a></h3>
@@ -541,9 +545,11 @@ If provided, only those groups are used and ordered as given.</p>
 <p><strong>col_colors</strong><br />
 One or more obs keys used to draw color annotations aligned to samples.<br />
 Values are converted to categorical strings and mapped to colors automatically.<br />
-Examples:<br />
-•	col_colors=”batch”
-•	col_colors=[“batch”, “sex”, “tumor_type”]</p>
+Examples:</p>
+<ul class="simple">
+<li><p>col_colors=”batch”</p></li>
+<li><p>col_colors=[“batch”, “sex”, “tumor_type”]</p></li>
+</ul>
 </section>
 <section id="plot-appearance">
 <h3>Plot appearance<a class="headerlink" href="#plot-appearance" title="Link to this heading">#</a></h3>
@@ -563,15 +569,15 @@ Whether to display the plot.</p>
 </section>
 <section id="returns">
 <h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">#</a></h2>
-<p>When dendrogram=True (default):</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">dendrogram=True</span></code> (default):</p>
 <ul class="simple">
 <li><p>cg — seaborn ClusterGrid object (contains cg.fig, cg.ax_heatmap, etc.)</p></li>
 </ul>
-<p>When dendrogram=False:</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">dendrogram=False</span></code>:</p>
 <ul class="simple">
 <li><p>(fig, ax) — matplotlib Figure and Axes</p></li>
 </ul>
-<p>Tip: if you want a consistent return type, keep dendrogram=True.</p>
+<p>Tip: if you want a consistent return type, keep <code class="docutils literal notranslate"><span class="pre">dendrogram=True</span></code>.</p>
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>

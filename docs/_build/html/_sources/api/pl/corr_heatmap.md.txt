@@ -23,8 +23,8 @@ When `use="genes"`, it produces a gene–gene correlation heatmap (useful for sm
 - Optionally subsets and orders samples using groupby / groups
 - Optionally annotates columns/rows with color bars from one or more obs keys (col_colors)
 - Plots either:
-	•	a clustered heatmap (seaborn clustermap) if dendrogram=True
-	•	a standard heatmap if dendrogram=False
+	-- a clustered heatmap (seaborn clustermap) if dendrogram=True
+	-- a standard heatmap if dendrogram=False.  
 
 Dependency: requires seaborn for plotting.
 
@@ -41,13 +41,13 @@ Use log-scale normalized expression for best behavior.
 
 **method** (default: "pearson")    
 Correlation metric:
-	•	"pearson" – linear correlation (fast)
-	•	"spearman" – rank correlation (more robust to non-linearity / outliers)
+- "pearson" – linear correlation (fast)
+- "spearman" – rank correlation (more robust to non-linearity / outliers)
 
 **use** (default: "samples")    
 Which correlation matrix to compute:
-	•	"samples" – sample × sample correlation (QC use-case)
-	•	"genes" – gene × gene correlation (for smaller panels)
+- "samples": sample × sample correlation (QC use-case)
+- "genes": gene × gene correlation (for smaller panels). 
 
 #### Subsetting / ordering (samples only)
 
@@ -64,8 +64,8 @@ If provided, only those groups are used and ordered as given.
 One or more obs keys used to draw color annotations aligned to samples.  
 Values are converted to categorical strings and mapped to colors automatically.  
 Examples:  
-	•	col_colors="batch"
-	•	col_colors=["batch", "sex", "tumor_type"]
+- col_colors="batch"
+- col_colors=["batch", "sex", "tumor_type"]
 
 #### Plot appearance
 
@@ -89,13 +89,13 @@ Whether to display the plot.
 
 ## Returns
 
-When dendrogram=True (default):
+When `dendrogram=True` (default):
 - cg — seaborn ClusterGrid object (contains cg.fig, cg.ax_heatmap, etc.)
 
-When dendrogram=False:
+When `dendrogram=False`:
 - (fig, ax) — matplotlib Figure and Axes
 
-Tip: if you want a consistent return type, keep dendrogram=True.
+Tip: if you want a consistent return type, keep `dendrogram=True`.
 
 ## Examples
 

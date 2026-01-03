@@ -501,11 +501,11 @@ y = -log10(q)</p>
 <h2>What it does<a class="headerlink" href="#what-it-does" title="Link to this heading">#</a></h2>
 <p><strong>Group masks</strong></p>
 <ul class="simple">
-<li><p>m1: samples where adata.obs[groupby] == group</p></li>
+<li><p>m1: samples where <code class="docutils literal notranslate"><span class="pre">adata.obs[groupby]</span> <span class="pre">==</span> <span class="pre">group</span></code></p></li>
 <li><p>m2: samples where:</p>
 <ul>
 <li><p>reference is None → all samples not in group (“rest”)</p></li>
-<li><p>otherwise adata.obs[groupby] == reference</p></li>
+<li><p>otherwise <code class="docutils literal notranslate"><span class="pre">adata.obs[groupby]</span> <span class="pre">==</span> <span class="pre">reference</span></code></p></li>
 </ul>
 </li>
 </ul>
@@ -513,8 +513,8 @@ y = -log10(q)</p>
 <p><strong>Input matrix</strong></p>
 <p>Expression values are taken from:</p>
 <ul class="simple">
-<li><p>adata.layers[layer] if layer is not None and exists</p></li>
-<li><p>otherwise adata.X.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">adata.layers[layer]</span></code> if layer is not None and exists</p></li>
+<li><p>otherwise <code class="docutils literal notranslate"><span class="pre">adata.X</span></code>.</p></li>
 </ul>
 <p>If genes is provided, it restricts to those genes (must exist in adata.var_names).</p>
 <p><strong>Per-gene test (current implementation)</strong></p>
@@ -525,11 +525,11 @@ y = -log10(q)</p>
 <p><strong>Effect size for plotting</strong></p>
 <p>Pick one:</p>
 <ul class="simple">
-<li><p>effect=”delta_mean”:
+<li><p><code class="docutils literal notranslate"><span class="pre">effect=&quot;delta_mean&quot;</span></code>:<br />
 [<br />
 \Delta = \mathrm{mean}(x_1) - \mathrm{mean}(x_2)<br />
 ]</p></li>
-<li><p>effect=”delta_median”:<br />
+<li><p><code class="docutils literal notranslate"><span class="pre">effect=&quot;delta_median&quot;</span></code>:<br />
 [<br />
 \Delta = \mathrm{median}(x_1) - \mathrm{median}(x_2)<br />
 ]</p></li>
@@ -597,8 +597,8 @@ Save to file and/or display the plot.</p>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>fig, ax: Matplotlib objects</p></li>
-<li><p>df: tidy results table with columns:</p>
+<li><p><strong>fig, ax</strong>: Matplotlib objects</p></li>
+<li><p><strong>df</strong>: tidy results table with columns:</p>
 <ul>
 <li><p>gene</p></li>
 <li><p>effect</p></li>
@@ -614,7 +614,7 @@ Save to file and/or display the plot.</p>
 <h2>Notes / tips<a class="headerlink" href="#notes-tips" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>Use a normalized/log layer for layer (e.g. “log1p_cpm”) so effect sizes are comparable across samples.</p></li>
-<li><p>If you want a more “DE-like” effect, consider using effect=”delta_median” for robustness.</p></li>
+<li><p>If you want a more “DE-like” effect, consider using <code class="docutils literal notranslate"><span class="pre">effect=&quot;delta_median&quot;</span></code> for robustness.</p></li>
 <li><p>For proper DE with covariates, batch correction, and count models, use your GLM/NB-DE functions instead of this scan.</p></li>
 </ul>
 </section>

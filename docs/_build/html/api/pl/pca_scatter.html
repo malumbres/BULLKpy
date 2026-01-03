@@ -498,7 +498,7 @@ or multiple color panels in a single row.</p>
 <p>Example PCA scatter plot</p>
 <section id="what-it-does">
 <h2>What it does<a class="headerlink" href="#what-it-does" title="Link to this heading">#</a></h2>
-<p>Reads PCA coordinates from adata.obsm[basis] (default: “X_pca”).<br />
+<p>Reads PCA coordinates from <code class="docutils literal notranslate"><span class="pre">adata.obsm[basis]</span></code> (default: “X_pca”).<br />
 Plots the selected principal components (components, 1-based indexing).<br />
 Optionally colors points by:</p>
 <ul class="simple">
@@ -512,9 +512,9 @@ Optionally colors points by:</p>
 <section id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>adata.obsm[basis] must exist (e.g. after running bk.tl.pca(adata)).</p></li>
-<li><p>If color is a gene, it must exist in adata.var_names.</p></li>
-<li><p>If layer is provided for gene coloring, it should exist in adata.layers[layer]
+<li><p><code class="docutils literal notranslate"><span class="pre">adata.obsm[basis]</span></code> must exist (e.g. after running <code class="docutils literal notranslate"><span class="pre">bk.tl.pca(adata)</span></code>).</p></li>
+<li><p>If color is a gene, it must exist in a <code class="docutils literal notranslate"><span class="pre">data.var_names</span></code>.</p></li>
+<li><p>If layer is provided for gene coloring, it should exist in <code class="docutils literal notranslate"><span class="pre">adata.layers[layer]</span></code>
 (the underlying helper _get_gene_vector decides how to fetch values).</p></li>
 </ul>
 </section>
@@ -529,7 +529,7 @@ Which PCs to plot as (PCx, PCy), 1-based.<br />
 Example: (1, 3) plots PC1 vs PC3.</p>
 <p><strong>key</strong> (str, default “pca”).
 Used by _pc_label(…) to build axis labels (typically includes explained variance
-if stored in adata.uns[key]).</p>
+if stored in <code class="docutils literal notranslate"><span class="pre">adata.uns[key]</span></code>).</p>
 </section>
 <section id="coloring">
 <h3>Coloring<a class="headerlink" href="#coloring" title="Link to this heading">#</a></h3>
@@ -538,7 +538,7 @@ Controls point coloring. Each entry can be:</p>
 <ul class="simple">
 <li><p>None → plain scatter</p></li>
 <li><p>an obs column name (categorical or numeric) → legend or colorbar</p></li>
-<li><p>a gene name in adata.var_names → continuous expression colormap
+<li><p>a gene name in <code class="docutils literal notranslate"><span class="pre">adata.var_names</span></code> → continuous expression colormap
 If a list is provided, one panel is drawn per entry.</p></li>
 </ul>
 <p><strong>layer</strong> (str | None, default “log1p_cpm”)<br />
@@ -563,7 +563,7 @@ Marker transparency.</p>
 </section>
 <section id="figure-output">
 <h3>Figure / output<a class="headerlink" href="#figure-output" title="Link to this heading">#</a></h3>
-<p>**figsize (tuple[float, float], default (6.5, 5.0)).
+<p><strong>figsize</strong> (tuple[float, float], default (6.5, 5.0)).
 Base figure size for a single panel.<br />
 If color is a list, the function scales width as figsize[0] * n_panels.</p>
 <p><strong>title</strong> (str | None, default None).
@@ -572,7 +572,7 @@ If multiple panels, titles default to “PCA” (for None) or the color key.</p>
 <p><strong>save</strong> (str | Path | None, default None).
 If provided, saves the figure via _savefig(fig, save).</p>
 <p><strong>show</strong> (bool, default True).
-If True, calls plt.show().</p>
+If True, calls `plt.show().</p>
 </section>
 </section>
 <section id="behavior-details">

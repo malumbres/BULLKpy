@@ -492,12 +492,12 @@ using <code class="docutils literal notranslate"><span class="pre">pandas.pivot_
 <p>Example Association heatmap</p>
 <section id="what-it-does">
 <h2>What it does<a class="headerlink" href="#what-it-does" title="Link to this heading">#</a></h2>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>•	Pivots a tidy DataFrame into a wide matrix
-•	Aggregates values when multiple entries map to the same cell
-•	Displays the result as a matplotlib heatmap
-•	Works with any association output (effect sizes, statistics, −log10(q), etc.)
-</pre></div>
-</div>
+<ul class="simple">
+<li><p>Pivots a tidy DataFrame into a wide matrix</p></li>
+<li><p>Aggregates values when multiple entries map to the same cell</p></li>
+<li><p>Displays the result as a matplotlib heatmap</p></li>
+<li><p>Works with any association output (effect sizes, statistics, −log10(q), etc.).</p></li>
+</ul>
 <p>This is a low-level plotting helper, intentionally flexible and minimal.</p>
 </section>
 <section id="parameters">
@@ -531,11 +531,13 @@ Whether to display the plot.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>•	fig — matplotlib Figure
-•	ax — matplotlib Axes
-</pre></div>
-</div>
-<p>Examples</p>
+<ul class="simple">
+<li><p><strong>fig</strong>: matplotlib Figure.</p></li>
+<li><p><strong>ax</strong>: matplotlib Axes.</p></li>
+</ul>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
 <ol class="arabic simple">
 <li><p>Gene × category heatmap (effect size)</p></li>
 </ol>
@@ -602,11 +604,11 @@ Whether to display the plot.</p>
 </section>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Link to this heading">#</a></h2>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>•	No clustering is applied.
-•	Feature ordering follows pivot table output.
-•	Missing combinations appear as empty cells.
-</pre></div>
-</div>
+<ul class="simple">
+<li><p>No clustering is applied.</p></li>
+<li><p>Feature ordering follows pivot table output.</p></li>
+<li><p>Missing combinations appear as empty cells.</p></li>
+</ul>
 <p>This function is designed as a building block for custom association visualizations.</p>
 </section>
 <section id="see-also">
@@ -672,6 +674,7 @@ Whether to display the plot.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-it-does">What it does</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#returns">Returns</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-to-use-this-vs-other-plots">When to use this vs other plots</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes">Notes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#see-also">See also</a></li>

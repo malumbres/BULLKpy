@@ -483,7 +483,7 @@
 </ul>
 <p>This is bulk-friendly: groups are sets of samples (obs), not single cells.</p>
 <figure class="align-center">
-<a class="reference internal image-reference" href="../../_images/dotplot.png"><img alt="Dotplot" src="../../_images/dotplot.png" style="width: 400px;" />
+<a class="reference internal image-reference" href="../../_images/dotplot.png"><img alt="Dotplot" src="../../_images/dotplot.png" style="width: 500px;" />
 </a>
 </figure>
 <p>Example Dotplot for bulk RNAseq</p>
@@ -497,8 +497,8 @@
 ]</p>
 <p>where X_mean comes from:</p>
 <ul class="simple">
-<li><p>adata.layers[layer] if available</p></li>
-<li><p>otherwise adata.X</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">adata.layers[layer]</span></code> if available</p></li>
+<li><p>otherwise <code class="docutils literal notranslate"><span class="pre">adata.X</span></code></p></li>
 </ul>
 <p><strong>Fraction expressing (size)</strong><br />
 [<br />
@@ -615,12 +615,9 @@ Clamp fraction values before size scaling.<br />
 Defaults: [0.0, 1.0].</p>
 <p><strong>gamma</strong><br />
 Nonlinear scaling for dot sizes (power transform).</p>
-<ul>
+<ul class="simple">
 <li><p>&lt; 1 expands small fractions</p></li>
-<li><blockquote>
-<div><p>1 compresses small fractions.</p>
-</div></blockquote>
-</li>
+<li><p>If &gt; 1 compresses small fractions.</p></li>
 </ul>
 <p>Default: 0.5 (makes small fractions more visible).</p>
 <p><strong>smallest_dot, largest_dot</strong><br />
@@ -647,8 +644,8 @@ Whether to call plt.show().</p>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>fig: Matplotlib Figure</p></li>
-<li><p>ax: main dotplot Axes (not the dendrogram/legend axes)</p></li>
+<li><p><strong>fig</strong>: Matplotlib Figure</p></li>
+<li><p><strong>ax</strong>: main dotplot Axes (not the dendrogram/legend axes).</p></li>
 </ul>
 </section>
 <section id="examples">

@@ -17,7 +17,7 @@ This is bulk-friendly: groups are sets of samples (obs), not single cells.
 
 ```{figure} /_static/dotplot.png
 :alt: Dotplot
-:width: 400px
+:width: 500px
 :align: center
 ```
 Example Dotplot for bulk RNAseq
@@ -34,8 +34,8 @@ For each group g and gene v:
 ]    
 
 where X_mean comes from:  
-- adata.layers[layer] if available
-- otherwise adata.X
+- `adata.layers[layer]` if available
+- otherwise `adata.X`
 
 **Fraction expressing (size)**   
 [   
@@ -152,7 +152,7 @@ Defaults: [0.0, 1.0].
 **gamma**   
 Nonlinear scaling for dot sizes (power transform).   
 - < 1 expands small fractions
-- > 1 compresses small fractions. 
+- If > 1 compresses small fractions. 
 
 Default: 0.5 (makes small fractions more visible).  
 
@@ -184,8 +184,8 @@ Whether to call plt.show().
 (fig, ax)
 ```
 
-- fig: Matplotlib Figure
-- ax: main dotplot Axes (not the dendrogram/legend axes)
+- **fig**: Matplotlib Figure
+- **ax**: main dotplot Axes (not the dendrogram/legend axes). 
 
 ## Examples
 

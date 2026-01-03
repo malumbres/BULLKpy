@@ -328,24 +328,92 @@
                   
   <section id="bullkpy">
 <h1>BULLKpy<a class="headerlink" href="#bullkpy" title="Link to this heading">#</a></h1>
+<figure class="align-left">
+<a class="reference internal image-reference" href="_images/BULLKpy_logo.png"><img alt="BULLKpy" src="_images/BULLKpy_logo.png" style="width: 400px;" />
+</a>
+</figure>
 <p>Scanpy-inspired pipeline for bulk RNA-seq analysis built around <strong>AnnData</strong>.</p>
 <p>BULLKpy is a Scanpy-inspired Python toolkit for <strong>bulk RNA-seq analysis</strong>,
 built on top of <strong>AnnData</strong> and designed for:</p>
 <ul class="simple">
-<li><p>Differential expression analysis</p></li>
 <li><p>QC and filtering of bulk RNA-seq</p></li>
 <li><p>Clustering and dimensionality reduction</p></li>
 <li><p>Gene set enrichment analysis (GSEA)</p></li>
+<li><p>Differential expression analysis</p></li>
+<li><p>Oncoprint and other tools for cancer research</p></li>
 <li><p>Rich publication-quality plots</p></li>
 </ul>
 <section id="quickstart">
 <h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">bullkpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bk</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>                        <span class="c1"># for better manipulation of metadata</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>                      <span class="c1"># for some plots</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gseapy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gspy</span>                      <span class="c1"># Additional GSEA tools</span>
 
-<span class="n">adata</span> <span class="o">=</span> <span class="n">bk</span><span class="o">.</span><span class="n">read_counts</span><span class="p">(</span><span class="s2">&quot;counts.tsv&quot;</span><span class="p">)</span>
+<span class="c1">## Data input and loading</span>
+<span class="n">adata</span> <span class="o">=</span> <span class="n">bk</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read_counts</span><span class="p">(</span><span class="s2">&quot;counts.tsv&quot;</span><span class="p">)</span><span class="o">.</span>      <span class="c1"># when using counts</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">add_metadata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+
+<span class="c1">## Preprocessing</span>
 <span class="n">bk</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">qc_metrics</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">qc_metrics</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;n_genes_detected&quot;</span><span class="p">,</span>
+    <span class="n">vars_to_plot</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;n_genes_detected&quot;</span><span class="p">,),</span>
+<span class="p">)</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">filter_samples</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">filter_genes</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+
+<span class="c1">## PCA and bidimensional representation</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">highly_variable_genes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s2">&quot;log1p_cpm&quot;</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s2">&quot;log1p_cpm&quot;</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> 
+         <span class="n">use_highly_variable</span><span class="o">=</span><span class="kc">True</span><span class="p">,)</span>  
+
+<span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">pca_scatter</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;Project_ID&quot;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span> <span class="n">point_size</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">pca_variance_ratio</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">pca_loadings</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">pcs</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="n">n_top</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1">### Neighbors and UMAP</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">n_pcs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">)</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">n_pcs</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">min_dist</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;Project_ID&quot;</span><span class="p">,</span> 
+           <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span>
+           <span class="n">point_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;tab20&quot;</span><span class="p">)</span>
+
+<span class="c1">## Clustering and groups</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">leiden_resolution_scan</span><span class="p">(</span><span class="n">adata</span><span class="o">=</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;leiden&quot;</span><span class="p">,</span> <span class="n">key_added</span><span class="o">=</span><span class="s2">&quot;leiden_2.2&quot;</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">2.2</span><span class="p">)</span>
+
+<span class="c1">## Genes and signatures</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">score_genes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">ne_score_25</span><span class="p">,</span> <span class="n">score_name</span><span class="o">=</span><span class="s2">&quot;NE25_score&quot;</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s2">&quot;log1p_cpm&quot;</span><span class="p">)</span>
+
+<span class="c1">## Data exploration</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">violin</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;MYC_amplified&quot;</span><span class="p">,</span> <span class="s2">&quot;n_genes_detected&quot;</span><span class="p">],</span>
+    <span class="n">groupby</span><span class="o">=</span><span class="s2">&quot;Project_ID&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">corr_heatmap</span><span class="p">(</span>
+    <span class="n">adata_lung</span><span class="p">,</span>
+    <span class="n">layer</span><span class="o">=</span><span class="s2">&quot;log1p_cpm&quot;</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;pearson&quot;</span><span class="p">,</span>
+    <span class="n">groupby</span><span class="o">=</span><span class="s2">&quot;Project_ID&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1">## Markers and Differential Expression</span>
 <span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">de</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s2">&quot;condition&quot;</span><span class="p">,</span> <span class="n">groupA</span><span class="o">=</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="n">groupB</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">)</span>
 <span class="n">bk</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">volcano</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+
+<span class="c1">##Pathway and Gene Set Enrichment Analysis</span>
+<span class="n">bk</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">gsea_preranked</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">,</span>
+    <span class="n">res</span><span class="o">=</span><span class="n">res</span><span class="p">,</span>
+    <span class="n">comparison</span><span class="o">=</span><span class="n">comparison</span><span class="p">,</span>
+    <span class="n">score_col</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span>                                       
+    <span class="n">gene_sets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hallmark&quot;</span><span class="p">],</span> 
+<span class="p">)</span>
+
 </pre></div>
 </div>
 <div class="toctree-wrapper compound">

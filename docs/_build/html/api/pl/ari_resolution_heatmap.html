@@ -500,13 +500,12 @@ stable or optimal resolutions based on clustering quality metrics.</p>
 <p>Example ARI resolution heatmap</p>
 <section id="what-it-does">
 <h2>What it does<a class="headerlink" href="#what-it-does" title="Link to this heading">#</a></h2>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>•	Displays clustering quality (e.g. ARI, NMI, or Cramér’s V) as a
-</pre></div>
-</div>
-<p>single-row heatmap across Leiden resolutions
-•	Optionally adds a second row showing the number of clusters
-•	Annotates each cell with the metric value (and cluster count)
-•	Designed to be compact, readable, and Scanpy-like</p>
+<p>Displays clustering quality (e.g. ARI, NMI, or Cramér’s V) as a single-row heatmap across Leiden resolutions.</p>
+<ul class="simple">
+<li><p>Optionally adds a second row showing the number of clusters</p></li>
+<li><p>Annotates each cell with the metric value (and cluster count)</p></li>
+<li><p>Designed to be compact, readable, and Scanpy-like.</p></li>
+</ul>
 <p>This plot is ideal for resolution selection and reporting.</p>
 </section>
 <section id="expected-input">
@@ -555,16 +554,18 @@ AnnData object. Used to retrieve results from adata.uns<br />
 if df is not provided.</p>
 <p><strong>df</strong><br />
 DataFrame with resolution scan results.<br />
-If None, adata.uns[store_key] is used.</p>
+If None, <code class="docutils literal notranslate"><span class="pre">adata.uns[store_key]</span></code> is used.</p>
 <p><strong>store_key</strong><br />
-Key in adata.uns where resolution scan results are stored<br />
+Key in <code class="docutils literal notranslate"><span class="pre">adata.uns</span></code> where resolution scan results are stored<br />
 (default: “leiden_scan”).</p>
 <p><strong>metric</strong><br />
 Clustering quality metric to visualize.<br />
-Supported values:<br />
-•	“ARI”
-•	“NMI”
-•	“cramers_v”</p>
+Supported values:</p>
+<ul class="simple">
+<li><p>“ARI”</p></li>
+<li><p>“NMI”</p></li>
+<li><p>“cramers_v”</p></li>
+</ul>
 <p><strong>show_n_clusters</strong><br />
 If True and n_clusters is present, adds a second row
 showing the number of clusters.</p>
@@ -587,10 +588,10 @@ Whether to immediately display the plot.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>•	fig — matplotlib Figure
-•	ax — matplotlib Axes
-</pre></div>
-</div>
+<ul class="simple">
+<li><p><strong>fig</strong>: matplotlib Figure.</p></li>
+<li><p><strong>ax</strong>: matplotlib Axes.</p></li>
+</ul>
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
@@ -645,12 +646,11 @@ Whether to immediately display the plot.</p>
 </section>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Link to this heading">#</a></h2>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>•	This function does not recompute clustering; it only visualizes results.
-•	Designed for bulk and pseudobulk workflows, but works for single-cell too.
-•	If sklearn was not available during the scan, ARI/NMI values may be NaN
-</pre></div>
-</div>
-<p>(Cramér’s V is always computed).</p>
+<ul class="simple">
+<li><p>This function does not recompute clustering; it only visualizes results.</p></li>
+<li><p>Designed for bulk and pseudobulk workflows, but works for single-cell too.</p></li>
+<li><p>If sklearn was not available during the scan, ARI/NMI values may be NaN (Cramér’s V is always computed).</p></li>
+</ul>
 </section>
 <section id="see-also">
 <h2>See also<a class="headerlink" href="#see-also" title="Link to this heading">#</a></h2>

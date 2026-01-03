@@ -21,7 +21,7 @@ Example PCA scatter plot
 
 ## What it does
 
-Reads PCA coordinates from adata.obsm[basis] (default: "X_pca").  
+Reads PCA coordinates from `adata.obsm[basis]` (default: "X_pca").  
 Plots the selected principal components (components, 1-based indexing).  
 Optionally colors points by:  
 - Nothing (plain scatter)
@@ -32,9 +32,9 @@ Optionally colors points by:
 For categorical colors, optionally highlights only selected categories and greys out the rest.  
 
 ## Requirements
-- adata.obsm[basis] must exist (e.g. after running bk.tl.pca(adata)).
-- If color is a gene, it must exist in adata.var_names.
-- If layer is provided for gene coloring, it should exist in adata.layers[layer]
+- `adata.obsm[basis]` must exist (e.g. after running `bk.tl.pca(adata)`).
+- If color is a gene, it must exist in a `data.var_names`.
+- If layer is provided for gene coloring, it should exist in `adata.layers[layer]`
 (the underlying helper _get_gene_vector decides how to fetch values).    
 
 ## Parameters
@@ -50,7 +50,7 @@ Example: (1, 3) plots PC1 vs PC3.
 
 **key** (str, default "pca"). 
 Used by _pc_label(...) to build axis labels (typically includes explained variance
-if stored in adata.uns[key]).   
+if stored in `adata.uns[key]`).   
 
 #### Coloring
 
@@ -58,7 +58,7 @@ if stored in adata.uns[key]).
 Controls point coloring. Each entry can be:  
 - None → plain scatter
 - an obs column name (categorical or numeric) → legend or colorbar
-- a gene name in adata.var_names → continuous expression colormap
+- a gene name in `adata.var_names` → continuous expression colormap
 If a list is provided, one panel is drawn per entry.  
 
 **layer** (str | None, default "log1p_cpm")  
@@ -88,7 +88,7 @@ Marker transparency.
 
 #### Figure / output
 
-**figsize (tuple[float, float], default (6.5, 5.0)). 
+**figsize** (tuple[float, float], default (6.5, 5.0)). 
 Base figure size for a single panel.  
 If color is a list, the function scales width as figsize[0] * n_panels.   
 
@@ -100,7 +100,7 @@ If multiple panels, titles default to "PCA" (for None) or the color key.
 If provided, saves the figure via _savefig(fig, save).  
 
 **show** (bool, default True). 
-If True, calls plt.show().  
+If True, calls `plt.show().  
 
 ## Behavior details
 
