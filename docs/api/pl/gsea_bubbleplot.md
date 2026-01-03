@@ -1,7 +1,7 @@
 # GSEA bubbleplot
 
 ```{eval-rst}
-.. autofunction:: bullkpy.pl.agsea_bubbleplot
+.. autofunction:: bullkpy.pl.gsea_bubbleplot
 
 ```
 
@@ -15,7 +15,7 @@ Each dot encodes enrichment direction/strength and significance for a given **(c
 
 
 ```{figure} /_static/gsea_bubbleplot.png
-:alt: Violin plot example
+:alt: GSEQ bubbleplot
 :width: 700px
 :align: center
 ```

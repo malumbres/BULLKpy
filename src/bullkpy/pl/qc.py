@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Sequence
+from typing import Literal, Sequence
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import scipy.sparse as sp
 import anndata as ad
+import seaborn as sns
 
 from ._style import set_style, _savefig
 from ..logging import info, warn
@@ -287,42 +289,158 @@ def library_size_vs_genes(
     x: str = "total_counts",
     y: str = "n_genes_detected",
     groupby: str | None = None,
+    # thresholds
     min_counts: float | None = None,
     max_counts: float | None = None,
     min_genes: float | None = None,
     max_genes: float | None = None,
+    # display
     logx: bool = True,
     logy: bool = True,
+    s: float = 18.0,
+    alpha: float = 0.85,
+    linewidth: float = 0.25,
+    edgecolor: str = "0.15",
+    # highlight outliers
+    show_outliers: bool = True,
+    outlier_color: str = "crimson",
+    outlier_marker: str = "x",
+    outlier_size: float = 28.0,
+    # labels
+    title: str | None = None,
+    xlabel: str | None = None,
+    ylabel: str | None = None,
+    # figure
     figsize: tuple[float, float] = (5.5, 4.5),
+    legend: bool = True,
+    legend_loc: str = "best",
     save: str | Path | None = None,
     show: bool = True,
-):
-    """Scatter QC: total counts vs detected genes (with optional thresholds)."""
+) -> tuple[plt.Figure, plt.Axes]:
+    """
+    QC scatter: library size vs detected genes with optional thresholds.
+
+    Requires columns in adata.obs:
+      - x (default: total_counts)
+      - y (default: n_genes_detected)
+
+    Typical usage:
+      bk.pl.library_size_vs_genes(adata, min_counts=1e6, min_genes=12000, groupby="Subtype")
+    """
     set_style()
+
+    if x not in adata.obs.columns:
+        raise KeyError(f"adata.obs['{x}'] not found")
+    if y not in adata.obs.columns:
+        raise KeyError(f"adata.obs['{y}'] not found")
+
+    df = adata.obs[[x, y]].copy()
+    df[x] = pd.to_numeric(df[x], errors="coerce")
+    df[y] = pd.to_numeric(df[y], errors="coerce")
+    df = df.dropna(subset=[x, y])
+
+    # compute pass/fail mask
+    ok = np.ones(len(df), dtype=bool)
+
+    if min_counts is not None:
+        ok &= df[x].to_numpy() >= float(min_counts)
+    if max_counts is not None:
+        ok &= df[x].to_numpy() <= float(max_counts)
+    if min_genes is not None:
+        ok &= df[y].to_numpy() >= float(min_genes)
+    if max_genes is not None:
+        ok &= df[y].to_numpy() <= float(max_genes)
+
+    # handle grouping/palette via seaborn set_palette in set_style()
+    if groupby is not None:
+        if groupby not in adata.obs.columns:
+            raise KeyError(f"adata.obs['{groupby}'] not found")
+        df[groupby] = adata.obs.loc[df.index, groupby].astype(str)
+
     fig, ax = plt.subplots(figsize=figsize)
-    ok, _ = _scatter_qc(
-        adata,
-        ax=ax,
-        x=x,
-        y=y,
-        groupby=groupby,
-        min_x=min_counts,
-        max_x=max_counts,
-        min_y=min_genes,
-        max_y=max_genes,
-        logx=logx,
-        logy=logy,
-        title=f"{y} vs {x} (QC fail: {(~ok).sum()})"
-        if any(v is not None for v in (min_counts, max_counts, min_genes, max_genes))
-        else f"{y} vs {x}",
-    )
+
+    # scatter (inliers)
+    if groupby is None:
+        ax.scatter(
+            df.loc[ok, x],
+            df.loc[ok, y],
+            s=s,
+            alpha=alpha,
+            linewidths=linewidth,
+            edgecolors=edgecolor,
+        )
+    else:
+        # plot per category (keeps legend manageable and stable)
+        cats = pd.Categorical(df[groupby]).categories
+        for c in cats:
+            m = ok & (df[groupby] == c).to_numpy()
+            if m.sum() == 0:
+                continue
+            ax.scatter(
+                df.loc[m, x],
+                df.loc[m, y],
+                s=s,
+                alpha=alpha,
+                linewidths=linewidth,
+                edgecolors=edgecolor,
+                label=str(c),
+            )
+
+    # outliers on top
+    if show_outliers and (~ok).any():
+        ax.scatter(
+            df.loc[~ok, x],
+            df.loc[~ok, y],
+            s=outlier_size,
+            alpha=0.95,
+            marker=outlier_marker,
+            c=outlier_color,
+            linewidths=0.8,
+            label="QC fail" if groupby is not None else None,
+        )
+
+    # log scales
+    if logx:
+        ax.set_xscale("log")
+    if logy:
+        ax.set_yscale("log")
+
+    # threshold lines
+    def _vline(val):
+        ax.axvline(val, color="0.35", lw=1.0, ls="--", zorder=0)
+
+    def _hline(val):
+        ax.axhline(val, color="0.35", lw=1.0, ls="--", zorder=0)
+
+    if min_counts is not None:
+        _vline(min_counts)
+    if max_counts is not None:
+        _vline(max_counts)
+    if min_genes is not None:
+        _hline(min_genes)
+    if max_genes is not None:
+        _hline(max_genes)
+
+    # labels
+    ax.set_xlabel(xlabel if xlabel is not None else x)
+    ax.set_ylabel(ylabel if ylabel is not None else y)
+
+    if title is None:
+        n_fail = int((~ok).sum())
+        title = f"{y} vs {x} (QC fail: {n_fail})" if (min_counts or max_counts or min_genes or max_genes) else f"{y} vs {x}"
+    ax.set_title(title)
+
+    if legend and groupby is not None:
+        ax.legend(loc=legend_loc, frameon=False, ncol=1)
+
     fig.tight_layout()
+
     if save is not None:
         _savefig(fig, save)
     if show:
         plt.show()
-    return fig, ax
 
+    return fig, ax
 
 def mt_fraction_vs_counts(
     adata: ad.AnnData,
@@ -496,3 +614,160 @@ def qc_scatter_panel(
         plt.show()
 
     return fig, axes
+
+def qc_by_group(
+    adata: ad.AnnData,
+    *,
+    groupby: str,
+    keys: Sequence[str] = ("total_counts", "n_genes_detected", "pct_counts_mt", "pct_counts_ribo"),
+    kind: Literal["violin", "box"] = "violin",
+    log1p: Sequence[str] = ("total_counts",),
+    figsize: tuple[float, float] = (11, 4),
+    rotate_xticks: int = 45,
+    save: str | Path | None = None,
+    show: bool = True,
+    show_n: bool = True,
+):
+    """
+    Plot QC metrics grouped by a metadata column in `adata.obs` (e.g. batch, cohort).
+    """
+    set_style()
+
+    if groupby not in adata.obs.columns:
+        raise KeyError(f"groupby='{groupby}' not found in adata.obs")
+
+    for k in keys:
+        if k not in adata.obs.columns:
+            raise KeyError(f"Missing '{k}' in adata.obs. Run bk.pp.qc_metrics(adata) first.")
+
+    groups = adata.obs[groupby].astype("category")
+    cat = groups.cat.categories.tolist()
+
+    counts = groups.value_counts().reindex(cat)
+
+    fig, axes = plt.subplots(1, len(keys), figsize=figsize, constrained_layout=True)
+    if len(keys) == 1:
+        axes = [axes]
+
+    for ax, k in zip(axes, keys):
+        vals = adata.obs[k].to_numpy(dtype=float)
+        if k in log1p:
+            vals = np.log1p(vals)
+
+        data = [vals[groups == g] for g in cat]
+
+        if kind == "violin":
+            parts = ax.violinplot(data, showmeans=False, showmedians=True, showextrema=False)
+            # keep default coloring; just clean edges
+            for pc in parts.get("bodies", []):
+                pc.set_alpha(0.8)
+        else:
+            ax.boxplot(data, showfliers=False)
+
+        ax.set_title(f"{_label(k, log1p)}")
+
+        ax.set_xticks(range(1, len(cat) + 1))
+
+        if show_n:
+            labels = [f"{c} (n={counts[c]})" for c in cat]
+        else:
+            labels = cat
+
+        ax.set_xticklabels(labels, rotation=rotate_xticks, ha="right")
+
+
+        ax.set_ylabel("value")
+
+    fig.suptitle(f"QC by {groupby}", y=1.05)
+
+    if save is not None:
+        _savefig(fig, save)
+    if show:
+        plt.show()
+
+    return fig, axes
+
+
+def _label(k: str, log1p: Sequence[str]) -> str:
+    return f"log1p({k})" if k in log1p else k
+
+
+def qc_pairplot(
+    adata: ad.AnnData,
+    *,
+    keys: Sequence[str] = ("total_counts", "n_genes_detected", "pct_counts_mt"),
+    color: str | None = "pct_counts_mt",
+    log1p: Sequence[str] = ("total_counts",),
+    point_size: float = 14.0,
+    alpha: float = 0.7,
+    figsize: tuple[float, float] = (8, 8),
+    save: str | Path | None = None,
+    show: bool = True,
+):
+    """
+    Scatter-matrix (pairplot) of QC metrics in `adata.obs`.
+
+    Diagonal: histograms
+    Off-diagonal: scatter plots
+    """
+    set_style()
+
+    for k in keys:
+        if k not in adata.obs.columns:
+            raise KeyError(f"Missing '{k}' in adata.obs. Run bk.pp.qc_metrics(adata) first.")
+
+    C = None
+    if color is not None:
+        if color in adata.obs.columns:
+            C = adata.obs[color].to_numpy()
+        else:
+            warn(f"color='{color}' not found in adata.obs; coloring disabled.")
+
+    # prepare transformed columns
+    data = {}
+    for k in keys:
+        v = adata.obs[k].to_numpy(dtype=float)
+        if k in log1p:
+            v = np.log1p(v)
+        data[k] = v
+
+    n = len(keys)
+    fig, axes = plt.subplots(n, n, figsize=figsize, constrained_layout=True)
+
+    for i, yi in enumerate(keys):
+        for j, xj in enumerate(keys):
+            ax = axes[i, j]
+            if i == j:
+                ax.hist(data[xj], bins=30)
+                ax.set_ylabel("")
+            else:
+                sc = ax.scatter(
+                    data[xj], data[yi],
+                    c=C, s=point_size, alpha=alpha, edgecolors="none"
+                )
+            # labels only on left and bottom
+            if i < n - 1:
+                ax.set_xticklabels([])
+            else:
+                ax.set_xlabel(_label(xj, log1p))
+            if j > 0:
+                ax.set_yticklabels([])
+            else:
+                ax.set_ylabel(_label(yi, log1p))
+
+    if C is not None:
+        cbar = fig.colorbar(sc, ax=axes, shrink=0.75, pad=0.01)
+        cbar.set_label(color)
+
+    fig.suptitle("QC pairplot", y=1.02)
+
+    if save is not None:
+        _savefig(fig, save)
+    if show:
+        plt.show()
+
+    return fig, axes
+
+
+def _label(k: str, log1p: Sequence[str]) -> str:
+    return f"log1p({k})" if k in log1p else k
