@@ -51,7 +51,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="GSEA Leading edge heatmap" href="gsea_leading_edge_heatmap.html" />
-    <link rel="prev" title="Gene Plot" href="gene_plot.html" />
+    <link rel="prev" title="Genes vs. mitochondrial fraction" href="genes_vs_mt_fraction.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.0.1" />
@@ -374,6 +374,7 @@
 <li class="toctree-l2"><a class="reference internal" href="gene_association.html">Gene Association</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gene_association_volcano.html">Gene Association Volcano</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gene_plot.html">Gene Plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="genes_vs_mt_fraction.html">Genes vs. mitochondrial fraction</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">GSEA bubbleplot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gsea_leading_edge_heatmap.html">GSEA Leading edge heatmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="heatmap_association.html">Heatmap association</a></li>
@@ -382,11 +383,22 @@
 <li class="toctree-l2"><a class="reference internal" href="leading_edge_overlap_matrix.html">Leading edge overlap matrix</a></li>
 <li class="toctree-l2"><a class="reference internal" href="library_size_vs_genes.html">Library size versus genes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ma.html">MA plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mt_fraction_vs_counts.html">Mitochondrial fraction vs. counts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="oncoprint.html">oncoprint</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pca_loadings_bar.html">PCA loadings bar plot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pca_loadings_heatmap.html">PCA loadings heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pca_scatter.html">PCA scatter plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pca_variance_ratio.html">PCA variance ratio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qc_by_group.html">QC by group</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qc_metrics.html">QC metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qc_pairplot.html">QC pairplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qc_scatter_panel.html">QC scatter panel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rankplot.html">Rankplot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rankplot_association.html">Rankplot association</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rank_genes_groups.html">Rank genes groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rank_genes_groups_dotplot.html">Rank genes groups dotplot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sample_distances.html">Sample distances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="umap.html">UMAP plots</a></li>
 <li class="toctree-l2"><a class="reference internal" href="violin.html">Violin plots</a></li>
 <li class="toctree-l2"><a class="reference internal" href="volcano.html">Volcano plot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="volcano_categorical.html">Volcano for categorial comparisons</a></li>
@@ -457,6 +469,23 @@
                   
   <section id="gsea-bubbleplot">
 <h1>GSEA bubbleplot<a class="headerlink" href="#gsea-bubbleplot" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="bullkpy.pl.gsea_bubbleplot">
+<span class="sig-prename descclassname"><span class="pre">bullkpy.pl.</span></span><span class="sig-name descname"><span class="pre">gsea_bubbleplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_gsea</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pathways</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comparison_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comparison'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">term_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Term'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nes_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'NES'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fdr_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'FDR</span> <span class="pre">q-val'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comparison_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_empty_comparisons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fdr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">350.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fdr_floor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_clip_quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.99</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RdBu_r'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dot_edgecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0.15'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dot_linewidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.35</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_label_rotation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xtick_rotation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/bullkpy/pl/gsea_bubbleplot.html#gsea_bubbleplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bullkpy.pl.gsea_bubbleplot" title="Link to this definition">#</a></dt>
+<dd><p>Bubble plot matrix for GSEA results.</p>
+<p>Rows: comparisons (contrasts)
+Cols: pathways (terms)
+Color: NES (diverging, centered at <cite>center</cite>)
+Size: -log10(FDR q-val) with floor &amp; optional clipping</p>
+<dl class="simple">
+<dt><cite>pathways</cite> can be:</dt><dd><ul class="simple">
+<li><p>dict: {“Immune”: [term1, term2], “Metabolism”: [term3]}</p></li>
+<li><p>list: [term1, term2, …]</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <p>Bubble-plot matrix for <strong>GSEA results</strong> across multiple comparisons (contrasts).<br />
 Each dot encodes enrichment direction/strength and significance for a given <strong>(comparison × pathway)</strong>.</p>
 <ul class="simple">
@@ -466,7 +495,7 @@ Each dot encodes enrichment direction/strength and significance for a given <str
 <li><p><strong>Size</strong>: <code class="docutils literal notranslate"><span class="pre">-log10(FDR</span> <span class="pre">q-val)</span></code> with a floor and optional clipping</p></li>
 </ul>
 <figure class="align-center">
-<a class="reference internal image-reference" href="../../_images/gsea_bubbleplot.png"><img alt="Violin plot example" src="../../_images/gsea_bubbleplot.png" style="width: 700px;" />
+<a class="reference internal image-reference" href="../../_images/gsea_bubbleplot.png"><img alt="GSEQ bubbleplot" src="../../_images/gsea_bubbleplot.png" style="width: 700px;" />
 </a>
 </figure>
 <p>Example GSEA bubble plot</p>
@@ -691,12 +720,12 @@ pass fixed vmin and vmax.</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="gene_plot.html"
+       href="genes_vs_mt_fraction.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Gene Plot</p>
+        <p class="prev-next-title">Genes vs. mitochondrial fraction</p>
       </div>
     </a>
     <a class="right-next"
@@ -727,6 +756,7 @@ pass fixed vmin and vmax.</p></li>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bullkpy.pl.gsea_bubbleplot"><code class="docutils literal notranslate"><span class="pre">gsea_bubbleplot()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#expected-input">Expected input</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-it-does">What it does</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a><ul class="visible nav section-nav flex-column">

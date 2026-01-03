@@ -1,13 +1,14 @@
+from ._style import set_style, _savefig, get_palette
+ 
 from .qc import (
     qc_metrics,
     library_size_vs_genes,
     mt_fraction_vs_counts,
     genes_vs_mt_fraction,
     qc_scatter_panel,
+    qc_by_group, qc_pairplot,
 )
-from ._style import set_style, _savefig, get_palette
-from .qc_pairplot import qc_pairplot
-from .qc_group import qc_by_group
+
 from .pca import pca_scatter, pca_variance_ratio
 from .umap import umap
 from .de import volcano, rankplot, ma
@@ -17,9 +18,7 @@ from .violin import violin
 from .corr_heatmap import corr_heatmap
 from .pca_loadings import pca_loadings_bar, pca_loadings_heatmap
 from .gene_plot import gene_plot
-from .rank_genes_groups import rank_genes_groups
-from .rank_genes_groups_dotplot import rank_genes_groups_dotplot
-from .library_qc import library_size_vs_genes
+from .rank_genes_groups import rank_genes_groups, rank_genes_groups_dotplot
 from .sample_distances import sample_distances, sample_correlation_clustergram
 from ._colors import _get_series, get_categorical_colors, categorical_colors_array
 from .ari_resolution_heatmap import ari_resolution_heatmap
