@@ -1,5 +1,5 @@
 # BULLKpy 🧬
-<img width="725" height="725" alt="image" src="https://github.com/user-attachments/assets/5915d41e-657d-4af8-8cbf-08bfdb46c9fa" />
+<img width="617" height="592" alt="Captura de pantalla 2026-01-03 a las 19 13 16" src="https://github.com/user-attachments/assets/d48c768e-ff71-4fce-859c-8ce165bee71d" />
 
 **BULLKpy** is a Python pipeline for **bulk RNA-seq analysis**, inspired by Scanpy but adapted for
 bulk transcriptomics. It integrates QC, normalization, clustering, differential expression,
@@ -9,12 +9,11 @@ Developed and used for TCGA and large-scale cancer transcriptomics analyses.
 
 ---
 
-## 📄 Documentation
+## 📄 Documentation
 
-BULLKpY documentation in Read The Docs:
+BULLKpy documentation in Read The Docs:
 
 https://bullkpy.readthedocs.io/en/latest/    
-
 
 --- 
 
@@ -60,6 +59,8 @@ pip install -e .
 
 ```bash
 import bullkpy as bk
+import pandas
+import seaborn as sns
 
 # Load data
 adata = bk.read_counts("counts.tsv")
@@ -141,16 +142,15 @@ bk.pl.sample_distances(adata)
 bk.pl.sample_correlation_clustergram(adata)
 bk.pl.gene_plot(adata)
 bk.pl.oncoprint(adata)
-
 ```
 
 ## 📊 Features
 
-	•	Bulk RNA-seq QC & filtering
+	•	Bulk RNA-seq, small and large projects. QC & filtering
 	•	PCA, UMAP, Leiden, k-means clustering
-	•	Differential expression from counts or log data
 	•	Gene scores and signatures
-	•	Gene–obs and obs–obs associations
+	•	Gene–obs and obs–obs associations and correlations
+	•	Differential expression from counts or log data
 	•	GSEA preranked pipeline (GSEApy)
 	•	Leading-edge GSEA analysis
 	•	Oncoprint-style mutation plots
