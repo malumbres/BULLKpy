@@ -6,6 +6,12 @@ This project is inspired by Scanpy (BSD 3-Clause) and reuses some design pattern
 
 from __future__ import annotations
 
+from importlib.metadata import version, PackageNotFoundError
+try:
+    __version__ = version("bullkpy")
+except PackageNotFoundError:
+    __version__ = "unknown"
+
 from ._settings import settings
 from .io import read_counts, add_metadata
 
