@@ -11,13 +11,19 @@ Scanpy-inspired pipeline for bulk RNA-seq analysis built around **AnnData**.
 BULLKpy is a Scanpy-inspired Python toolkit for **bulk RNA-seq analysis**,
 built on top of **AnnData** and designed for:
 
+### Basic pipelines. 
+  
+- Data import and AnnData object
 - QC and filtering of bulk RNA-seq
 - Clustering and dimensionality reduction
+- Data Exploration 
 - Gene set enrichment analysis (GSEA)
 - Differential expression analysis
 - Oncoprint and other tools for cancer research
 - Rich publication-quality plots
-
+  
+  
+  
 ## Quickstart
 
 ```python
@@ -91,6 +97,7 @@ bk.tl.gsea_preranked(
 )
 
 ```
+## Table of contents
 
 ```{toctree}
 :maxdepth: 2
