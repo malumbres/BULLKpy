@@ -10,3 +10,5 @@ myst-parser
 sphinx-autodoc-typehints
 sphinx-copybutton
 ipython
+myst-nb
+myst-parser
