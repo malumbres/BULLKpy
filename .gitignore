@@ -2,6 +2,13 @@
 # Large data & results (local)
 # ===============================
 data/
+*.h5ad
+*.h5
+*.loom
+*.rds
+*.parquet
+*.npz
+*.pkl
 results/
 
 # ===============================
@@ -29,6 +36,9 @@ __pycache__/
 *.egg-info/
 .build/
 dist/
+
+# Sphinx build
+docs/_build/
 
 # ===============================
 # Jupyter
