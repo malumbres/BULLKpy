@@ -7,7 +7,8 @@ build:
   jobs:
     pre_build:
       - mkdir -p docs/notebooks
-      - rsync -av --delete notebooks/ docs/notebooks/ --exclude ".ipynb_checkpoints"
+      - find docs/notebooks -mindepth 1 -delete
+      - find notebooks -maxdepth 1 -name "*.ipynb" -exec cp -t docs/notebooks {} +
 
 python:
   install:
