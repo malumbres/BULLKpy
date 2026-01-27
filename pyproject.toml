@@ -32,6 +32,7 @@ dependencies = [
   "statsmodels",
   "gseapy",
   "lifelines",
+  "nbsphinx",
 ]
 
 [project.optional-dependencies]

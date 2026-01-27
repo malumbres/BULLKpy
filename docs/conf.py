@@ -33,7 +33,14 @@ extensions = [
     "myst_nb",  # this provides MyST markdown support
     "sphinx_copybutton",
     "sphinx_design",
+    "nbsphinx",
 ]
+
+# Do NOT execute notebooks on RTD
+nbsphinx_execute = "never"
+
+# Better notebook rendering
+nbsphinx_allow_errors = False
 
 templates_path = ["_templates"]
 exclude_patterns = [
