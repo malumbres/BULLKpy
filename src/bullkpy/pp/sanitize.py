@@ -363,3 +363,136 @@ def make_obs_h5ad_safe_strict(
 
     adata2.obs = obs
     return adata2, rep
+
+
+
+def _safe_filename_var(name: str) -> str:
+    # safe for tmp file names (also fixes your earlier '/' issue)
+    return "".join(c if c.isalnum() or c in "._-" else "_" for c in str(name))[:180]
+
+def find_bad_var_cols_by_write(
+    adata: ad.AnnData,
+    *,
+    n_cols: int = 5000,
+    include_index_test: bool = True,
+):
+    """
+    Try writing each var column into a tiny AnnData to detect which columns break .write().
+    This mirrors your obs tester, but for var.
+    """
+    bad = []
+    with tempfile.TemporaryDirectory() as td:
+        td = Path(td)
+
+        n_total = adata.n_vars
+        n_use = min(int(n_cols), n_total)
+
+        # ---- index test (var_names) ----
+        if include_index_test:
+            try:
+                tmp = ad.AnnData(X=np.zeros((1, n_use), dtype=np.float32))
+                tmp.var = pd.DataFrame(index=adata.var_names[:n_use].copy())
+                tmp.write(td / "ok_var_index.h5ad")
+            except Exception as e:
+                return [("<var_names/index>", str(e))], str(e)
+
+        # ---- per-column tests ----
+        for col in adata.var.columns:
+            s = adata.var[col]
+            try:
+                tmp = ad.AnnData(X=np.zeros((1, n_use), dtype=np.float32))
+                tmp.var_names = pd.Index(adata.var_names[:n_use].astype(str))  # safe
+                tmp.var = pd.DataFrame({col: s.iloc[:n_use].to_numpy()}, index=tmp.var_names)
+                tmp.write(td / f"ok_{_safe_filename_var(col)}.h5ad")
+            except Exception as e:
+                bad.append((col, str(e)))
+
+    return bad, None
+
+
+def make_var_h5ad_safe_strict(
+    adata: ad.AnnData,
+    *,
+    columns=None,
+    copy: bool = False,
+    convert_string_to_object: bool = True,
+    convert_categorical_string_categories_to_object: bool = True,
+    stringify_bytes: bool = True,
+    stringify_non_scalar_objects: bool = True,
+    stringify_mixed_object_columns: bool = True,
+):
+    """
+    Sanitize `.var` to be reliably writable to .h5ad.
+    Returns (adata_or_None, report)
+    """
+    ad2 = adata.copy() if copy else adata
+    var = ad2.var.copy()
+
+    cols = list(columns) if columns is not None else list(var.columns)
+
+    rep = {
+        "string_to_object": [],
+        "category_fixed": [],
+        "bytes_stringified": [],
+        "nonscalar_stringified": [],
+        "mixed_object_stringified": [],
+        "errors": [],
+        "n_cols": len(cols),
+    }
+
+    for col in cols:
+        if col not in var.columns:
+            continue
+        s = var[col]
+        dt = s.dtype
+
+        try:
+            # 1) pandas string dtype -> object
+            if convert_string_to_object and pd.api.types.is_string_dtype(dt) and not pd.api.types.is_object_dtype(dt):
+                var[col] = s.astype("object")
+                rep["string_to_object"].append(col)
+                s = var[col]
+                dt = s.dtype
+
+            # 2) categorical categories (string dtype) -> object
+            if convert_categorical_string_categories_to_object and isinstance(dt, pd.CategoricalDtype):
+                cats = s.cat.categories
+                if pd.api.types.is_string_dtype(cats.dtype) and not pd.api.types.is_object_dtype(cats.dtype):
+                    new_cats = cats.astype("object")
+                    var[col] = pd.Categorical(s.astype("object"), categories=new_cats, ordered=s.cat.ordered)
+                    rep["category_fixed"].append(col)
+                    s = var[col]
+
+            # 3) object columns: bytes -> str
+            if pd.api.types.is_object_dtype(var[col].dtype):
+                if stringify_bytes:
+                    sample = var[col].dropna().head(200)
+                    if (not sample.empty) and sample.apply(lambda x: isinstance(x, (bytes, bytearray))).any():
+                        var[col] = var[col].map(lambda x: x.decode("utf-8", "ignore") if isinstance(x, (bytes, bytearray)) else x)
+                        rep["bytes_stringified"].append(col)
+
+                # 4) object columns: list/dict/set/tuple -> str
+                if stringify_non_scalar_objects:
+                    sample = var[col].dropna().head(200)
+                    if (not sample.empty) and sample.apply(lambda x: isinstance(x, (list, dict, set, tuple))).any():
+                        var[col] = var[col].map(lambda x: str(x) if isinstance(x, (list, dict, set, tuple)) else x)
+                        rep["nonscalar_stringified"].append(col)
+
+                # 5) object columns: mixed types -> convert only non-strings to str
+                if stringify_mixed_object_columns:
+                    sample = var[col].dropna().head(200)
+                    if not sample.empty:
+                        types = sample.map(lambda x: type(x)).unique()
+                        # If it isn't purely strings (or NA), make it safe
+                        if len(types) > 1 or (len(types) == 1 and types[0] is not str):
+                            var[col] = var[col].map(lambda x: x if (x is None or isinstance(x, str)) else str(x))
+                            rep["mixed_object_stringified"].append(col)
+
+                # ensure dtype object
+                var[col] = var[col].astype("object")
+
+        except Exception as e:
+            rep["errors"].append((col, str(e)))
+
+    ad2.var = var
+    return (ad2 if copy else None), rep

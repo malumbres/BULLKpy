@@ -6,6 +6,7 @@ from .batch import batch_correct_combat
 from .sanitize import (
       sanitize_metadata, find_bad_obs_columns,
       find_bad_obs_cols_by_write, make_obs_h5ad_safe_strict,
+      find_bad_var_cols_by_write, make_var_h5ad_safe_strict,
       ) 
 
 from .obs import standardize_tcga_obs, obs_map_categories
@@ -16,5 +17,6 @@ __all__ = ["qc_metrics", "_is_integerish",
            "batch_correct_combat",
            "sanitize_metadata", "find_bad_obs_columns",
            "find_bad_obs_cols_by_write", "make_obs_h5ad_safe_strict",
+           "find_bad_var_cols_by_write", "make_var_h5ad_safe_strict",
            "standardize_tcga_obs", "obs_map_categories",
           ]
