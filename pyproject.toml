@@ -9,7 +9,7 @@ description = "Scanpy-like pipeline for bulk RNA-seq in Python"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { file = "LICENSE" }
-authors = [{ name = "Marcos Malumbres" }, email = "mmalumbres@vhio.net" }]
+authors = [{ name = "Marcos Malumbres" }, {email = "mmalumbres@vhio.net" }]
 keywords = ["bulk-rnaseq", "tcga", "anndata", "scanpy", "bioinformatics"]
 
 classifiers = [
