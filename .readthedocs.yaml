@@ -4,6 +4,10 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.10"
+  jobs:
+    pre_build:
+      - mkdir -p docs/notebooks
+      - rsync -av --delete notebooks/ docs/notebooks/ --exclude ".ipynb_checkpoints"
 
 python:
   install:
@@ -14,7 +18,3 @@ python:
 sphinx:
   configuration: docs/conf.py
 
-jobs:
-  pre_build:
-    - mkdir -p docs/notebooks
-    - rsync -av --delete notebooks/ docs/notebooks/ --exclude ".ipynb_checkpoints"
