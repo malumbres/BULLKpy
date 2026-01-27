@@ -1,20 +1,23 @@
 from __future__ import annotations
 
-import re
+from pathlib import Path
+from typing import Optional, Sequence
+
+import re, tempfile
 import numpy as np
 import pandas as pd
-import tempfile
-from pathlib import Path
-from dataclasses import dataclass
-from typing import Optional, Sequence
 import anndata as ad
 from anndata import AnnData
+import tempfile
+
+from dataclasses import dataclass
 
 @dataclass
 class ObsColumnIssue:
     column: str
     dtype: str
     issue: str
+
 
 
 def _safe_filename(name: str, maxlen: int = 80) -> str:
@@ -170,64 +173,6 @@ def sanitize_metadata(
 
 
 
-def find_bad_obs_cols_by_write(
-    adata: ad.AnnData,
-    *,
-    n_rows: int = 200,
-    include_index_test: bool = True,
-) -> tuple[list[tuple[str, str]], str | None]:
-    """
-    Try writing each obs column into a tiny AnnData to detect which columns break .write().
-
-    Key improvements vs your version:
-    - tests many rows, not only the first
-    - selects "informative" rows likely to expose mixed / non-string objects
-    - uses safe filenames
-    - keeps obs_names aligned
-    """
-    bad: list[tuple[str, str]] = []
-
-    with tempfile.TemporaryDirectory() as td:
-        td = Path(td)
-
-        # Small X with enough rows
-        n_total = adata.n_obs
-        n_use = min(int(n_rows), n_total)
-        Xsmall = np.zeros((n_use, 1), dtype=np.float32)
-
-        # --------- index test (obs_names) ----------
-        if include_index_test:
-            try:
-                tmp = ad.AnnData(X=Xsmall.copy())
-                tmp.obs = pd.DataFrame(index=adata.obs_names[:n_use].copy())
-                tmp.write(td / "ok_obs_index.h5ad")
-            except Exception as e:
-                return [("<obs_names/index>", str(e))], str(e)
-
-        # --------- per-column tests ----------
-        for col in adata.obs.columns:
-            s = adata.obs[col]
-
-            # choose rows likely to expose problems
-            idx = _pick_informative_rows(s, n=n_use)
-            # Ensure we always have at least 1 row
-            if len(idx) == 0:
-                idx = adata.obs_names[:1]
-
-            try:
-                tmp = ad.AnnData(X=np.zeros((len(idx), 1), dtype=np.float32))
-                tmp.obs_names = pd.Index(idx.astype(str))  # safe
-                tmp.obs = pd.DataFrame({col: s.loc[idx].to_numpy()}, index=tmp.obs_names)
-
-                fname = f"ok_{_safe_filename(col)}.h5ad"
-                tmp.write(td / fname)
-
-            except Exception as e:
-                bad.append((col, str(e)))
-
-    return bad, None
-
-
 def find_bad_obs_columns(adata: AnnData) -> list[ObsColumnIssue]:
     """
     Identify `.obs` columns likely to break `adata.write_h5ad()`,
@@ -260,29 +205,98 @@ def find_bad_obs_columns(adata: AnnData) -> list[ObsColumnIssue]:
 
 
 
-def make_obs_h5ad_safe(
-    adata: AnnData,
+
+#####################################################
+### SANITIZE adata.obs
+#####################################################
+
+
+def _safe_filename(name: str) -> str:
+    s = re.sub(r"[^A-Za-z0-9._-]+", "_", str(name))
+    return s[:150] if len(s) > 150 else s
+
+def _pick_informative_rows(s: pd.Series, n: int) -> pd.Index:
+    nonmiss = s.dropna()
+    if nonmiss.empty:
+        return s.index[: min(n, len(s))]
+    take = []
+    take.extend(nonmiss.index[: min(n // 3, len(nonmiss))].tolist())
+    take.extend(nonmiss.index[-min(n // 3, len(nonmiss)):].tolist())
+    remain = [i for i in nonmiss.index.tolist() if i not in set(take)]
+    if remain and len(take) < n:
+        rng = np.random.default_rng(0)
+        extra = rng.choice(remain, size=min(n - len(take), len(remain)), replace=False)
+        take.extend(extra.tolist())
+    return pd.Index(take)
+
+def find_bad_obs_cols_by_write(
+    adata,
     *,
-    columns: Optional[Sequence[str]] = None,
-    coerce_object_mixed_to_str: bool = True,
-    convert_string_to_object: bool = True,
-    convert_categories_to_object: bool = True,
-    copy: bool = False,
-) -> Optional[AnnData]:
+    n_rows: int = 3000,
+    include_index_test: bool = True,
+):
+    import anndata as anndata  # local import avoids notebook shadowing
+
+    bad = []
+    with tempfile.TemporaryDirectory() as td:
+        td = Path(td)
+
+        n_use = min(int(n_rows), adata.n_obs)
+        Xsmall = np.zeros((n_use, 1), dtype=np.float32)
+
+        if include_index_test:
+            try:
+                tmp = anndata.AnnData(X=Xsmall.copy())
+                tmp.obs = pd.DataFrame(index=pd.Index(adata.obs_names[:n_use].astype(str)))
+                tmp.write(td / "ok_obs_index.h5ad")
+            except Exception as e:
+                return [("<obs_names/index>", str(e))], str(e)
+
+        for col in adata.obs.columns:
+            s = adata.obs[col]
+            idx = _pick_informative_rows(s, n=n_use)
+            if len(idx) == 0:
+                idx = adata.obs_names[:1]
+
+            try:
+                tmp = anndata.AnnData(X=np.zeros((len(idx), 1), dtype=np.float32))
+                tmp.obs_names = pd.Index(idx.astype(str))
+                tmp.obs = pd.DataFrame({col: s.loc[idx].to_numpy()}, index=tmp.obs_names)
+                tmp.write(td / f"ok_{_safe_filename(col)}.h5ad")
+            except Exception as e:
+                bad.append((col, str(e)))
+
+    return bad, None
+
+
+def make_obs_h5ad_safe_strict(
+    adata,
+    *,
+    columns: list[str] | None = None,
+    copy: bool = True,
+    numeric_coerce_min_frac: float = 0.85,   # if >=85% of non-missing parses -> numeric
+    stringify_complex_objects: bool = True,
+    convert_nullable_string_to_object: bool = True,
+    convert_categorical_string_categories_to_object: bool = True,
+):
     """
-    Sanitize `.obs` to be reliably writable to .h5ad.
-
-    Key fixes:
-    - pandas nullable string dtype -> object dtype (Python str)
-    - categorical categories with nullable string dtype -> object
-    - object columns with list/dict/set/tuple -> stringify (optional)
-
-    Modifies adata in place unless copy=True.
+    Returns (adata_safe, report_dict).
     """
-    ad = adata.copy() if copy else adata
-    obs = ad.obs.copy()
+    adata2 = adata.copy() if copy else adata
+    obs = adata2.obs.copy()
 
-    cols = list(columns) if columns is not None else list(obs.columns)
+    cols = columns if columns is not None else list(obs.columns)
+    rep = {"numeric_coerced": [], "string_to_object": [], "stringified": [], "category_fixed": [], "errors": []}
+
+    def _is_missing(x) -> bool:
+        if x is None or x is pd.NA:
+            return True
+        if isinstance(x, float) and np.isnan(x):
+            return True
+        return False
+
+    def _is_complex(x) -> bool:
+        return isinstance(x, (list, dict, set, tuple))
 
     for col in cols:
         if col not in obs.columns:
@@ -291,27 +305,61 @@ def make_obs_h5ad_safe(
         s = obs[col]
         dt = s.dtype
 
-        # 1) Convert pandas nullable string dtype to object
-        if convert_string_to_object and pd.api.types.is_string_dtype(dt) and not pd.api.types.is_object_dtype(dt):
-            # ensure python strings / pd.NA preserved as NA
-            s2 = s.astype("object")
-            obs[col] = s2
-            s = obs[col]
-            dt = s.dtype
+        # 1) pandas nullable string (string[python]/string[pyarrow]) -> object
+        if convert_nullable_string_to_object and pd.api.types.is_string_dtype(dt) and not pd.api.types.is_object_dtype(dt):
+            try:
+                obs[col] = s.astype("object")
+                rep["string_to_object"].append(col)
+                s = obs[col]
+                dt = s.dtype
+            except Exception as e:
+                rep["errors"].append((col, f"string->object failed: {e}"))
+                continue
 
-        # 2) Fix categorical categories dtype (can be StringArray)
-        if pd.api.types.is_categorical_dtype(dt) and convert_categories_to_object:
-            cats = s.cat.categories
-            if pd.api.types.is_string_dtype(cats.dtype) and not pd.api.types.is_object_dtype(cats.dtype):
-                # rebuild categorical with object categories
-                new_cats = cats.astype("object")
-                obs[col] = pd.Categorical(s.astype("object"), categories=new_cats, ordered=s.cat.ordered)
+        # 2) fix categorical categories dtype if they are nullable strings
+        if pd.api.types.is_categorical_dtype(dt) and convert_categorical_string_categories_to_object:
+            try:
+                cats = s.cat.categories
+                if pd.api.types.is_string_dtype(cats.dtype) and not pd.api.types.is_object_dtype(cats.dtype):
+                    obs[col] = pd.Categorical(
+                        s.astype("object"),
+                        categories=cats.astype("object"),
+                        ordered=s.cat.ordered,
+                    )
+                    rep["category_fixed"].append(col)
+                    s = obs[col]
+                    dt = s.dtype
+            except Exception as e:
+                rep["errors"].append((col, f"categorical fix failed: {e}"))
+                continue
 
-        # 3) Object columns that contain non-scalars -> stringify
-        if pd.api.types.is_object_dtype(obs[col].dtype) and coerce_object_mixed_to_str:
-            sample = obs[col].dropna().head(200)
-            if not sample.empty and sample.apply(lambda x: isinstance(x, (list, dict, set, tuple))).any():
-                obs[col] = obs[col].map(lambda x: str(x) if isinstance(x, (list, dict, set, tuple)) else x).astype("object")
+        # 3) object dtype: decide numeric vs stringify
+        if pd.api.types.is_object_dtype(obs[col].dtype):
+            sample = obs[col].dropna()
+            if sample.empty:
+                continue
 
-    ad.obs = obs
-    return ad if copy else None
+            # 3a) stringify complex objects (lists/dicts/tuples/sets)
+            if stringify_complex_objects and sample.head(500).map(_is_complex).any():
+                obs[col] = obs[col].map(lambda x: str(x) if _is_complex(x) else x).astype("object")
+                rep["stringified"].append(col)
+                continue
+
+            # 3b) try numeric coercion if most values parse
+            # (this fixes your albumin/days_to/etc columns which should be numeric)
+            coerced = pd.to_numeric(obs[col], errors="coerce")
+            nonmiss = obs[col].map(lambda x: not _is_missing(x)).sum()
+            parsed = coerced.notna().sum()
+            frac = (parsed / nonmiss) if nonmiss else 1.0
+
+            if frac >= float(numeric_coerce_min_frac):
+                obs[col] = coerced
+                rep["numeric_coerced"].append(col)
+                continue
+
+            # 3c) otherwise stringify all non-missing non-strings
+            obs[col] = obs[col].map(lambda x: x if _is_missing(x) or isinstance(x, str) else str(x)).astype("object")
+            rep["stringified"].append(col)
+
+    adata2.obs = obs
+    return adata2, rep
