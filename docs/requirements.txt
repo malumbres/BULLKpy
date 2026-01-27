@@ -13,4 +13,4 @@ sphinx-rtd-theme
 sphinx-autodoc-typehints
 sphinx-copybutton
 sphinx-design
-
+pydata-sphinx-theme
