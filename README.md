@@ -1,5 +1,5 @@
 # BULLKpy 🧬
-<img src="docs/images/BULLKpy_logo.png" width="300"> alt="BULLKpy logo">
+<img src="docs/images/BULLKpy_logo.png" width="300">
 
 **BULLKpy** is a Python pipeline for **bulk RNA-seq analysis**, inspired by Scanpy but adapted for
 bulk transcriptomics. It integrates QC, normalization, clustering, differential expression,
@@ -16,6 +16,23 @@ BULLKpy documentation in Read The Docs:
 https://bullkpy.readthedocs.io/en/latest/    
 
 --- 
+
+
+## 🚀 Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/malumbres/BULLKpy.git
+cd BULLKpy
+```
+
+Install from Pypi:
+https://pypi.org/project/bullkpy/  
+
+```bash
+pip install bullkpy
+```
 
 ## 📦 Project structure
 
@@ -40,21 +57,6 @@ bullkpy-skeleton/
 └── .gitignore
 ```
 ---
-
-## 🚀 Installation
-
-Clone the repository:
-
-```bash
-git clone https://github.com/malumbres/BULLKpy.git
-cd BULLKpy
-```
-
-Install from Pypi
-```bash
-pip install bullkpy
-Pip install bullkpy[survival]
-```
 
 ## 🧪 Typical workflow
 

@@ -122,3 +122,11 @@ source_suffix = {
 # Keep notebook UX clean
 html_show_sourcelink = True
 html_show_sphinx = False
+
+autodoc_mock_imports = [
+    "scanpy",
+    "anndata",
+    "lifelines",
+    "gseapy",
+    # añade aquí los que den guerra
+]

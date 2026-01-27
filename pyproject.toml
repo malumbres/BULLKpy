@@ -47,6 +47,7 @@ docs = [
   "sphinx-autodoc-typehints",
   "sphinx-copybutton>=0.5",
   "sphinx-design>=0.6",
+  "ipython",
 ]
 [project.urls]
 Homepage = "https://github.com/malumbres/BULLKpy"
