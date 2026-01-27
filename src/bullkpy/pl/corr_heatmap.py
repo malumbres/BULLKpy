@@ -43,28 +43,35 @@ def corr_heatmap(
     figsize: tuple[float, float] | None = None,
     show_labels: bool = False,
     dendrogram: bool = True,
+    # NEW:
+    add_col_color_legend: bool = True,
+    legend_title: str | None = None,
+    legend_fontsize: float = 8,
+    legend_title_fontsize: float = 9,
+    legend_max_cols: int = 1,
+    remove_cbar_label: bool = True,
+    dendrogram_gap: float = 0.004,   # smaller = closer
+    right_margin: float = 0.82,      # room for legend on right
     save: str | Path | None = None,
     show: bool = True,
 ):
     """
     Correlation heatmap for sample QC (or gene-gene if use="genes").
 
-    Parameters
-    ----------
-    use
-        "samples" -> correlation between samples (obs x obs) [default, QC]
-        "genes"   -> correlation between genes (var x var)
-    groupby / groups
-        If provided, subset and order samples by adata.obs[groupby].
-    col_colors
-        obs key(s) used to annotate columns (and rows, since it's symmetric) when plotting samples.
-        Values are mapped to colors automatically.
-    dendrogram
-        If True, uses seaborn clustermap. If False, uses heatmap without clustering.
+    Improvements:
+      - removes vertical colorbar label (optional)
+      - pulls left dendrogram closer to heatmap
+      - adds legend for col_colors categories on the right
+      - fixes cg undefined for dendrogram=False branch
     """
     set_style()
     if sns is None:
         raise ImportError("corr_heatmap requires seaborn. Please install seaborn.")
+
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import matplotlib as mpl
 
     X = _get_matrix(adata, layer)
 
@@ -79,8 +86,6 @@ def corr_heatmap(
         axis_name = "genes"
 
     # --- optional subsetting/ordering by groupby (samples only) ---
-    order = np.arange(data.shape[0])
-
     if use == "samples" and groupby is not None:
         if groupby not in adata.obs.columns:
             raise KeyError(f"groupby='{groupby}' not found in adata.obs")
@@ -96,7 +101,6 @@ def corr_heatmap(
         g = g[mask]
         names = adata.obs_names[mask].astype(str).tolist()
 
-        # group order: use provided groups, else alphabetical
         if groups is None:
             cat_order = sorted(pd.unique(g))
         else:
@@ -105,7 +109,6 @@ def corr_heatmap(
         order = np.argsort(pd.Categorical(g, categories=cat_order, ordered=True))
         data = data[order, :]
         names = [names[i] for i in order]
-        g = g.iloc[order]
     else:
         g = None
 
@@ -114,42 +117,46 @@ def corr_heatmap(
         df = pd.DataFrame(data, index=names)
         corr = df.T.corr(method="spearman")
     else:
-        # pearson fast path
         corr = np.corrcoef(data)
         corr = pd.DataFrame(corr, index=names, columns=names)
 
-    # --- col_colors mapping for samples ---
+    # --- col_colors mapping for samples + keep LUTs for legend ---
     col_colors_df = None
+    legend_luts: dict[str, dict[str, tuple]] = {}
+
     if use == "samples" and col_colors is not None:
         if isinstance(col_colors, str):
             col_colors = [col_colors]
 
-        ann = {}
-        # rebuild obs aligned to corr index
         obs_sub = adata.obs.loc[corr.index]
+        ann = {}
 
         for key in col_colors:
             if key not in obs_sub.columns:
                 raise KeyError(f"col_colors obs key '{key}' not found in adata.obs")
 
             vals = obs_sub[key].astype(str)
-            cats = pd.Categorical(vals).categories
+            cats = list(pd.Categorical(vals).categories)
             pal = sns.color_palette("tab20", n_colors=len(cats))
-            lut = {cat: pal[i] for i, cat in enumerate(cats)}
+            lut = {str(cat): pal[i] for i, cat in enumerate(cats)}
             ann[key] = vals.map(lut)
+            legend_luts[key] = lut
 
         col_colors_df = pd.DataFrame(ann, index=corr.index)
 
     # --- autosize ---
     if figsize is None:
         n = corr.shape[0]
-        # clamp: big matrices become huge otherwise
         w = min(max(6.0, 0.18 * n + 2.0), 18.0)
         h = min(max(6.0, 0.18 * n + 2.0), 18.0)
         figsize = (w, h)
 
     # --- plot ---
     if dendrogram:
+        cbar_kws = {}
+        if not remove_cbar_label:
+            cbar_kws["label"] = f"{method} correlation ({axis_name})"
+
         cg = sns.clustermap(
             corr,
             cmap=cmap,
@@ -162,14 +169,85 @@ def corr_heatmap(
             yticklabels=show_labels,
             figsize=figsize,
             col_colors=col_colors_df,
-            cbar_kws={"label": f"{method} correlation ({axis_name})"},
+            cbar_kws=cbar_kws,
         )
 
         _apply_clustergrid_style(cg)
-        cg.fig.tight_layout()   
-     
-        fig = cg.fig
 
+        # (a) remove vertical label (and any leftover)
+        if remove_cbar_label and hasattr(cg, "cax") and cg.cax is not None:
+            cg.cax.set_ylabel("")
+            cg.cax.set_title("")
+
+        # (a) tighten layout + make room for legend on the right
+        cg.fig.subplots_adjust(right=right_margin)
+
+        # (a) bring left dendrogram closer to heatmap
+        # Move heatmap left so x0 touches dendrogram x1 + small gap
+        try:
+            row_pos = cg.ax_row_dendrogram.get_position()
+            heat_pos = cg.ax_heatmap.get_position()
+
+            new_heat_x0 = row_pos.x1 + float(dendrogram_gap)
+            dx = new_heat_x0 - heat_pos.x0
+
+            cg.ax_heatmap.set_position([heat_pos.x0 + dx, heat_pos.y0, heat_pos.width - dx, heat_pos.height])
+
+            # keep top dendrogram and col_colors aligned with the heatmap
+            if hasattr(cg, "ax_col_dendrogram") and cg.ax_col_dendrogram is not None:
+                p = cg.ax_col_dendrogram.get_position()
+                cg.ax_col_dendrogram.set_position([p.x0 + dx, p.y0, p.width - dx, p.height])
+            if hasattr(cg, "ax_col_colors") and cg.ax_col_colors is not None:
+                p = cg.ax_col_colors.get_position()
+                cg.ax_col_colors.set_position([p.x0 + dx, p.y0, p.width - dx, p.height])
+
+            # move colorbar too (if present), but keep it on the left area
+            if hasattr(cg, "cax") and cg.cax is not None:
+                p = cg.cax.get_position()
+                cg.cax.set_position([p.x0, p.y0, p.width, p.height])
+        except Exception:
+            pass
+
+        # (b) legend for cluster/groupby colors (col_colors)
+        if add_col_color_legend and legend_luts:
+            # make a dedicated right-side legend area
+            # (use fig.legend so it sits outside axes cleanly)
+            handles_all = []
+            labels_all = []
+            # If multiple keys, we prefix labels with "key: category"
+            multi = len(legend_luts) > 1
+
+            for key, lut in legend_luts.items():
+                for cat, color in lut.items():
+                    lab = f"{key}: {cat}" if multi else f"{cat}"
+                    handles_all.append(mpl.patches.Patch(facecolor=color, edgecolor="none"))
+                    labels_all.append(lab)
+
+            cg.fig.legend(
+                handles_all,
+                labels_all,
+                title=(legend_title or ("Annotations" if multi else (col_colors[0] if isinstance(col_colors, list) else str(col_colors)))),
+                loc="upper left",
+                bbox_to_anchor=(right_margin + 0.01, 0.98),
+                frameon=False,
+                fontsize=legend_fontsize,
+                title_fontsize=legend_title_fontsize,
+                ncol=int(max(1, legend_max_cols)),
+                borderaxespad=0.0,
+                handlelength=1.2,
+                handletextpad=0.4,
+                labelspacing=0.3,
+            )
+
+        # final
+        cg.fig.tight_layout()
+        if save is not None:
+            _savefig(cg.fig, save)
+        if show:
+            plt.show()
+        return cg
+
+    # --- non-clustered heatmap ---
     else:
         fig, ax = plt.subplots(figsize=figsize)
         sns.heatmap(
@@ -181,20 +259,24 @@ def corr_heatmap(
             square=True,
             xticklabels=show_labels,
             yticklabels=show_labels,
-            cbar_kws={"label": f"{method} correlation ({axis_name})"},
+            cbar_kws={"label": ""} if remove_cbar_label else {"label": f"{method} correlation ({axis_name})"},
             ax=ax,
         )
-        ax.set_title(f"{method} correlation ({axis_name})")
+        if remove_cbar_label:
+            try:
+                cbar = ax.collections[0].colorbar
+                if cbar is not None:
+                    cbar.set_label("")
+            except Exception:
+                pass
 
-    _apply_clustergrid_style(cg)
-    cg.fig.tight_layout()
-
-    if save is not None:
-        _savefig(cg.fig, save)
-    if show:
-        plt.show()
-
-    return cg
+        ax.set_title("")  # avoid big title
+        fig.tight_layout()
+        if save is not None:
+            _savefig(fig, save)
+        if show:
+            plt.show()
+        return fig, ax
 
 
 
