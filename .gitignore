@@ -53,3 +53,9 @@ Thumbs.db
 .vscode/
 .idea/
 .DS_Store
+
+# NEVER COMMIT
+/data/
+*.h5ad
+/docs/_build/
+/notebooks/.ipynb_checkpoints/
