@@ -109,6 +109,22 @@ df = bk.tl.top_gene_obs_correlations(
 )
 ```
 
+All genes: look for top genes correlated with a numeric obs column (e.g. "tumor_purity", "age", "score", ...)
+
+```python
+df = bk.tl.top_gene_obs_correlations(
+    adata,
+    gene=list(adata.var_names),   # scan all genes
+    obs="tumor_purity",           # the obs you care about (must be numeric)
+    layer="log1p_cpm",            # or None to use adata.X
+    method="spearman",            # "pearson" or "spearman"
+    top_n=50,                     # keep top 50
+    min_abs_r=0.3,                # optional filter (speeds up output / focus)
+    use_abs=True,                 # rank by |r|
+)
+df.head(10)
+```
+
 With batch adjustment
 
 ```python
@@ -121,10 +137,10 @@ df = bk.tl.top_gene_obs_correlations(
 ```
 
 ## Interpretation notes
-	•	Correlation does not imply causation; treat results as exploratory.
-	•	Batch effects and confounders can inflate correlations — use batch_mode="residual"
+- Correlation does not imply causation; treat results as exploratory.
+- Batch effects and confounders can inflate correlations — use batch_mode="residual"
 and/or covariates=[...] when appropriate.
-	•	For visualization, follow up with a scatter plot of gene expression vs the selected obs.
+- For visualization, follow up with a scatter plot of gene expression vs the selected obs.
 
 ## See also
 	•	tl.gene_gene_correlations

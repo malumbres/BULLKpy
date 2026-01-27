@@ -81,26 +81,25 @@ def qc_metrics(
             adata.obs["n_genes_detected"] = (np.asarray(X) > thr).sum(axis=1)
 
     # --- pct_counts_mt ---
-    if compute_pct_mt:
-        # define mitochondrial genes
-        if mt_var_key is not None and mt_var_key in adata.var.columns:
-            mt_mask = adata.var[mt_var_key].astype(bool).to_numpy()
-        else:
-            mt_mask = adata.var_names.astype(str).str.upper().str.startswith(mt_prefix.upper()).to_numpy()
+    if mt_var_key is not None and mt_var_key in adata.var.columns:
+        mt_mask = adata.var[mt_var_key].astype(bool).to_numpy()
+    else:
+        gene_names = pd.Series(adata.var_names.astype(str))
+        mt_mask = gene_names.str.upper().str.startswith(mt_prefix.upper()).to_numpy()
 
-        if mt_mask.sum() == 0:
-            warn("qc_metrics: no mitochondrial genes detected with given mt_prefix/mt_var_key; pct_counts_mt not computed.")
-            return
+    if mt_mask.sum() == 0:
+        warn("qc_metrics: no mitochondrial genes detected with given mt_prefix/mt_var_key; pct_counts_mt not computed.")
+        return
 
-        Xmt = X[:, mt_mask]
-        if sp.issparse(X):
-            mt_counts = np.asarray(Xmt.sum(axis=1)).ravel()
-            tot = np.asarray(X.sum(axis=1)).ravel()
-        else:
-            mt_counts = np.sum(np.asarray(Xmt), axis=1)
-            tot = np.sum(np.asarray(X), axis=1)
+    Xmt = X[:, mt_mask]
+    if sp.issparse(X):
+        mt_counts = np.asarray(Xmt.sum(axis=1)).ravel()
+        tot = np.asarray(X.sum(axis=1)).ravel()
+    else:
+        mt_counts = np.sum(np.asarray(Xmt), axis=1)
+        tot = np.sum(np.asarray(X), axis=1)
 
-        tot_safe = np.where(tot == 0, np.nan, tot)
-        adata.obs["pct_counts_mt"] = 100.0 * (mt_counts / tot_safe)
+    tot_safe = np.where(tot == 0, np.nan, tot)
+    adata.obs["pct_counts_mt"] = 100.0 * (mt_counts / tot_safe)
 
     info("QC metrics added to adata.obs (total_counts, n_genes_detected, pct_counts_mt where applicable).")

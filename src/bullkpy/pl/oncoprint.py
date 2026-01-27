@@ -153,6 +153,8 @@ def oncoprint(
     expr_row_height: float = 0.25,
     top_annotation_height: float = 0.35,
     title: str | None = None,
+    figsize: tuple[float, float] | None = None,  # NEW: override auto size
+    fontsize: float = 10.0,                      # NEW: base font size
     # output safety
     save_dpi: int | None = None,        # auto-reduced if needed
     max_pixels: int = 60000,            # keep < 2^16 per dimension
@@ -164,6 +166,9 @@ def oncoprint(
     Implements mutation-first sample ordering and optional group blocks.
     """
     set_style()
+
+    # --- NEW: global font control for this figure ---
+    fontsize = float(fontsize)
 
     mut = _binary_from_obs(adata, mut_cols)  # (samples x genes)
     mut.index = mut.index.astype(str)
@@ -240,7 +245,8 @@ def oncoprint(
         # (still readable, but prevents exploding pixel sizes)
         cell_size = float(np.clip(18.0 / max(n_samples, 1), 0.02, 0.22))
 
-    # figure size
+
+    # figure size (auto unless figsize provided)
     width = max(6.0, cell_size * n_samples + 2.8)
     height = (
         (top_annotation_height if groups is not None else 0.0)
@@ -250,7 +256,15 @@ def oncoprint(
         + 1.2
     )
 
-    fig = plt.figure(figsize=(width, height), constrained_layout=False)
+    if figsize is not None:
+        width, height = map(float, figsize)
+
+    with mpl.rc_context({"font.size": fontsize}):
+        fig = plt.figure(figsize=(width, height), constrained_layout=False)
+
+        # apply base fontsize to this figure (matplotlib uses rcParams at draw time)
+        fig.rcParams = {}  # optional safeguard; no-op in most mpl versions
+        plt.rcParams.update({"font.size": fontsize})
 
     heights = []
     if groups is not None:
@@ -301,14 +315,17 @@ def oncoprint(
 
         # legend
         handles = [mpl.patches.Patch(color=m[str(c)], label=str(c)) for c in cats]
+
         ax_top.legend(
             handles=handles,
             title=groupby,
-            bbox_to_anchor=(1.22, 0.0),  # moved right so it doesn't overlap freq bar
+            bbox_to_anchor=(1.22, 0.0),
             loc="lower left",
             frameon=False,
             borderaxespad=0.0,
-    )
+            fontsize=max(7.0, fontsize * 0.85),
+            title_fontsize=max(8.0, fontsize * 0.90),
+        )
 
     # --- mutation panel ---
     ax = fig.add_subplot(gs[row_i, 0])
@@ -332,6 +349,10 @@ def oncoprint(
     ax.set_ylim(0, n_genes)
     ax.set_xticks(np.arange(0, n_samples + 1, 1), minor=True)
     ax.set_yticks(np.arange(0, n_genes + 1, 1), minor=True)
+
+    ax.tick_params(axis="y", labelsize=max(7.0, fontsize * 0.85))
+    ax.tick_params(axis="x", labelsize=max(7.0, fontsize * 0.75))
+
     ax.grid(which="minor", color=grid_color, linewidth=0.6)
     ax.tick_params(which="minor", bottom=False, left=False)
 
@@ -343,7 +364,12 @@ def oncoprint(
     ax.set_yticks(np.arange(n_genes) + 0.5)
     ax.set_yticklabels(list(reversed(mut.columns.astype(str).tolist())))
     ax.set_xticks(np.arange(n_samples) + 0.5)
-    ax.set_xticklabels(mut.index.astype(str).tolist(), rotation=90, fontsize=7 if show_sample_labels else 7)
+
+    ax.set_xticklabels(
+        mut.index.astype(str).tolist(),
+        rotation=90,
+        fontsize=max(6.0, fontsize * 0.70),
+    )
     if not show_sample_labels:
         ax.set_xticklabels([])
     ax.tick_params(axis="x", length=0)
@@ -351,7 +377,7 @@ def oncoprint(
 
     ax.set_xlabel("Samples")
     ax.set_ylabel("Mutations")
-    ax.set_title(title or "Oncoprint", pad=8)
+    ax.set_title(title or "Oncoprint", pad=8, fontsize=max(10.0, fontsize * 1.15))
 
     # side bar: frequency
     ax_bar = fig.add_subplot(gs[(0 if ax_top is None else 1), 1])
@@ -362,6 +388,11 @@ def oncoprint(
     ax_bar.set_xlabel("Freq")
     ax_bar.xaxis.set_label_position("top")
     ax_bar.xaxis.tick_top()
+
+    ax_bar.set_xlabel("Freq", fontsize=max(8.0, fontsize * 0.85))
+    ax_bar.tick_params(axis="x", labelsize=max(7.0, fontsize * 0.75))
+
+
     for spn in ["right", "bottom", "left"]:
         ax_bar.spines[spn].set_visible(False)
 
@@ -385,14 +416,15 @@ def oncoprint(
             ax_expr.axvline(b - 0.5, color="0.5", lw=1.2, alpha=0.8)
 
         ax_expr.set_yticks(np.arange(n_expr))
-        ax_expr.set_yticklabels(expr_df.columns.astype(str).tolist())
+        ax_expr.set_yticklabels(expr_df.columns.astype(str).tolist(), fontsize=max(7.0, fontsize * 0.85))
         ax_expr.set_xticks([])
         ax_expr.tick_params(axis="y", length=0)
 
         # compact colorbar
         cax = fig.add_axes([0.92, 0.12, 0.015, 0.16])
         cb = fig.colorbar(im, cax=cax)
-        cb.set_label(("Z-score" if expr_zscore else "Expression"), rotation=90)
+        cb.set_label(("Z-score" if expr_zscore else "Expression"), rotation=90, fontsize=max(8.0, fontsize * 0.85))
+        cb.ax.tick_params(labelsize=max(7.0, fontsize * 0.75))
 
     fig.subplots_adjust(left=0.26, right=0.86, top=0.92, bottom=0.10)
 

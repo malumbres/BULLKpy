@@ -4,6 +4,7 @@ from __future__ import annotationsfrom pathlib import Pathfrom typing import 
     *,
     index_col: str,
     sep: str = "\t",
+    low_memory = False, 
     how: Literal["left", "inner"] = "left",
 ) -> ad.AnnData:
     """
@@ -19,6 +20,8 @@ from __future__ import annotationsfrom pathlib import Pathfrom typing import 
         Column in metadata that matches `adata.obs_names`.
     sep
         Column separator for tsv/csv files.
+    low_memory 
+	Pandas low_memory parameter
     how
         Merge strategy:
         - "left": keep all samples in adata (default)
@@ -34,7 +37,7 @@ from __future__ import annotationsfrom pathlib import Pathfrom typing import 
 
     # Load metadata
     if metadata_file.suffix in {".xls", ".xlsx"}:
-        meta = pd.read_excel(metadata_file)
+        meta = pd.read_excel(metadata_file, low_memory=low_memory)
     else:
         meta = pd.read_csv(metadata_file, sep=sep)
 

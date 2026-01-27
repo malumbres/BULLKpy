@@ -5,7 +5,17 @@ import numpy as np
 import pandas as pd
 import tempfile
 from pathlib import Path
+from dataclasses import dataclass
+from typing import Optional, Sequence
 import anndata as ad
+from anndata import AnnData
+
+@dataclass
+class ObsColumnIssue:
+    column: str
+    dtype: str
+    issue: str
+
 
 def _safe_filename(name: str, maxlen: int = 80) -> str:
     # Replace characters that can break paths in HDF5 / filesystem
@@ -115,7 +125,7 @@ def sanitize_metadata(
 
         # try datetime
         if s.dtype == object or pd.api.types.is_string_dtype(s):
-            parsed_dt = pd.to_datetime(s, errors="coerce", infer_datetime_format=True)
+            parsed_dt = pd.to_datetime(s, errors="coerce")
             frac_dt = parsed_dt.notna().mean()
             if frac_dt >= datetime_min_frac and parsed_dt.notna().sum() >= 2:
                 df[c] = parsed_dt
@@ -218,25 +228,90 @@ def find_bad_obs_cols_by_write(
     return bad, None
 
 
-def make_obs_h5ad_safe(adata, cols=None):
-    if cols is None:
-        cols = list(adata.obs.columns)
+def find_bad_obs_columns(adata: AnnData) -> list[ObsColumnIssue]:
+    """
+    Identify `.obs` columns likely to break `adata.write_h5ad()`,
+    especially Pandas nullable StringArray ('string[python]').
 
-    # always safe
-    adata.obs.columns = adata.obs.columns.map(str)
-    adata.obs_names = adata.obs_names.map(str)
+    Returns a list of ObsColumnIssue.
+    """
+    issues: list[ObsColumnIssue] = []
+    for col in adata.obs.columns:
+        s = adata.obs[col]
+        dt = str(s.dtype)
 
-    for c in cols:
-        s = adata.obs[c]
+        # Pandas StringArray / nullable string dtype
+        if pd.api.types.is_string_dtype(s.dtype) and not pd.api.types.is_object_dtype(s.dtype):
+            issues.append(ObsColumnIssue(col, dt, "nullable pandas string dtype (StringArray)"))
 
-        # categorical -> force categories to strings
-        if pd.api.types.is_categorical_dtype(s):
-            adata.obs[c] = s.astype(str).astype("category")
+        # Categorical with nullable string categories can also trigger issues
+        if pd.api.types.is_categorical_dtype(s.dtype):
+            cats = s.cat.categories
+            if pd.api.types.is_string_dtype(cats.dtype) and not pd.api.types.is_object_dtype(cats.dtype):
+                issues.append(ObsColumnIssue(col, f"{dt} (cats: {cats.dtype})", "categorical has StringArray categories"))
+
+        # Object columns with mixed non-serializable stuff
+        if pd.api.types.is_object_dtype(s.dtype):
+            # quick heuristic: if it contains lists/dicts/sets, h5ad will likely fail
+            bad = s.dropna().head(200)
+            if bad.apply(lambda x: isinstance(x, (list, dict, set, tuple))).any():
+                issues.append(ObsColumnIssue(col, dt, "object column contains list/dict/set/tuple"))
+    return issues
+
+
+
+def make_obs_h5ad_safe(
+    adata: AnnData,
+    *,
+    columns: Optional[Sequence[str]] = None,
+    coerce_object_mixed_to_str: bool = True,
+    convert_string_to_object: bool = True,
+    convert_categories_to_object: bool = True,
+    copy: bool = False,
+) -> Optional[AnnData]:
+    """
+    Sanitize `.obs` to be reliably writable to .h5ad.
+
+    Key fixes:
+    - pandas nullable string dtype -> object dtype (Python str)
+    - categorical categories with nullable string dtype -> object
+    - object columns with list/dict/set/tuple -> stringify (optional)
+
+    Modifies adata in place unless copy=True.
+    """
+    ad = adata.copy() if copy else adata
+    obs = ad.obs.copy()
+
+    cols = list(columns) if columns is not None else list(obs.columns)
+
+    for col in cols:
+        if col not in obs.columns:
             continue
 
-        # object -> stringify elementwise
-        if s.dtype == "object":
-            adata.obs[c] = s.map(lambda x: "" if x is None or (isinstance(x, float) and np.isnan(x)) else str(x))
+        s = obs[col]
+        dt = s.dtype
 
-    return adata
+        # 1) Convert pandas nullable string dtype to object
+        if convert_string_to_object and pd.api.types.is_string_dtype(dt) and not pd.api.types.is_object_dtype(dt):
+            # ensure python strings / pd.NA preserved as NA
+            s2 = s.astype("object")
+            obs[col] = s2
+            s = obs[col]
+            dt = s.dtype
 
+        # 2) Fix categorical categories dtype (can be StringArray)
+        if pd.api.types.is_categorical_dtype(dt) and convert_categories_to_object:
+            cats = s.cat.categories
+            if pd.api.types.is_string_dtype(cats.dtype) and not pd.api.types.is_object_dtype(cats.dtype):
+                # rebuild categorical with object categories
+                new_cats = cats.astype("object")
+                obs[col] = pd.Categorical(s.astype("object"), categories=new_cats, ordered=s.cat.ordered)
+
+        # 3) Object columns that contain non-scalars -> stringify
+        if pd.api.types.is_object_dtype(obs[col].dtype) and coerce_object_mixed_to_str:
+            sample = obs[col].dropna().head(200)
+            if not sample.empty and sample.apply(lambda x: isinstance(x, (list, dict, set, tuple))).any():
+                obs[col] = obs[col].map(lambda x: str(x) if isinstance(x, (list, dict, set, tuple)) else x).astype("object")
+
+    ad.obs = obs
+    return ad if copy else None

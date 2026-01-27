@@ -1,7 +1,7 @@
 # Plot Correlation heatmap
 
 ```{eval-rst}
-.. autofunction:: bullkpy.tl.plot_corr_scatter
+.. autofunction:: bullkpy.tl.plot_corr_heatmap
 
 ```
 
@@ -12,10 +12,10 @@ This function is designed to visualize **wide correlation matrices**
 `obs_obs_corr_matrix`, `gene_gene_correlations`, or similar utilities.
 
 ## What it does
-	•	Takes a wide pandas DataFrame (rows × columns)
-	•	Displays a heatmap of correlation values
-	•	Uses seaborn if available, otherwise falls back to pure matplotlib
-	•	Supports optional value annotations and color scaling
+- Takes a wide pandas DataFrame (rows × columns)
+- Displays a heatmap of correlation values
+- Uses seaborn if available, otherwise falls back to pure matplotlib
+- Supports optional value annotations and color scaling
 
 This function is intentionally lightweight and does not recompute
 correlations—it only visualizes an existing matrix.
@@ -57,8 +57,8 @@ Whether to immediately display the figure using plt.show().
 ```python
 (fig, ax)
 ```
-	•	fig — matplotlib Figure
-	•	ax — matplotlib Axes
+- **fig** — matplotlib Figure
+- **ax** — matplotlib Axes
 
 Returning the objects allows further customization or saving by the caller.
 
@@ -102,13 +102,12 @@ bk.pl.plot_corr_heatmap(
 ```
 
 ## Notes
-	•	If seaborn is installed, it is used for nicer defaults and labels.
-	•	If seaborn is not available, the function gracefully falls back to
-matplotlib.imshow.
-	•	For very large matrices, consider:
-	•	disabling annot
-	•	pre-filtering rows/columns
-	•	clustering externally before plotting
+- If seaborn is installed, it is used for nicer defaults and labels.
+- If seaborn is not available, the function gracefully falls back to matplotlib.imshow.
+- For very large matrices, consider:
+	- disabling annot
+	- pre-filtering rows/columns
+	- clustering externally before plotting
 
 ## See also
 	•	tl.obs_obs_corr_matrix

@@ -603,8 +603,15 @@ def qc_scatter_panel(
     if share_legend and groupby is not None:
         handles, labels = axes[0].get_legend_handles_labels()
         if handles:
-            fig.legend(handles, labels, loc="center right", frameon=False)
-            fig.subplots_adjust(right=0.90)
+            fig.legend(
+                handles,
+                labels,
+                title=groupby,
+                loc="center left",
+                bbox_to_anchor=(1.02, 0.5),
+                frameon=False,
+            )
+            fig.subplots_adjust(right=0.82)
 
     fig.tight_layout()
 

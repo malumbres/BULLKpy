@@ -50,9 +50,10 @@ git clone https://github.com/malumbres/BULLKpy.git
 cd BULLKpy
 ```
 
-Install in editable mode:
+Install from Pypi
 ```bash
-pip install -e .
+pip install bullkpy
+Pip install bullkpy[survival]
 ```
 
 ## 🧪 Typical workflow

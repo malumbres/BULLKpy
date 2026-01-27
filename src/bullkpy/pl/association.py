@@ -6,12 +6,14 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-
 import anndata as ad
 
 from ._style import set_style, _savefig
-from ..tl.association import categorical_association
+
+# FIX: update this import to your new TL module location:
+from ..tl.associations import categorical_association
+# If instead you kept tl/categorical_association.py, use:
+# from ..tl.categorical_association import categorical_association
 
 
 def association_heatmap(
@@ -31,7 +33,29 @@ def association_heatmap(
 ):
     """
     Generic heatmap for association outputs.
-    Example: genes x categories using effect or -log10(qval).
+
+    Parameters
+    ----------
+    df
+        Long-form association table (tidy dataframe).
+    index, columns, values
+        Column names used to build the pivot (heatmap matrix).
+    agg
+        Aggregation used when multiple rows map to the same (index, column) cell.
+    cmap, vmin, vmax
+        Matplotlib colormap and scaling.
+    figsize
+        Figure size in inches. If None, auto-sized from matrix shape.
+    title
+        Plot title.
+    save
+        Path to save the figure (png/pdf/svg).
+    show
+        Whether to display the figure.
+
+    Returns
+    -------
+    fig, ax
     """
     set_style()
 
@@ -64,8 +88,8 @@ def association_heatmap(
 def boxplot_with_stats(
     adata: ad.AnnData,
     *,
-    y: str,                       # numeric obs key
-    groupby: str,                 # categorical obs key
+    y: str,
+    groupby: str,
     figsize: tuple[float, float] = (7, 3.5),
     kind: Literal["box", "violin"] = "violin",
     show_points: bool = True,
@@ -76,7 +100,13 @@ def boxplot_with_stats(
     show: bool = True,
 ):
     """
-    Simple scanpy-like box/violin plot annotated with global p-value (Kruskal for >2 groups, MWU for 2).
+    Box/violin plot of a numeric obs column across categorical groups, with a
+    simple global p-value annotation.
+
+    - If 2 groups: Mann–Whitney U
+    - If >2 groups: Kruskal–Wallis
+
+    Returns (fig, ax).
     """
     set_style()
 
@@ -93,7 +123,6 @@ def boxplot_with_stats(
     groups = [df.loc[df["g"] == c, "y"].to_numpy(dtype=float) for c in cats]
     k_eff = sum(v.size > 0 for v in groups)
 
-    # compute p-value
     pval = np.nan
     if k_eff >= 2:
         if len(cats) == 2:
@@ -105,14 +134,12 @@ def boxplot_with_stats(
 
     fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
 
-    # lightweight plotting without seaborn dependency
-    # (if you prefer seaborn, we can switch)
     positions = np.arange(len(cats))
     if kind == "box":
         ax.boxplot(groups, positions=positions, showfliers=False)
     else:
         parts = ax.violinplot(groups, positions=positions, showmeans=False, showextrema=False, showmedians=True)
-        for pc in parts["bodies"]:
+        for pc in parts.get("bodies", []):
             pc.set_alpha(0.8)
 
     if show_points:
@@ -152,7 +179,13 @@ def categorical_confusion(
     show: bool = True,
 ):
     """
-    Confusion-style heatmap for two categorical obs columns + Cramér’s V / ARI / NMI.
+    Confusion-style heatmap for two categorical obs columns + association metrics.
+
+    Metrics (from categorical_association):
+      - chi2
+      - cramers_v
+      - ari
+      - nmi
     """
     set_style()
 

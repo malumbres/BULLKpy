@@ -26,8 +26,8 @@ The function is flexible with respect to matrix orientation and file format.
 
 ## Supported input formats
 
-- **TSV / CSV text files**
-- Genes in rows **or** genes in columns
+- TSV / CSV text files
+- Genes in rows or genes in columns
 - Integer or numeric count values
 
 Typical inputs include:
@@ -52,8 +52,8 @@ adata = bk.io.read_counts(
 This corresponds to matrices where rows are genes and columns are samples
 (e.g. HTSeq, featureCounts default output).
 
+### Samples in rows, genes in columns
 ```python
-#Samples in rows, genes in columns
 adata = bk.io.read_counts(
     "counts.tsv",
     orientation="samples_by_genes",
@@ -81,42 +81,43 @@ Merge strategy:
 
 ## File separators
 
+By default, tab-separated files are assumed:
 ```python
-
-# By default, tab-separated files are assumed:
 adata = bk.io.read_counts("counts.tsv", sep="\t")
-
-# For comma-separated files:
+```
+For comma-separated files:
+```python
 adata = bk.io.read_counts("counts.csv", sep=",")
 ```
 
 # Data types
 
+By default, the count matrix is cast to int64
 ```python
-# By default, the count matrix is cast to int64
 adata = bk.io.read_counts("counts.tsv", dtype="int64")
+```
 
-# If your input is already normalized or contains non-integer values,
+If your input is already normalized or contains non-integer values,
 disable casting:
+```python
 adata = bk.io.read_counts("matrix.tsv", dtype=None)
-
 ```
 
 # Output
 
 The returned object is an AnnData instance with:
-	•	adata.X → count matrix (samples × genes)
-	•	adata.obs_names → sample IDs
-	•	adata.var_names → gene IDs
+- adata.X → count matrix (samples × genes)
+- adata.obs_names → sample IDs
+- adata.var_names → gene IDs
 
-Example:
 ```python
 adata
 # AnnData object with n_obs × n_vars = 120 × 18000
 ```
 
 # Notes
-	•	This function does not perform normalization
-	•	Gene identifiers are taken directly from the input file index/columns
-	•	Downstream steps such as QC, normalization, PCA, clustering, etc.
-should be run separately
+- This function does not perform normalization
+- Gene identifiers are taken directly from the input file index/columns
+- Downstream steps such as QC, normalization, PCA, clustering, etc. should be run separately.
+
+

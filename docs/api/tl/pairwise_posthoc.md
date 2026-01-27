@@ -1,4 +1,4 @@
-# Pairwise postdoc
+# Pairwise posthoc
 
 ```{eval-rst}
 .. autofunction:: bullkpy.tl.pairwise_posthoc

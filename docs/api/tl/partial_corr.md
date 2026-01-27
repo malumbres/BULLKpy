@@ -13,9 +13,9 @@ This is useful when you want to quantify the association between `x` and `y`
 purity scores).
 
 ## What it does
-	1.	Builds a design matrix from adata.obs[covariates] (with an intercept)
-	2.	Residualizes x and y with respect to these covariates
-	3.	Computes a correlation between the residuals
+1. Builds a design matrix from adata.obs[covariates] (with an intercept). 
+2. Residualizes x and y with respect to these covariates. 
+3. Computes a correlation between the residuals. 
 
 Conceptually:
 
@@ -56,9 +56,9 @@ A tuple:
 ```python
 (r, pval, n)
 ```
-	•	r — partial correlation coefficient
-	•	pval — two-sided p-value
-	•	n — number of observations used in the correlation
+- r — partial correlation coefficient
+- pval — two-sided p-value
+- n — number of observations used in the correlation
 
 ## Examples
 

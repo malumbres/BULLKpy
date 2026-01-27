@@ -195,3 +195,156 @@ def corr_heatmap(
         plt.show()
 
     return cg
+
+
+
+def gene_panel_correlation_heatmap(
+    adata,
+    *,
+    genes: Sequence[str],
+    layer: str | None = "log1p_cpm",
+    method: Literal["pearson", "spearman"] = "pearson",
+    use_abs: bool = False,
+    figsize: tuple[float, float] | None = None,
+    cmap: str = "vlag",
+    vmin: float | None = -1.0,
+    vmax: float | None = 1.0,
+    annotate: bool = False,
+    annot_fontsize: float = 7.0,
+    tick_fontsize: float = 8.0,
+    title: str | None = None,
+    cluster: bool = False,          # uses seaborn.clustermap if True
+    dendrogram_ratio: float = 0.12, # only for cluster=True
+    cbar_pos: tuple[float, float, float, float] = (0.92, 0.15, 0.02, 0.7),
+    save: str | None = None,
+    show: bool = True,
+):
+    """
+    Pairwise correlation heatmap for a gene panel.
+
+    Returns
+    -------
+    dfC : pd.DataFrame (gene x gene correlation)
+    fig, ax_or_grid : matplotlib figure + axis (or seaborn ClusterGrid if cluster=True)
+    """
+    # --- expression matrix ---
+    genes = [str(g) for g in genes if str(g) in adata.var_names]
+    if len(genes) < 2:
+        raise ValueError("Need at least 2 genes present in adata.var_names.")
+
+    X = adata.layers[layer] if (layer is not None and layer in getattr(adata, "layers", {})) else adata.X
+    gidx = adata.var_names.get_indexer(genes)
+    M = X[:, gidx]
+    M = M.toarray() if hasattr(M, "toarray") else np.asarray(M, dtype=float)
+
+    # --- correlation ---
+    if method == "spearman":
+        Mr = np.apply_along_axis(lambda x: pd.Series(x).rank(method="average").to_numpy(), 0, M)
+        C = np.corrcoef(Mr, rowvar=False)
+    elif method == "pearson":
+        C = np.corrcoef(M, rowvar=False)
+    else:
+        raise ValueError("method must be 'pearson' or 'spearman'.")
+
+    C = np.nan_to_num(C, nan=0.0, posinf=0.0, neginf=0.0)
+    if use_abs:
+        C = np.abs(C)
+        if vmin is None:
+            vmin = 0.0
+        if vmax is None:
+            vmax = 1.0
+
+    dfC = pd.DataFrame(C, index=genes, columns=genes)
+
+    # --- size ---
+    if figsize is None:
+        s = max(4.5, 0.28 * len(genes) + 2.0)
+        figsize = (s, s)
+
+
+    # --- clustered heatmap (optional) ---
+    if cluster:
+        try:
+            import seaborn as sns
+            import matplotlib.pyplot as plt
+        except Exception as e:
+            raise ImportError(f"cluster=True requires seaborn/matplotlib. ({e})")
+
+        g = sns.clustermap(
+            dfC,
+            cmap=cmap,
+            row_cluster=True,
+            col_cluster=True,
+            xticklabels=True,
+            yticklabels=True,
+            figsize=figsize,
+            dendrogram_ratio=float(dendrogram_ratio),
+            cbar_pos=cbar_pos,  # initial hint
+        )
+
+        # --- title ---
+        if title is None:
+            title = f"Gene–gene correlation ({method}{', abs' if use_abs else ''})"
+        g.ax_heatmap.set_title(title, pad=12)
+
+        # --- ticks ---
+        for lab in g.ax_heatmap.get_xticklabels():
+            lab.set_rotation(90)
+            lab.set_fontsize(float(tick_fontsize))
+        for lab in g.ax_heatmap.get_yticklabels():
+            lab.set_fontsize(float(tick_fontsize))
+
+        # --- spacing (leave room for labels + the cbar) ---
+        # (do this BEFORE final cbar placement)
+        g.fig.subplots_adjust(bottom=0.22)
+
+        # IMPORTANT in seaborn 0.11.x:
+        # Force layout to settle, THEN force the colorbar position at the end.
+        g.fig.canvas.draw()
+        g.cax.set_position(cbar_pos)
+        g.fig.canvas.draw()
+
+        # if you want df in plotted order:
+        row_order = [dfC.index[i] for i in g.dendrogram_row.reordered_ind]
+        col_order = [dfC.columns[i] for i in g.dendrogram_col.reordered_ind]
+        dfC_plot_order = dfC.loc[row_order, col_order]
+
+        if save is not None:
+            # NOTE: bbox_inches="tight" can override manual axis positions.
+            # Use bbox_inches=None to preserve exact cbar_pos.
+            g.fig.savefig(save, dpi=300)  # <-- no bbox_inches="tight"
+        if show:
+            plt.show()
+
+        return dfC_plot_order, g.fig, g
+
+    # --- plain matplotlib heatmap ---
+    fig, ax = plt.subplots(figsize=figsize)
+    im = ax.imshow(dfC.to_numpy(), aspect="auto", vmin=vmin, vmax=vmax, cmap=cmap)
+
+    ax.set_xticks(np.arange(len(genes)))
+    ax.set_xticklabels(genes, rotation=90, fontsize=float(tick_fontsize))
+    ax.set_yticks(np.arange(len(genes)))
+    ax.set_yticklabels(genes, fontsize=float(tick_fontsize))
+
+    if title is None:
+        title = f"Gene–gene correlation ({method}{', abs' if use_abs else ''})"
+    ax.set_title(title, pad=12)
+
+    cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    cbar.set_label(f"{'| ' if use_abs else ''}{method} corr")
+
+    if annotate and len(genes) <= 35:
+        arr = dfC.to_numpy()
+        for i in range(arr.shape[0]):
+            for j in range(arr.shape[1]):
+                ax.text(j, i, f"{arr[i, j]:.2f}", ha="center", va="center", fontsize=float(annot_fontsize))
+
+    fig.tight_layout()
+
+    if save is not None:
+        fig.savefig(save, bbox_inches="tight", dpi=300)
+    if show:
+        plt.show()
+
+    return dfC, fig, ax
