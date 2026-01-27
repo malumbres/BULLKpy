@@ -1,5 +1,5 @@
 # BULLKpy 🧬
-<img src="docs/images/oncoprint_example.png" width="300"> alt="BULLKpy logo">
+<img src="docs/images/BULLKpy_logo.png" width="300"> alt="BULLKpy logo">
 
 **BULLKpy** is a Python pipeline for **bulk RNA-seq analysis**, inspired by Scanpy but adapted for
 bulk transcriptomics. It integrates QC, normalization, clustering, differential expression,
