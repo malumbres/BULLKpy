@@ -1,8 +1,8 @@
 # BULLKpy
 
-```{figure} /_static/BULLKpy_logo.png
+```{figure} /images/BULLKpy_logo.png
 :alt: BULLKpy
-:width: 400px
+:width: 200px
 :align: left
 ``` 
 
