@@ -30,7 +30,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
-    "myst_nb",  # this provides MyST markdown support
+    "myst_nb",                   # this provides MyST markdown support
     "sphinx_copybutton",
     "sphinx_design",
     "nbsphinx",
@@ -52,11 +52,14 @@ exclude_patterns = [
 
 # --- MyST / MyST-NB ---
 myst_enable_extensions = [
+    "amsmath",
     "colon_fence",
     "deflist",
     "substitution",
     "tasklist",
     "attrs_inline",
+    "html_admonition",
+    "html_image",
 ]
 
 nb_execution_mode = "off"  # IMPORTANT: fast & stable on RTD; you can set "auto" later

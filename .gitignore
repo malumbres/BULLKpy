@@ -58,4 +58,5 @@ Thumbs.db
 /data/
 *.h5ad
 /docs/_build/
+docs/_build/
 /notebooks/.ipynb_checkpoints/
