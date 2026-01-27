@@ -13,3 +13,8 @@ python:
 
 sphinx:
   configuration: docs/conf.py
+
+jobs:
+  pre_build:
+    - mkdir -p docs/notebooks
+    - rsync -av --delete notebooks/ docs/notebooks/ --exclude ".ipynb_checkpoints"
