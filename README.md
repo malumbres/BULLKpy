@@ -220,7 +220,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a full list of changes.
 MIT License
 
 Please cite:   
-Malumbres M. BULLKpy: An AnnData-Inspired Unified Framework for Comprehensive Bulk OMICs Analysis. BioRxiv 10.64898/2026.01.26.701768v1. doi: https://doi.org/10.64898/2026.01.26.701768. 
+Malumbres M. (2026) BULLKpy: An AnnData-Inspired Unified Framework for Comprehensive Bulk OMICs Analysis. BioRxiv 10.64898/2026.01.26.701768v1. doi: https://doi.org/10.64898/2026.01.26.701768. 
 
 https://www.biorxiv.org/content/10.64898/2026.01.26.701768v1. 
 
