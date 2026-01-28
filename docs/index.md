@@ -1,6 +1,6 @@
 # BULLKpy 🧬
 
-<img src="images/BULLKpy_logo.png" width="300">
+<img src="https://raw.githubusercontent.com/malumbres/BULLKpy/main/docs/images/BULLKpy_logo.png" width="300">
 
 **BULLKpy** is a Python framework for **comprehensive bulk OMICs data analysis**,  
 with a strong focus on **biomedical and cancer research**.
@@ -50,6 +50,17 @@ pip install bullkpy
 
 install
 api/index
+notebooks/index
+```
+
+## 🚀 Tutorials
+
+Step-by-step tutorials
+
+```{toctree}
+:maxdepth: 2
+:caption: Tutorial
+
 notebooks/index
 ```
 

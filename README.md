@@ -1,5 +1,5 @@
 # BULLKpy 🧬
-<img src="docs/images/BULLKpy_logo.png" width="300">
+<img src="https://raw.githubusercontent.com/malumbres/BULLKpy/main/docs/images/BULLKpy_logo.png" width="300">
 
 **BULLKpy** is a Python pipeline for **bulk OMICs analysis**, based on AnnData objects and inspired by Scanpy/scverse but adapted for bulk transcriptomics. It integrates QC, normalization, clustering, correlation and association utilities, differential expression, gene set enrichment analysis (GSEA), metaprograms, and rich visualization utilities (oncoprints, etc.).  
 
