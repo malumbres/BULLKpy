@@ -15,6 +15,8 @@ It provides a unified, AnnData-inspired workflow to perform:
 - Survival analysis and clinical associations
 - Publication-ready visualization
 
+[BULLKpy on GitHub](https://github.com/malumbres/BULLKpy)
+
 BULLKpy is designed to integrate seamlessly with the **scverse ecosystem**,  
 and to help **standardize and democratize** bulk transcriptomics analysis in Python.
 
@@ -40,15 +42,8 @@ pip install bullkpy
 
 ## 🚀 Getting started
 
-```{toctree}
-:maxdepth: 2
-:caption: Getting started
 
-installation
-```
-
-
-Table of contents
+### 📘 Table of contents
 ```{toctree}
 :maxdepth: 2
 :caption: Contents
@@ -60,28 +55,9 @@ notebooks/index
 
 ⸻
 
-📘 Tutorials & notebooks
+## 📘 Quickstart
 
-```{toctree}
-:maxdepth: 2
-:caption: Tutorials
-
-notebooks/index
-```
-⸻
-
-📚 API reference
-
-```{toctree}
-:maxdepth: 2
-:caption: API reference
-
-api/index
-```
-
-Quickstart
-
-```{python}
+```bash
 import bullkpy as bk
 import pandas as pd                        # for better manipulation of metadata
 import seaborn as sns                      # for some plots
@@ -151,12 +127,13 @@ bk.tl.gsea_preranked(
     gene_sets=["hallmark"], 
 )
 ```
+⸻
 
+## 🔗 Links
 
-🔗 Links
+BULLKpy is available on GitHub ([https://github.com/malumbres/BULLKpy](https://github.com/malumbres/BULLKpy)).
 
-- GitHub: https://github.com/malumbres/BULLKpy
-- Issue tracker: https://github.com/malumbres/BULLKpy/issues
+Issue tracker: ([https://github.com/malumbres/BULLKpy/issues](https://github.com/malumbres/BULLKpy/issues))
 
 ---
 
