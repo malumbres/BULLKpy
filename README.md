@@ -13,7 +13,6 @@ https://bullkpy.readthedocs.io/en/latest/
 
 --- 
 
-
 ## 🚀 Installation
 
 Clone the repository:
@@ -29,17 +28,27 @@ https://pypi.org/project/bullkpy/
 ```bash
 pip install bullkpy
 ```
+--- 
 
+## 🚀 Tutorials
+
+Use this initial Jupyter notebook for a practical presentation of BULLKpy functions:  
+
+https://bullkpy.readthedocs.io/en/latest/notebooks/BULLKpy_TCGA_example_notebook.html
+
+More functions and field-specific tutorials to come...
+
+--- 
 ## 📦 Project structure
 
 ```bash
 bullkpy-skeleton/
 ├── src/                # BULLKpy Python package
 │   └── bullkpy/
+|       ├── io.py.      # input/output tools
 │       ├── pp/         # preprocessing
 │       ├── tl/         # tools (DE, clustering, GSEA, associations)
 │       ├── pl/         # plotting
-│       ├── io.py
 │       └── settings.py
 │
 ├── notebooks/          # analysis notebooks (examples, use cases)
@@ -49,8 +58,11 @@ bullkpy-skeleton/
 │
 ├── pyproject.toml      # package configuration
 ├── README.md
+├── CHANGELOG.md
 ├── LICENSE
-└── .gitignore
+├── .gitignore
+└── .readthedocs.yaml
+
 ```
 ---
 
@@ -60,9 +72,13 @@ bullkpy-skeleton/
 import bullkpy as bk
 import pandas
 import seaborn as sns
+import anndata as ad
 
 # Load data
-adata = bk.read_counts("counts.tsv")
+adata = bk.io.read_counts("counts.tsv", sep="\t")
+
+# Load metadata
+adata = bk.add_metadata(adata, "metadata.tsv", sep="\t")
 
 # QC
 bk.pp.qc_metrics(adata)
@@ -79,7 +95,6 @@ bk.tl.pca_loadings(adata)
 bk.pl.pca_loadings_bar(adata)
 bk.pl.pca_loadings_heatmap(adata)
 bk.tl.neighbors(adata)
-bk.tl.cluster(adata, method="leiden")
 bk.tl.umap(adata)
 bk.tl.umap_graph(adata)
 bk.pl.umap(adata)
@@ -87,7 +102,8 @@ bk.pl.umap(adata)
 # Clustering
 bk.tl.leiden_resolution_scan(adata)
 bk.pl.ari_resolution_heatmap(adata)
-bk.tl.cluster(adata)
+bk.tl.cluster(adata, method="leiden")
+bk.tl.cluster(adata, method="means")
 bk.tl.cluster_metrics(adata)
 
 # Genes and gene signatures
@@ -119,8 +135,8 @@ bk.pl.volcano_categorical(res)
 bk.tl.posthoc_per_gene(adata)
 
 # Marker genes and Differential expression
-res = bk.tl.de(adata)
-bk.tl.de_glm(data)
+bk.tl.de(adata)
+bk.tl.de_glm(data).  # DESeq-like   
 bk.pl.volcano(res)
 bk.pl.rankplot(res)
 bk.pl.ma(res)
@@ -133,6 +149,29 @@ bk.pl.leading_edge_jaccard_heatmap(pre_res)
 bk.pl.leading_edge_overlap_matrix(pre_res)
 bk.tl.list_enrichr_libraries()
 
+# Metaprograms
+bk.tl.score_metaprograms(adata)
+bk.tl.metaprogram_heterogeneity(adata)
+bk.pl.metaprogram_corr(adata)
+bk.pl.metaprogram_heatmap(adata)
+bk.tl.metaprogram_sample_metrics(adata)
+bk.tl.metaprogram_dispersion_by_group(adata)
+bk.tl.metaprogram_ne_enrichment(adata)
+bk.tl.metaprogram_topk_contribution(adata)
+bk.pl.metaprogram_dispersion_heatmap(adata)
+bk.pl.metaprogram_metrics_summary(adata)
+bk.pl.metaprogram_ne_scatter(adata)
+bk.pl.metaprogram_dominance_ridgeplot_like(adata)
+bk.pl.metaprogram_rank1_composition_stackedbar(adata)
+
+# Survival analysis
+bk.tl.cox_univariate(adata)
+bk.pl.cox_forest_from_uns(adata)
+bk.pl.run_cox_per_group(adata)
+bk.tl.cox_interaction(adata)
+bk.pl.km_univariate(adata)
+bk.pl.km_2x2_interaction(adata)
+
 # Plots
 bk.pl.violin(adata)
 bk.pl.dotplot(adata)
@@ -141,8 +180,17 @@ bk.pl.sample_distances(adata)
 bk.pl.sample_correlation_clustergram(adata)
 bk.pl.gene_plot(adata)
 bk.pl.oncoprint(adata)
+
+# Other Utilities
+bk.pp.find_bad_obs_cols_by_write(adata)
+bk.pp.find_bad_var_cols_by_write(adata)
+bk.pp.make_obs_h5ad_safe_strict(adata)
+bbk.pp.make_var_h5ad_safe_strict(adata
+bk.pp.batch_correct_combat(adata)
+
 ```
 
+---
 ## 📊 Features
 
 	•	Bulk RNA-seq, small and large projects. QC & filtering
@@ -154,17 +202,25 @@ bk.pl.oncoprint(adata)
 	•	Leading-edge GSEA analysis
 	•	Oncoprint-style mutation plots
 	•	Scanpy-like API (pp, tl, pl)
-
+---
 ## ⚠️ Notes
 
 	•	data/ and results/ are not versioned
 	•	Designed for small or large datasets (TCGA-scale)
 	•	Requires Python ≥ 3.9
 
+---
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for a full list of changes.
 
-## 📄 License
+---
+## 📄 Publication & License
 
 MIT License
+
+Please cite: Malumbres M. BULLKpy: An AnnData-Inspired Unified Framework for Comprehensive Bulk OMICs Analysis. BioRxiv 10.64898/2026.01.26.701768v1. doi: https://doi.org/10.64898/2026.01.26.701768. 
+
+https://www.biorxiv.org/content/10.64898/2026.01.26.701768v1. 
+
+
