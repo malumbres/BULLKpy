@@ -1,10 +1,6 @@
-# BULLKpy
+# BULLKpy 🧬
 
-```{figure} /images/BULLKpy_logo.png
-:width: 200px
-:align: center
-```
-
+<img src="images/BULLKpy_logo.png" width="300">
 
 **BULLKpy** is a Python framework for **comprehensive bulk OMICs data analysis**,  
 with a strong focus on **biomedical and cancer research**.
@@ -21,6 +17,24 @@ It provides a unified, AnnData-inspired workflow to perform:
 
 BULLKpy is designed to integrate seamlessly with the **scverse ecosystem**,  
 and to help **standardize and democratize** bulk transcriptomics analysis in Python.
+
+---
+
+## 🚀 Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/malumbres/BULLKpy.git
+cd BULLKpy
+```
+
+Install from Pypi:
+https://pypi.org/project/bullkpy/  
+
+```bash
+pip install bullkpy
+```
 
 ---
 

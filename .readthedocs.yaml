@@ -7,8 +7,8 @@ build:
   jobs:
     pre_build:
       - mkdir -p docs/notebooks
-      - find docs/notebooks -mindepth 1 -delete
-      - find notebooks -maxdepth 1 -name "*.ipynb" -exec cp -t docs/notebooks {} +
+      - find docs/notebooks -type f -name "*.ipynb" ! -name "index.ipynb" -delete
+      - cp notebooks/*.ipynb docs/notebooks/ || true
 
 python:
   install:
