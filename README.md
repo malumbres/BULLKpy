@@ -161,6 +161,10 @@ bk.pl.oncoprint(adata)
 	•	Designed for small or large datasets (TCGA-scale)
 	•	Requires Python ≥ 3.9
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a full list of changes.
+
 ## 📄 License
 
 MIT License

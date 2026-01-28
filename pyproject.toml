@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bullkpy"
-version = "0.0.1"
+version = "0.1.0"
 description = "Scanpy-like pipeline for bulk RNA-seq in Python"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -53,6 +53,8 @@ docs = [
 Homepage = "https://github.com/malumbres/BULLKpy"
 Repository = "https://github.com/malumbres/BULLKpy"
 Issues = "https://github.com/malumbres/BULLKpy/issues"
+ReadTheDocs = "https://bullkpy.readthedocs.io/en/latest/index.html"
+Pypi = "https://pypi.org/project/bullkpy/"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
