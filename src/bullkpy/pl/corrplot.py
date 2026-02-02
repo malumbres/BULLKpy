@@ -45,6 +45,48 @@ def _get_color_vector(
     raise KeyError(f"color/hue key '{key}' not found in adata.obs columns or adata.var_names.")
 
 
+def _get_numeric_vector(
+    adata: ad.AnnData,
+    key: str,
+    *,
+    source: Literal["auto", "obs", "gene"] = "auto",
+    layer: str | None = None,
+) -> tuple[np.ndarray, str]:
+    """
+    Return (values, label) where values is float array aligned to adata.obs_names.
+
+    - obs: pd.to_numeric(errors="coerce")
+    - gene: from X or layer
+    """
+    def _from_obs(k: str) -> tuple[np.ndarray, str]:
+        if k not in adata.obs.columns:
+            raise KeyError(f"'{k}' not found in adata.obs (source='obs').")
+        s = pd.to_numeric(adata.obs[k], errors="coerce")
+        return s.to_numpy(dtype=float), k
+
+    def _from_gene(g: str) -> tuple[np.ndarray, str]:
+        if g not in adata.var_names:
+            raise KeyError(f"Gene '{g}' not found in adata.var_names (source='gene').")
+        X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
+        j = int(adata.var_names.get_loc(g))
+        v = X[:, j]
+        if sp.issparse(v):
+            v = v.toarray()
+        return np.asarray(v, dtype=float).ravel(), g
+
+    if source == "obs":
+        return _from_obs(key)
+    if source == "gene":
+        return _from_gene(key)
+
+    # auto
+    if key in adata.obs.columns:
+        return _from_obs(key)
+    if key in adata.var_names:
+        return _from_gene(key)
+    raise KeyError(f"'{key}' not found in adata.obs columns or adata.var_names (source='auto').")
+
+
 def _corr_stats(
     xvals: np.ndarray,
     yvals: np.ndarray,
@@ -106,7 +148,6 @@ def _plot_one(
         ax.scatter(xvals, yvals, s=point_size, alpha=alpha, edgecolors="none")
     else:
         vals, kind, label = _get_color_vector(adata=df.attrs["_adata_"], key=color_key, layer=layer)
-        # align to df index
         vals = pd.Series(vals, index=df.attrs["_adata_"].obs_names).reindex(df.index).to_numpy()
 
         if kind == "numeric":
@@ -169,11 +210,13 @@ def _plot_one(
     return stats
 
 
-def corrplot_obs(
+def corrplot(
     adata: ad.AnnData,
     *,
     x: str,
     y: str,
+    x_source: Literal["auto", "obs", "gene"] = "auto",
+    y_source: Literal["auto", "obs", "gene"] = "auto",
     color: str | Sequence[str] | None = None,
     hue: str | Sequence[str] | None = None,  # alias for color
     layer: str | None = None,
@@ -193,30 +236,42 @@ def corrplot_obs(
     show: bool = True,
 ):
     """
-    Scatter + correlations between two quantitative obs columns.
+    Scatter + correlations between two quantitative vectors.
+    Correlation scatter plot between two vectors.
 
-    Multi-panel:
-      color=["DLL3","SOX10"] makes one panel per color key in a single row.
+    x and y can be:
+    - obs columns
+    - genes (from X or layer)
+
+    Supports:
+    - obs vs obs
+    - gene vs gene
+    - gene vs obs
+
+    Examples
+    --------
+    # gene vs gene
+    bk.pl.corrplot(adata, x="MKI67", y="TOP2A", x_source="gene", y_source="gene", layer="log1p_cpm")
+
+    # gene vs obs
+    bk.pl.corrplot(adata, x="MKI67", y="Proliferation_score", x_source="gene", y_source="obs")
+
+    # obs vs obs (auto)
+    bk.pl.corrplot(adata, x="mp_entropy", y="purity")
     """
     set_style()
 
     if hue is not None and color is None:
         color = hue
 
-    if x not in adata.obs.columns:
-        raise KeyError(f"x='{x}' not in adata.obs")
-    if y not in adata.obs.columns:
-        raise KeyError(f"y='{y}' not in adata.obs")
+    xvals, xlabel = _get_numeric_vector(adata, x, source=x_source, layer=layer)
+    yvals, ylabel = _get_numeric_vector(adata, y, source=y_source, layer=layer)
 
-    df = adata.obs[[x, y]].copy()
-    df[x] = pd.to_numeric(df[x], errors="coerce")
-    df[y] = pd.to_numeric(df[y], errors="coerce")
-
-    # store for _plot_one
+    df = pd.DataFrame({xlabel: xvals, ylabel: yvals}, index=adata.obs_names.astype(str))
     df.attrs["_adata_"] = adata
 
     if dropna:
-        df = df.dropna(subset=[x, y])
+        df = df.dropna(subset=[xlabel, ylabel])
 
     if df.shape[0] < 3:
         raise ValueError(f"Not enough valid points for correlation: n={df.shape[0]}")
@@ -245,8 +300,8 @@ def corrplot_obs(
         st = _plot_one(
             ax,
             df,
-            x=x,
-            y=y,
+            x=xlabel,
+            y=ylabel,
             color_key=c,
             layer=layer,
             palette=palette,
