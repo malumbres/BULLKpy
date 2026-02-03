@@ -42,10 +42,10 @@ def get_expr_matrix(adata, genes, *, layer="log1p_cpm"):
     return genes, M
 
 # Apply the label mask (drop unknowns)
-def mask_known_labels(adata, label_col):
+def mask_known_labels(adata, label_col, label):
     yraw = adata.obs[label_col].astype("object")
     ok = yraw.notna().to_numpy()
-    y = (yraw[ok].astype(str).to_numpy() == "NR").astype(int)
+    y = (yraw[ok].astype(str).to_numpy() == label).astype(int)
     return ok, y
 
 
@@ -57,6 +57,7 @@ def filter_genes_var(
     adata,
     *,
     label_col,
+    label="NR",
     layer="log1p_cpm",
     min_var=0.05,
     top_var=None,
@@ -73,7 +74,7 @@ def filter_genes_var(
         Sorted by descending variance.
     """
     # mask samples with known labels
-    ok, y = mask_known_labels(adata, label_col)
+    ok, y = mask_known_labels(adata, label_col, label)
 
     genes_all = list(adata.var_names)
     genes, M = get_expr_matrix(adata, genes_all, layer=layer)
@@ -106,6 +107,7 @@ def rank_genes_univariate_pr(
     genes,
     *,
     label_col,
+    label,
     layer="log1p_cpm",
 ):
     """
@@ -116,7 +118,7 @@ def rank_genes_univariate_pr(
         direction = +1 → high expression predicts NR
         direction = -1 → low expression predicts NR
     """
-    ok, y = mask_known_labels(adata, label_col)
+    ok, y = mask_known_labels(adata, label_col, label)
     genes, M = get_expr_matrix(adata, genes, layer=layer)
     M = M[ok, :]
 
@@ -150,6 +152,7 @@ def gene_corr_redundancy(
     genes_ranked,
     *,
     label_col,
+    label,
     layer="log1p_cpm",
     corr_threshold=0.8,
     prefer_genes=None,                 # e.g. {"SOCS2", "CXCL13"}
@@ -168,7 +171,7 @@ def gene_corr_redundancy(
     kept_genes : list[str]
     """
     # ---- subset to labeled samples (same as your current helper) ----
-    ok, _ = mask_known_labels(adata, label_col)
+    ok, _ = mask_known_labels(adata, label_col, label)
     genes, M = get_expr_matrix(adata, genes_ranked, layer=layer)
     M = M[ok, :]
 

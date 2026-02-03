@@ -8,7 +8,7 @@ association_heatmap
 boxplot_with_stats
 categorical_confusion
 corr_heatmap
-corrplot_obs
+corrplot
 dotplot
 dotplot_association
 gene_association

@@ -1,11 +1,11 @@
-# Correlation plot Observations
+# Correlation plot 
 
 ```{eval-rst}
-.. autofunction:: bullkpy.pl.corrplot_obs
+.. autofunction:: bullkpy.pl.corrplot
 
 ```
 
-Scatter plot and correlation analysis between **two numeric observation (`obs`) columns**, with optional coloring, regression lines, and multi-panel layout.
+Scatter plot and correlation analysis between **two numeric arrays** including gene versus gene, gene versus numeric observation (`obs`) column or correlation plot between two numeric observations, with optional coloring, regression lines, and multi-panel layout.
 
 This function is designed for **exploratory QC and association analysis** at the sample/observation level, similar in spirit to Scanpy/Seaborn correlation plots but tightly integrated with `AnnData`.
 
@@ -35,8 +35,11 @@ It supports:
 Annotated data matrix (AnnData).  
 
 **x, y**   
-Names of numeric columns in adata.obs to correlate.  
+Names of genes or numeric columns in adata.obs to correlate.  
 Both are coerced to numeric (pd.to_numeric(errors="coerce")).   
+
+**x_source, y_source**   
+"Gene" or "obs" or leave as "auto"   
 
 **color**   
 Optional coloring variable(s) from adata.obs.  
@@ -50,7 +53,7 @@ color=["Batch", "Subtype"]
 ```
 
 **hue**    
-Alias for color (Scanpy/Seaborn-style convenience).  
+Alias for color (Scanpy/Seaborn-style convenience). e.g. "CDC20" for gene expression. 
 If provided and color=None, hue is used.  
 
 **layer**    
