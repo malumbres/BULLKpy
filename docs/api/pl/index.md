@@ -16,11 +16,15 @@ gene_association_volcano
 gene_plot
 genes_vs_mt_fraction
 gsea_bubbleplot
+export_leading_edge_clusters_cytoscape
 gsea_leading_edge_heatmap
 heatmap_association
 heatmap_de
+leading_edge_cluster_bubbles
+leading_edge_cluster_driver_genes
 leading_edge_jaccard_heatmap
 leading_edge_overlap_matrix
+leading_edge_pathway_clusters
 library_size_vs_genes
 ma
 mt_fraction_vs_counts
@@ -37,8 +41,9 @@ rankplot
 rankplot_association
 rank_genes_groups
 rank_genes_groups_dotplot
-sample_correlation_custergram
+sample_correlation_clustergram
 sample_distances
+signature_dispersion_heatmap
 umap
 violin
 volcano

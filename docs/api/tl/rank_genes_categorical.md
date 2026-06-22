@@ -1,7 +1,7 @@
 # Rank genes categorical
 
 ```{eval-rst}
-.. autofunction:: bullkpy.tl.rank_genes_categorical
+.. autofunction:: bullkpy.tl.rank_genes_groups_fast
 
 ```
 

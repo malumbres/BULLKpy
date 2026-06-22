@@ -18,7 +18,7 @@ Example Correlation Plot between Obs.
 
 ## Purpose
 
-corrplot_obs visualizes the relationship between two quantitative adata.obs columns and computes correlation statistics:
+corrplot visualizes the relationship between two quantitative adata.obs columns and computes correlation statistics:
 - Pearson correlation
 - Spearman correlation
 - Or both (default). 
@@ -138,7 +138,7 @@ Whether to display the figure via plt.show().
 
 If color is a list, one panel is created per color key:
 ```python
-bk.pl.corrplot_obs(
+bk.pl.corrplot(
     adata,
     x="libsize",
     y="pct_mito",
@@ -162,7 +162,7 @@ Two panels in one row, same x/y, different coloring.
 
 Basic correlation plot
 ```python
-bk.pl.corrplot_obs(
+bk.pl.corrplot(
     adata,
     x="libsize",
     y="n_genes"
@@ -171,7 +171,7 @@ bk.pl.corrplot_obs(
 
 Colored by batch
 ```python
-bk.pl.corrplot_obs(
+bk.pl.corrplot(
     adata,
     x="libsize",
     y="pct_mito",
@@ -181,7 +181,7 @@ bk.pl.corrplot_obs(
 
 Multiple panels
 ```python
-bk.pl.corrplot_obs(
+bk.pl.corrplot(
     adata,
     x="libsize",
     y="pct_mito",
@@ -192,7 +192,7 @@ bk.pl.corrplot_obs(
 
 Spearman only, no regression line
 ```python
-bk.pl.corrplot_obs(
+bk.pl.corrplot(
     adata,
     x="score_A",
     y="score_B",

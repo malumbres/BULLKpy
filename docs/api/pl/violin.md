@@ -108,7 +108,7 @@ bk.pl.violin(
 ```python
 # QC variables:
 bk.pl.violin(adata, keys=["total_counts", "pct_counts_mt"], 
-    groupby="Project_ID".
+    groupby="Project_ID",
 )
 
 # Gene expression:
@@ -116,19 +116,22 @@ bk.pl.violin(adata, keys=["DLL3", "SOX10"],
     groupby="Subtype_PAM50", 
     layer="log1p_cpm",
 )
+```
+
 ```{figure} /_static/violin_genes_example.png
 :alt: Violin plot example
 :width: 800px
 :align: center
 ```
 
-#Control category order and tick rotation:
+```python
+# Control category order and tick rotation:
 bk.pl.violin(
        adata,
        keys=["CDC20"],
        groupby="Project_ID",
        order=["LUAD", "LUSC", "BRCA"],
-       otate_xticks=90,
+       rotate_xticks=90,
 )
 ```
 

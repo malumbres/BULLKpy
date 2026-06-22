@@ -1,7 +1,7 @@
 # Obs-Category association
 
 ```{eval-rst}
-.. autofunction:: bullkpy.tl.obs_categorical_association
+.. autofunction:: bullkpy.tl.categorical_association
 
 ```
 

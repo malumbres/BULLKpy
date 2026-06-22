@@ -2,7 +2,7 @@ from ._style import set_style, _savefig, get_palette
 
 from ._colors import _get_series, get_categorical_colors, categorical_colors_array
 
-from .association import association_heatmap, boxplot_with_stats, categorical_confusion
+from .association import association_heatmap, boxplot_with_stats
 from .association_rankplots import (
     rankplot_association, dotplot_association, heatmap_association,
     )
@@ -79,12 +79,10 @@ __all__ = ["corrplot",
            "pca_loadings_bar", "pca_loadings_heatmap",
            "gene_plot",
            "rank_genes_groups", "rank_genes_groups_dotplot",
-           "library_size_vs_genes",
            "sample_distances", "sample_correlation_clustergram",
            "_get_series", "get_categorical_colors", "categorical_colors_array",
            "ari_resolution_heatmap", "categorical_confusion",
-           
-           "association_heatmap", "boxplot_with_stats", "categorical_confusion",
+           "association_heatmap", "boxplot_with_stats",
            "rankplot_association", "dotplot_association", "heatmap_association",
            "gene_association", "volcano_categorical", "gene_association_volcano",
            "cox_volcano", "cox_forest", "km_plot_signature",
