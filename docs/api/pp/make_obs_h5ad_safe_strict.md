@@ -1,7 +1,7 @@
 # Make Obs .h5ad safe
 
 ```{eval-rst}
-.. autofunction:: bullkpy.pp.make_obs_h5ad_safe
+.. autofunction:: bullkpy.pp.make_obs_h5ad_safe_strict
 
 ```
 
@@ -64,11 +64,11 @@ Additionally:
 
 ```python 
 # Minimal safe write
-bk.io.make_obs_h5ad_safe(adata)
+bk.pp.make_obs_h5ad_safe_strict(adata)
 adata.write("clean.h5ad")
 
 # Targeted cleanup
-bk.io.make_obs_h5ad_safe(
+bk.pp.make_obs_h5ad_safe_strict(
     adata,
     cols=["clinical_notes", "mutation_status", "free_text_comments"]
 )
@@ -78,7 +78,7 @@ bad, _ = bk.io.find_bad_obs_cols_by_write(adata)
 
 if bad:
     cols = [c for c, _ in bad]
-    bk.io.make_obs_h5ad_safe(adata, cols=cols)
+    bk.pp.make_obs_h5ad_safe_strict(adata, cols=cols)
 
 adata.write("safe.h5ad")
 
