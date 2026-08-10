@@ -43,6 +43,8 @@ dependencies = [
 [project.optional-dependencies]
 umap = ["umap-learn>=0.5.7", "numba>=0.60"]
 leiden = ["igraph", "leidenalg"]
+network = ["networkx"]          # GSEA leading-edge network layouts
+notebook = ["ipykernel", "jupyterlab", "networkx"]
 dev = ["pytest", "ruff", "black", "build", "twine"]
 docs = [
   "sphinx>=7,<8",
