@@ -64,10 +64,35 @@ def read_counts(
         warn("Gene names are duplicated")
 
     if dtype is not None:
-        try:
-            df = df.astype(dtype)
-        except Exception as e:
-            warn(f"Could not cast counts to {dtype}: {e}")
+        # Casting float expression values to an integer dtype truncates them
+        # (10.77 -> 10, 0.9999 -> 0), which silently destroys the data. Several
+        # public resources distribute log2(count+1) matrices under a "counts"
+        # filename, so check before casting rather than after.
+        is_integer_target = np.issubdtype(np.dtype(dtype), np.integer)
+        values = df.to_numpy()
+        looks_integral = (
+            np.issubdtype(values.dtype, np.integer)
+            or np.allclose(values[np.isfinite(values)],
+                           np.round(values[np.isfinite(values)]), atol=1e-8)
+            if values.size
+            else True
+        )
+
+        if is_integer_target and not looks_integral:
+            warn(
+                f"{filename.name} does not contain integer values, so it was NOT cast "
+                f"to {dtype}: doing so would truncate every value (e.g. 10.77 -> 10) "
+                "and destroy the data. The matrix has been loaded unchanged as float.\n"
+                "  If this file holds log2(count+1) values (as UCSC Xena distributes "
+                "them), recover counts with: adata.X = 2 ** adata.X - 1\n"
+                "  If it is already normalised, pass dtype=None and skip "
+                "bk.pp.normalize_cpm()."
+            )
+        else:
+            try:
+                df = df.astype(dtype)
+            except Exception as e:
+                warn(f"Could not cast counts to {dtype}: {e}")
 
     # Warn if data does not look like counts
     if np.any(df.values < 0):

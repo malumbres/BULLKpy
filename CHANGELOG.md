@@ -12,6 +12,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 Repository-wide audit and cleanup ahead of the first fully public release.
 
 ### Fixed
+- **`io.read_counts()` silently truncated non-integer matrices.** The default
+  `dtype="int64"` was applied unconditionally, so a float expression matrix was
+  cast without warning: `10.7698` became `10` and `0.9999` became `0`. This
+  matters because several public resources — UCSC Xena's GDC Pan-Cancer table
+  among them — distribute **log2(count + 1)** values under a `*_counts.tsv`
+  filename. Loading one produced a matrix of small integers that looked
+  plausible but had lost the data, and every downstream CPM, log1p and
+  fold-change was computed from it. `read_counts` now checks whether the values
+  are integral before casting, and if they are not it loads them unchanged and
+  explains how to recover counts. Genuine integer matrices are still cast.
 - `tl.adjusted_rand_index()` was entirely non-functional: it called
   `adjusted_rand_score` without importing it, raising `NameError` on every call.
 - Nine `NameError`-at-runtime defects caused by notebook code pasted into the
@@ -91,8 +101,9 @@ Repository-wide audit and cleanup ahead of the first fully public release.
   `pl`, where the rest of the plotting API lives. The `tl` names still resolve to
   the same functions.
 - Tutorial notebook paths repointed at this machine's `BioDATA` root, with the
-  provenance of the pan-cancer counts matrix documented in the notebook rather
-  than assumed present.
+  provenance of the pan-cancer matrix documented in the notebook rather than
+  assumed present. The notebook now loads it with `dtype=None` and
+  back-transforms `2**x - 1` to recover counts, since Xena ships log2(count+1).
 - Removed the empty `bullkpy.tools` submodule, which shipped in every wheel.
 - `requires-python` raised from `>=3.9` to `>=3.10`, verified against the
   test suite on 3.10, 3.11, 3.12 and 3.13.

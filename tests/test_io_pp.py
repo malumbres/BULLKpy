@@ -126,3 +126,43 @@ def test_h5ad_safety_helpers_roundtrip(tmp_path, adata):
     p = tmp_path / "out.h5ad"
     a.write_h5ad(p)
     assert p.exists() and p.stat().st_size > 0
+
+
+# ------------------------------------------------- read_counts truncation guard
+def test_read_counts_does_not_truncate_float_input(tmp_path):
+    """A float matrix must never be silently cast to int.
+
+    UCSC Xena distributes log2(count+1) matrices under a *_counts.tsv name;
+    casting those to int64 turned 10.77 into 10 and 0.9999 into 0.
+    """
+    df = pd.DataFrame(
+        [[10.7698, 10.7211], [3.5, 0.9999], [0.0, 15.25]],
+        index=["G1", "G2", "G3"],
+        columns=["S1", "S2"],
+    )
+    p = tmp_path / "log2.tsv"
+    df.to_csv(p, sep="\t")
+
+    adata = bk.io.read_counts(p, orientation="genes_by_samples")
+    X = np.asarray(adata.X)
+
+    assert not np.issubdtype(X.dtype, np.integer), "float input was cast to an integer dtype"
+    assert np.allclose(X, df.to_numpy().T), "values changed while reading"
+
+
+def test_read_counts_still_casts_genuine_counts(tmp_path):
+    df = pd.DataFrame([[10, 7], [3, 1], [0, 15]], index=["G1", "G2", "G3"], columns=["S1", "S2"])
+    p = tmp_path / "counts.tsv"
+    df.to_csv(p, sep="\t")
+
+    adata = bk.io.read_counts(p, orientation="genes_by_samples")
+    assert np.issubdtype(np.asarray(adata.X).dtype, np.integer)
+
+
+def test_read_counts_dtype_none_never_casts(tmp_path):
+    df = pd.DataFrame([[1.5, 2.5]], index=["G1"], columns=["S1", "S2"])
+    p = tmp_path / "f.tsv"
+    df.to_csv(p, sep="\t")
+
+    adata = bk.io.read_counts(p, orientation="genes_by_samples", dtype=None)
+    assert np.allclose(np.asarray(adata.X).ravel(), [1.5, 2.5])
