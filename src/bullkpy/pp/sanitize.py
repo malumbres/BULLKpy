@@ -570,26 +570,33 @@ def make_h5ad_safe(
     var: bool = True,
     uns: bool = True,
     mappings: bool = True,
+    dtypes: bool = True,
+    numeric_min_frac: float = 0.9,
     copy: bool = False,
     verbose: bool = True,
 ):
     """
-    Rename keys that ``.h5ad`` writing cannot represent.
+    Make an AnnData writable to ``.h5ad``, fixing both key names and dtypes.
 
-    HDF5 uses ``/`` as a group separator, so any ``.obs`` / ``.var`` column (or
-    ``.uns`` / ``.obsm`` / ``.layers`` key) containing one makes
-    :meth:`anndata.AnnData.write` fail with::
+    Writing fails for two unrelated reasons, and a dataset with real clinical
+    metadata usually hits both:
+
+    **Illegal key names.** HDF5 uses ``/`` as a group separator, so a column
+    such as ``GP1_Proliferation/DNA_repair`` raises::
 
         ValueError: Forward slashes are not allowed in keys
 
-    Score and signature columns are the usual culprits, since names like
-    ``GP1_Proliferation/DNA_repair`` read naturally but are illegal on disk.
-    This replaces every illegal character, de-duplicates any names that collide
-    as a result, and renames anything using anndata's reserved ``_index`` key.
+    **Un-serialisable dtypes.** pandas represents a missing string as
+    ``float('nan')``, so any text column with gaps holds a mix of ``str`` and
+    ``float``, and h5py refuses it::
 
-    Only *names* are touched — no values, dtypes or ordering change. For dtype
-    problems (mixed ``object`` columns and similar) use
-    :func:`make_obs_h5ad_safe_strict` and :func:`make_var_h5ad_safe_strict`.
+        TypeError: Can't implicitly convert non-string objects to strings
+
+    This handles both, so one call is enough before writing. Columns are
+    repaired by intent rather than blanket-stringified: a column that is
+    numeric apart from its missing values becomes numeric with ``NaN``
+    preserved, and anything else becomes a categorical with string categories,
+    which anndata stores natively and which also keeps missing values missing.
 
     Parameters
     ----------
@@ -603,18 +610,24 @@ def make_h5ad_safe(
         Sanitise ``adata.uns`` keys, recursively through nested dicts.
     mappings
         Sanitise ``.obsm`` / ``.varm`` / ``.layers`` / ``.obsp`` / ``.varp`` keys.
+    dtypes
+        Repair ``.obs`` / ``.var`` column dtypes that h5py cannot serialise.
+    numeric_min_frac
+        Fraction of non-missing values that must parse as numbers for a column
+        to be stored as numeric. Below this it becomes a string categorical.
     copy
         Return a sanitised copy and leave `adata` untouched. By default the
         object is modified in place.
     verbose
-        Log a summary of the renames.
+        Log a summary of what changed.
 
     Returns
     -------
     AnnData or dict
-        With ``copy=True``, the sanitised copy. Otherwise a dict mapping each
-        location (``"obs"``, ``"var"``, ``"uns"``, ...) to its ``{old: new}``
-        renames, empty if nothing needed changing.
+        With ``copy=True``, the sanitised copy. Otherwise a report: each
+        location (``"obs"``, ``"var"``, ``"uns"``, ...) maps to its
+        ``{old: new}`` renames, and ``"dtypes"`` maps each repaired column to
+        the conversion applied. Empty if nothing needed changing.
 
     Examples
     --------
@@ -623,16 +636,18 @@ def make_h5ad_safe(
         bk.pp.make_h5ad_safe(adata)
         adata.write("results.h5ad", compression="gzip")
 
-    Inspect what would change without writing::
+    Inspect what changed::
 
-        renames = bk.pp.make_h5ad_safe(adata, copy=False)
-        renames["obs"]
+        report = bk.pp.make_h5ad_safe(adata)
+        report["obs"]
         {'GP4_MES/ECM': 'GP4_MES_ECM'}
+        report["dtypes"]
+        {'obs.vital_status': 'object -> category', 'obs.age': 'object -> float64'}
 
     See Also
     --------
     find_bad_obs_cols_by_write : find ``.obs`` columns that fail a trial write.
-    make_obs_h5ad_safe_strict : repair ``.obs`` *dtypes* rather than names.
+    sanitize_metadata : clean a metadata table before it reaches ``.obs``.
     """
     target = adata.copy() if copy else adata
     report: dict[str, dict[str, str]] = {}
@@ -685,14 +700,84 @@ def make_h5ad_safe(
             if changed:
                 report[attr] = changed
 
+    if dtypes:
+        converted: dict[str, str] = {}
+        for where, df in (("obs", target.obs), ("var", target.var)):
+            for col in list(df.columns):
+                s = df[col]
+                if not _needs_dtype_repair(s):
+                    continue
+                new_s, how = _repair_column(s, numeric_min_frac=numeric_min_frac)
+                df[col] = new_s
+                converted[f"{where}.{col}"] = how
+        if converted:
+            report["dtypes"] = converted
+
     if verbose:
-        total = sum(len(v) for v in report.values())
-        if total:
-            for where, changed in report.items():
-                preview = ", ".join(f"{o!r}->{n!r}" for o, n in list(changed.items())[:3])
-                more = f" (+{len(changed) - 3} more)" if len(changed) > 3 else ""
-                info(f"make_h5ad_safe: renamed {len(changed)} key(s) in .{where}: {preview}{more}")
-        else:
-            info("make_h5ad_safe: no illegal keys found; nothing renamed.")
+        renames = {k: v for k, v in report.items() if k != "dtypes"}
+        for where, changed in renames.items():
+            preview = ", ".join(f"{o!r}->{n!r}" for o, n in list(changed.items())[:3])
+            more = f" (+{len(changed) - 3} more)" if len(changed) > 3 else ""
+            info(f"make_h5ad_safe: renamed {len(changed)} key(s) in .{where}: {preview}{more}")
+
+        conv = report.get("dtypes", {})
+        if conv:
+            kinds: dict[str, int] = {}
+            for how in conv.values():
+                kinds[how] = kinds.get(how, 0) + 1
+            summary = ", ".join(f"{n} x {how}" for how, n in sorted(kinds.items(), key=lambda kv: -kv[1]))
+            info(f"make_h5ad_safe: repaired {len(conv)} column dtype(s): {summary}")
+
+        if not report:
+            info("make_h5ad_safe: nothing to fix; the object is already writable.")
 
     return target if copy else report
+
+
+def _is_missing(v) -> bool:
+    return v is None or (isinstance(v, float) and v != v) or v is pd.NaT
+
+
+def _needs_dtype_repair(s: pd.Series) -> bool:
+    """True when h5py cannot serialise this column as-is.
+
+    anndata copes with far more than it might appear: numeric, bool, datetime,
+    ``category`` and pandas' ``str`` dtype all write cleanly, and an ``object``
+    column holding only strings is converted to a categorical on write, with
+    missing values preserved. The one case it cannot handle is an ``object``
+    column containing *non-string* values -- ``bool`` or numbers mixed with the
+    ``float('nan')`` that pandas uses for missing entries -- which fails with
+    "Can't implicitly convert non-string objects to strings".
+    """
+    dtype = s.dtype
+
+    if isinstance(dtype, pd.CategoricalDtype):
+        cats = dtype.categories
+        return cats.dtype == object and any(
+            not isinstance(c, str) for c in cats if not _is_missing(c)
+        )
+
+    if dtype != object:
+        return False
+
+    return any(
+        not isinstance(v, str) for v in s.to_numpy() if not _is_missing(v)
+    )
+
+
+def _repair_column(s: pd.Series, *, numeric_min_frac: float = 0.9) -> tuple[pd.Series, str]:
+    """Coerce one column into something h5py can write, preserving missingness."""
+    original = str(s.dtype)
+    non_null = s[s.notna()]
+
+    if len(non_null):
+        as_num = pd.to_numeric(non_null, errors="coerce")
+        if as_num.notna().mean() >= numeric_min_frac:
+            out = pd.to_numeric(s, errors="coerce")
+            return out, f"{original} -> {out.dtype}"
+
+    # Anything else becomes a categorical with string categories. Missing values
+    # stay missing rather than turning into the literal string "nan".
+    as_str = s.astype(object).where(s.notna(), None)
+    as_str = as_str.map(lambda v: v if v is None else str(v))
+    return pd.Series(pd.Categorical(as_str), index=s.index), f"{original} -> category"

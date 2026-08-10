@@ -246,3 +246,79 @@ def test_make_h5ad_safe_copy_leaves_original_untouched(adata):
 def ad_read(p):
     import anndata
     return anndata.read_h5ad(p)
+
+
+# ------------------------------------------- make_h5ad_safe: dtype repair
+def test_make_h5ad_safe_fixes_object_column_with_non_string_values(tmp_path, adata):
+    """The real failure: an object column holding numbers plus float('nan')."""
+    a = adata.copy()
+    vals = [1.0] * (a.n_obs - 1) + [np.nan]
+    a.obs["mixed_numeric"] = pd.Series(vals, index=a.obs_names, dtype=object)
+
+    with pytest.raises((TypeError, ValueError)):
+        a.write(tmp_path / "before.h5ad", compression="gzip")
+
+    bk.pp.make_h5ad_safe(a, verbose=False)
+    a.write(tmp_path / "after.h5ad", compression="gzip")
+
+    back = ad_read(tmp_path / "after.h5ad")
+    assert back.obs["mixed_numeric"].isna().sum() == 1, "missing value was not preserved"
+
+
+def test_make_h5ad_safe_leaves_writable_string_columns_alone(adata):
+    """object/str columns of strings already write correctly; do not touch them."""
+    a = adata.copy()
+    a.obs["vital_status"] = pd.Series(
+        ["Alive"] * (a.n_obs - 2) + [np.nan, "Dead"], index=a.obs_names, dtype=object
+    )
+    rep = bk.pp.make_h5ad_safe(a, verbose=False)
+    assert "obs.vital_status" not in rep.get("dtypes", {})
+
+
+def test_make_h5ad_safe_keeps_numeric_columns_numeric(adata):
+    """A column that is numeric apart from gaps must not become a string."""
+    a = adata.copy()
+    vals = np.arange(a.n_obs, dtype=float)
+    a.obs["mostly_numeric"] = pd.Series(vals, index=a.obs_names, dtype=object)
+    a.obs.loc[a.obs_names[0], "mostly_numeric"] = np.nan
+
+    bk.pp.make_h5ad_safe(a, verbose=False)
+    assert pd.api.types.is_numeric_dtype(a.obs["mostly_numeric"])
+    assert a.obs["mostly_numeric"].isna().sum() == 1
+    assert a.obs["mostly_numeric"].iloc[-1] == vals[-1]
+
+
+def test_make_h5ad_safe_handles_bool_with_missing(tmp_path, adata):
+    """bool + NaN becomes object, which h5py cannot write."""
+    a = adata.copy()
+    a.obs["is_ffpe"] = pd.Series([True] * (a.n_obs - 1) + [np.nan], index=a.obs_names, dtype=object)
+    bk.pp.make_h5ad_safe(a, verbose=False)
+    a.write(tmp_path / "b.h5ad", compression="gzip")
+    assert ad_read(tmp_path / "b.h5ad").obs["is_ffpe"].isna().sum() == 1
+
+
+def test_make_h5ad_safe_reports_dtype_repairs(adata):
+    """A genuinely un-writable column is reported with the conversion applied."""
+    a = adata.copy()
+    a.obs["mixed"] = pd.Series(
+        [True] * (a.n_obs - 1) + [np.nan], index=a.obs_names, dtype=object
+    )
+    rep = bk.pp.make_h5ad_safe(a, verbose=False)
+    assert "obs.mixed" in rep["dtypes"]
+    assert "->" in rep["dtypes"]["obs.mixed"]
+
+
+def test_make_h5ad_safe_leaves_clean_dtypes_alone(adata):
+    """Numeric and clean categorical columns must not be touched."""
+    a = adata.copy()
+    before = {c: str(a.obs[c].dtype) for c in ("age", "purity", "OS_time")}
+    bk.pp.make_h5ad_safe(a, verbose=False)
+    for c, dt in before.items():
+        assert str(a.obs[c].dtype) == dt, f"{c} dtype changed from {dt}"
+
+
+def test_make_h5ad_safe_can_skip_dtype_repair(adata):
+    a = adata.copy()
+    a.obs["mixed"] = ["x"] * (a.n_obs - 1) + [np.nan]
+    rep = bk.pp.make_h5ad_safe(a, dtypes=False, verbose=False)
+    assert "dtypes" not in rep

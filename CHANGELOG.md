@@ -95,7 +95,16 @@ Repository-wide audit and cleanup ahead of the first fully public release.
   offending columns, but nothing renamed them. The new function covers `.obs`,
   `.var`, `.uns` (recursively), `.obsm`, `.varm`, `.layers`, `.obsp` and
   `.varp`, de-duplicates names that would collide after renaming, and reports
-  what it changed. Only names change; no values or columns are dropped.
+  what it changed.
+
+  It also repairs the column dtypes h5py cannot serialise. pandas stores a
+  missing string as `float('nan')`, so an `object` column mixing booleans or
+  numbers with missing entries fails with *"Can't implicitly convert
+  non-string objects to strings"*. Only genuinely un-writable columns are
+  touched — anndata handles numeric, `bool`, datetime, `category`, pandas'
+  `str` dtype and all-string `object` columns by itself. A column that is
+  numeric apart from its gaps becomes numeric; anything else becomes a string
+  categorical. Missing values stay missing rather than becoming `"nan"`.
 
 ### Changed
 - `tl.association()` now covers every combination of gene and `.obs` inputs

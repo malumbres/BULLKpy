@@ -5,9 +5,12 @@
 
 ```
 
-Rename keys that `.h5ad` writing cannot represent.
+Make an AnnData writable to `.h5ad`, fixing both key names and column dtypes.
 
-## The problem
+Writing fails for two unrelated reasons, and a dataset with real clinical
+metadata usually hits both.
+
+## Problem 1 — illegal key names
 
 HDF5 uses `/` as a group separator, so it can never appear in a key. Any
 `.obs` or `.var` column whose name contains one makes `adata.write()` fail:
@@ -25,6 +28,32 @@ Score and signature columns are the usual culprits, because names like
 `GP1_Proliferation/DNA_repair` or `GP4_MES/ECM` read naturally in an
 analysis but are illegal on disk. The same applies to `.uns`, `.obsm`,
 `.varm`, `.layers`, `.obsp` and `.varp` keys.
+
+## Problem 2 — un-serialisable dtypes
+
+pandas represents a missing string as `float('nan')`, so a column can end up
+holding a mix of Python types. h5py refuses those:
+
+```text
+TypeError: Can't implicitly convert non-string objects to strings
+Error raised while writing key 'samples.is_ffpe' of <class 'h5py._hl.group.Group'> to /obs
+```
+
+anndata copes with more than it may appear: numeric, `bool`, datetime,
+`category` and pandas' `str` dtype all write cleanly, and an `object` column
+holding only strings is converted to a categorical on write with missing
+values preserved. The one case that fails is an **`object` column containing
+non-string values** — booleans or numbers alongside the `nan` used for missing
+entries. Only those are repaired, so nothing else in your metadata is touched.
+
+Repairs are made by intent rather than by blanket stringification:
+
+| Column | Becomes |
+| --- | --- |
+| numeric apart from its missing values | numeric, with `NaN` preserved |
+| anything else | `category` with string categories, `NaN` preserved |
+
+Missing values stay missing — they never become the literal string `"nan"`.
 
 ## The fix
 
@@ -79,16 +108,20 @@ any other string:
 bk.pp.make_h5ad_safe(adata, replacement="-")
 ```
 
-## Names versus dtypes
+## Skipping the dtype pass
 
-This function fixes **key names** only. If writing still fails after calling
-it, the problem is a column *dtype* — typically a mixed `object` column that
-h5py cannot serialise. Those are handled separately:
+Pass `dtypes=False` to rename keys only and leave every column as it is:
 
 ```python
-bad, index_err = bk.pp.find_bad_obs_cols_by_write(adata)   # identify
-bk.pp.make_obs_h5ad_safe_strict(adata)                     # repair .obs dtypes
-bk.pp.make_var_h5ad_safe_strict(adata)                     # repair .var dtypes
+bk.pp.make_h5ad_safe(adata, dtypes=False)
+```
+
+## If writing still fails
+
+Find the offending column by trial write, which names it directly:
+
+```python
+bad, index_err = bk.pp.find_bad_obs_cols_by_write(adata)
 ```
 
 ## See also
