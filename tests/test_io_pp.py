@@ -166,3 +166,78 @@ def test_read_counts_dtype_none_never_casts(tmp_path):
 
     adata = bk.io.read_counts(p, orientation="genes_by_samples", dtype=None)
     assert np.allclose(np.asarray(adata.X).ravel(), [1.5, 2.5])
+
+
+# ------------------------------------------------------- h5ad key sanitisation
+def _adata_with_illegal_keys(adata):
+    a = adata.copy()
+    a.obs["GP4_MES/ECM"] = np.arange(a.n_obs, dtype=float)
+    a.obs["GP1_Prolif/DNA_repair"] = np.arange(a.n_obs, dtype=float)
+    a.var["source/db"] = "x"
+    a.uns["gsea/hallmark"] = {"res/table": 1}
+    a.obsm["X_pca/50"] = np.zeros((a.n_obs, 3))
+    a.layers["cpm/raw"] = np.asarray(a.X, dtype=float)
+    return a
+
+
+def test_write_h5ad_fails_on_slash_keys(tmp_path, adata):
+    """Baseline: this is the failure make_h5ad_safe exists to prevent."""
+    a = _adata_with_illegal_keys(adata)
+    with pytest.raises(ValueError, match="[Ff]orward slashes"):
+        a.write(tmp_path / "bad.h5ad", compression="gzip")
+
+
+def test_make_h5ad_safe_allows_write(tmp_path, adata):
+    a = _adata_with_illegal_keys(adata)
+    n_obs_cols = a.obs.shape[1]
+
+    bk.pp.make_h5ad_safe(a, verbose=False)
+    p = tmp_path / "good.h5ad"
+    a.write(p, compression="gzip")
+
+    back = ad_read(p)
+    assert back.n_obs == a.n_obs
+    assert back.obs.shape[1] == n_obs_cols, "columns were lost, not renamed"
+    assert not [c for c in back.obs.columns if "/" in c]
+    assert "GP4_MES_ECM" in back.obs.columns
+
+
+def test_make_h5ad_safe_reports_renames(adata):
+    a = _adata_with_illegal_keys(adata)
+    rep = bk.pp.make_h5ad_safe(a, verbose=False)
+    assert rep["obs"]["GP4_MES/ECM"] == "GP4_MES_ECM"
+    assert set(rep) >= {"obs", "var", "uns", "obsm", "layers"}
+
+
+def test_make_h5ad_safe_preserves_values(adata):
+    a = _adata_with_illegal_keys(adata)
+    expected = a.obs["GP4_MES/ECM"].to_numpy(copy=True)
+    bk.pp.make_h5ad_safe(a, verbose=False)
+    assert np.allclose(a.obs["GP4_MES_ECM"].to_numpy(), expected)
+
+
+def test_make_h5ad_safe_is_a_noop_when_clean(adata):
+    rep = bk.pp.make_h5ad_safe(adata.copy(), verbose=False)
+    assert rep == {}
+
+
+def test_make_h5ad_safe_avoids_collisions(adata):
+    """Renaming must never merge two columns into one."""
+    a = adata.copy()
+    a.obs["A/B"] = 1.0
+    a.obs["A_B"] = 2.0
+    bk.pp.make_h5ad_safe(a, verbose=False)
+    assert len(set(a.obs.columns)) == len(a.obs.columns)
+    assert a.obs.shape[1] == adata.obs.shape[1] + 2
+
+
+def test_make_h5ad_safe_copy_leaves_original_untouched(adata):
+    a = _adata_with_illegal_keys(adata)
+    out = bk.pp.make_h5ad_safe(a, copy=True, verbose=False)
+    assert "GP4_MES/ECM" in a.obs.columns       # original untouched
+    assert "GP4_MES_ECM" in out.obs.columns     # copy fixed
+
+
+def ad_read(p):
+    import anndata
+    return anndata.read_h5ad(p)

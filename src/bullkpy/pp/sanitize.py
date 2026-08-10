@@ -10,6 +10,8 @@ from anndata import AnnData
 
 from dataclasses import dataclass
 
+from ..logging import info
+
 @dataclass
 class ObsColumnIssue:
     column: str
@@ -525,3 +527,172 @@ def make_var_h5ad_safe_strict(
 
     ad2.var = var
     return (ad2 if copy else None), rep
+
+# ---------------------------------------------------------------------------
+# HDF5 key sanitisation
+# ---------------------------------------------------------------------------
+
+# HDF5 treats "/" as a group separator, so it can never appear in a key.
+# Null bytes are rejected outright. Everything else is legal.
+_H5_ILLEGAL = re.compile(r"[/\x00]")
+
+# anndata reserves this name for the DataFrame index.
+_H5_RESERVED = {"_index"}
+
+
+def _sanitize_key(name, replacement: str = "_") -> str:
+    """Make a single key safe to use as an HDF5 dataset name."""
+    new = _H5_ILLEGAL.sub(replacement, str(name))
+    if new in _H5_RESERVED:
+        new = new + replacement
+    return new
+
+
+def _dedupe(names: list[str], replacement: str = "_") -> list[str]:
+    """Append numeric suffixes so renaming can never collapse two columns into one."""
+    seen: dict[str, int] = {}
+    out: list[str] = []
+    for n in names:
+        if n in seen:
+            seen[n] += 1
+            out.append(f"{n}{replacement}{seen[n]}")
+        else:
+            seen[n] = 0
+            out.append(n)
+    return out
+
+
+def make_h5ad_safe(
+    adata,
+    *,
+    replacement: str = "_",
+    obs: bool = True,
+    var: bool = True,
+    uns: bool = True,
+    mappings: bool = True,
+    copy: bool = False,
+    verbose: bool = True,
+):
+    """
+    Rename keys that ``.h5ad`` writing cannot represent.
+
+    HDF5 uses ``/`` as a group separator, so any ``.obs`` / ``.var`` column (or
+    ``.uns`` / ``.obsm`` / ``.layers`` key) containing one makes
+    :meth:`anndata.AnnData.write` fail with::
+
+        ValueError: Forward slashes are not allowed in keys
+
+    Score and signature columns are the usual culprits, since names like
+    ``GP1_Proliferation/DNA_repair`` read naturally but are illegal on disk.
+    This replaces every illegal character, de-duplicates any names that collide
+    as a result, and renames anything using anndata's reserved ``_index`` key.
+
+    Only *names* are touched — no values, dtypes or ordering change. For dtype
+    problems (mixed ``object`` columns and similar) use
+    :func:`make_obs_h5ad_safe_strict` and :func:`make_var_h5ad_safe_strict`.
+
+    Parameters
+    ----------
+    adata
+        Annotated data matrix.
+    replacement
+        String substituted for each illegal character. Defaults to ``"_"``.
+    obs, var
+        Sanitise ``adata.obs`` / ``adata.var`` column names.
+    uns
+        Sanitise ``adata.uns`` keys, recursively through nested dicts.
+    mappings
+        Sanitise ``.obsm`` / ``.varm`` / ``.layers`` / ``.obsp`` / ``.varp`` keys.
+    copy
+        Return a sanitised copy and leave `adata` untouched. By default the
+        object is modified in place.
+    verbose
+        Log a summary of the renames.
+
+    Returns
+    -------
+    AnnData or dict
+        With ``copy=True``, the sanitised copy. Otherwise a dict mapping each
+        location (``"obs"``, ``"var"``, ``"uns"``, ...) to its ``{old: new}``
+        renames, empty if nothing needed changing.
+
+    Examples
+    --------
+    Call it immediately before writing::
+
+        bk.pp.make_h5ad_safe(adata)
+        adata.write("results.h5ad", compression="gzip")
+
+    Inspect what would change without writing::
+
+        renames = bk.pp.make_h5ad_safe(adata, copy=False)
+        renames["obs"]
+        {'GP4_MES/ECM': 'GP4_MES_ECM'}
+
+    See Also
+    --------
+    find_bad_obs_cols_by_write : find ``.obs`` columns that fail a trial write.
+    make_obs_h5ad_safe_strict : repair ``.obs`` *dtypes* rather than names.
+    """
+    target = adata.copy() if copy else adata
+    report: dict[str, dict[str, str]] = {}
+
+    def _rename_frame(df, where: str):
+        old = [str(c) for c in df.columns]
+        new = _dedupe([_sanitize_key(c, replacement) for c in old], replacement)
+        changed = {o: n for o, n in zip(old, new) if o != n}
+        if changed:
+            df.columns = new
+            report[where] = changed
+
+    if obs:
+        _rename_frame(target.obs, "obs")
+    if var:
+        _rename_frame(target.var, "var")
+
+    if uns:
+        changed: dict[str, str] = {}
+
+        def _walk(d):
+            if not isinstance(d, dict):
+                return d
+            out = {}
+            keys = [str(k) for k in d.keys()]
+            new_keys = _dedupe([_sanitize_key(k, replacement) for k in keys], replacement)
+            for (k, v), nk in zip(list(d.items()), new_keys):
+                if str(k) != nk:
+                    changed[str(k)] = nk
+                out[nk] = _walk(v)
+            return out
+
+        new_uns = _walk(dict(target.uns))
+        if changed:
+            target.uns.clear()
+            target.uns.update(new_uns)
+            report["uns"] = changed
+
+    if mappings:
+        for attr in ("obsm", "varm", "layers", "obsp", "varp"):
+            store = getattr(target, attr, None)
+            if store is None:
+                continue
+            keys = [str(k) for k in store.keys()]
+            new_keys = _dedupe([_sanitize_key(k, replacement) for k in keys], replacement)
+            changed = {o: n for o, n in zip(keys, new_keys) if o != n}
+            for o, n in changed.items():
+                store[n] = store[o]
+                del store[o]
+            if changed:
+                report[attr] = changed
+
+    if verbose:
+        total = sum(len(v) for v in report.values())
+        if total:
+            for where, changed in report.items():
+                preview = ", ".join(f"{o!r}->{n!r}" for o, n in list(changed.items())[:3])
+                more = f" (+{len(changed) - 3} more)" if len(changed) > 3 else ""
+                info(f"make_h5ad_safe: renamed {len(changed)} key(s) in .{where}: {preview}{more}")
+        else:
+            info("make_h5ad_safe: no illegal keys found; nothing renamed.")
+
+    return target if copy else report

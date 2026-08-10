@@ -7,6 +7,7 @@ from .sanitize import (
       sanitize_metadata, find_bad_obs_columns,
       find_bad_obs_cols_by_write, make_obs_h5ad_safe_strict,
       find_bad_var_cols_by_write, make_var_h5ad_safe_strict,
+      make_h5ad_safe,
       ) 
 
 from .obs import standardize_tcga_obs, obs_map_categories
@@ -18,5 +19,6 @@ __all__ = ["qc_metrics",
            "sanitize_metadata", "find_bad_obs_columns",
            "find_bad_obs_cols_by_write", "make_obs_h5ad_safe_strict",
            "find_bad_var_cols_by_write", "make_var_h5ad_safe_strict",
+           "make_h5ad_safe",
            "standardize_tcga_obs", "obs_map_categories",
           ]

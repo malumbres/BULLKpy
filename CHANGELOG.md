@@ -87,6 +87,15 @@ Repository-wide audit and cleanup ahead of the first fully public release.
   downstream projects.
 - Notebook contract tests that bind every `bk.*` call in the tutorial against the
   real signatures, catching drift that stored outputs otherwise hide.
+- `pp.make_h5ad_safe()` — renames keys that `.h5ad` writing cannot represent.
+  HDF5 uses `/` as a group separator, so a column such as
+  `GP1_Proliferation/DNA_repair` made `adata.write()` fail with
+  *"Forward slashes are not allowed in keys"*. None of the existing sanitise
+  helpers fixed this: `find_bad_obs_cols_by_write()` correctly identified the
+  offending columns, but nothing renamed them. The new function covers `.obs`,
+  `.var`, `.uns` (recursively), `.obsm`, `.varm`, `.layers`, `.obsp` and
+  `.varp`, de-duplicates names that would collide after renaming, and reports
+  what it changed. Only names change; no values or columns are dropped.
 
 ### Changed
 - `tl.association()` now covers every combination of gene and `.obs` inputs

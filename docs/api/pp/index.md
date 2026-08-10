@@ -11,6 +11,7 @@ find_bad_obs_cols_by_write
 find_bad_var_cols_by_write
 highly_variable_genes
 log1p
+make_h5ad_safe
 make_obs_h5ad_safe_strict
 make_var_h5ad_safe_strict
 normalize_cpm
