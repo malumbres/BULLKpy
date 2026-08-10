@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Sequence, Literal
 
@@ -532,6 +531,51 @@ def leading_edge_jaccard_heatmap(
     save: str | Path | None = None,
     show: bool = True,
 ):
+    """
+    Heatmap of pairwise Jaccard overlap between pathway leading-edge gene sets.
+
+    Enriched pathways often share most of their driving genes, so a long GSEA
+    result can overstate how many distinct signals it contains. This shows, for
+    every pair of terms, the fraction of leading-edge genes they share, making
+    redundant blocks visible as clusters.
+
+    Parameters
+    ----------
+    pre_res
+        Pre-ranked GSEA result from :func:`bullkpy.tl.gsea_preranked`.
+    term_idx
+        Positional indices of terms to include. Mutually exclusive with `terms`.
+    terms
+        Explicit term names to include. Defaults to all terms in `pre_res`.
+    min_shared_genes
+        Drop pairs sharing fewer than this many genes before clustering.
+    row_cluster, col_cluster
+        Apply hierarchical clustering to rows/columns so redundant groups sit together.
+    cmap, vmin, vmax
+        Colour map and limits. Jaccard is bounded in ``[0, 1]``, which the defaults match.
+    figsize
+        Figure size in inches; scaled from the number of terms when ``None``.
+    show_labels, label_fontsize
+        Show term names on the axes, and their font size.
+    dendrogram_ratio
+        Fraction of the figure given to the row and column dendrograms.
+    title, show_title
+        Title text, and whether to draw it.
+    save
+        Path to write the figure to; respects ``bk.settings.figdir``.
+    show
+        Call ``plt.show()`` before returning.
+
+    Returns
+    -------
+    seaborn.matrix.ClusterGrid
+        The clustergrid, so axes can be adjusted before saving.
+
+    See Also
+    --------
+    bullkpy.pl.leading_edge_pathway_clusters : cluster terms by this overlap.
+    bullkpy.pl.gsea_leading_edge_heatmap : leading-edge gene expression per term.
+    """
     set_style()
     if sns is None:
         raise ImportError("leading_edge_jaccard_heatmap requires seaborn. Please install seaborn.")

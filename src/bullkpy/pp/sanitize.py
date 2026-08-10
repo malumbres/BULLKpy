@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional, Sequence
 
 import re, tempfile
 import numpy as np
 import pandas as pd
 import anndata as ad
 from anndata import AnnData
-import tempfile
 
 from dataclasses import dataclass
 
@@ -108,7 +106,7 @@ def sanitize_metadata(
     # 1) normalize missing tokens
     na_tokens = {"", "NA", "N/A", "na", "n/a", "NaN", "nan", "None", "none", "NULL", "null", ".", "-"}
     for c in df.columns:
-        if df[c].dtype == object:
+        if df[c].dtype == object or pd.api.types.is_string_dtype(df[c]):
             s = df[c].astype(str)
             m = s.isin(na_tokens)
             if m.any():
@@ -235,6 +233,37 @@ def find_bad_obs_cols_by_write(
     n_rows: int = 3000,
     include_index_test: bool = True,
 ):
+    """
+    Find ``.obs`` columns that make ``.h5ad`` writing fail, by trial write.
+
+    Some pandas dtypes (mixed-type ``object`` columns, extension types, exotic
+    index values) cannot be serialised by h5py, and the resulting error names
+    neither the offending column nor a fix. This probes each column
+    individually against a tiny in-memory AnnData and reports the ones that
+    raise, so you can repair or drop them.
+
+    Parameters
+    ----------
+    adata
+        Annotated data matrix whose ``.obs`` should be tested.
+    n_rows
+        Number of rows to use for the trial writes. Lower is faster; the default
+        is usually enough to surface a bad value.
+    include_index_test
+        Also test ``adata.obs_names`` itself, which can fail independently of
+        any column.
+
+    Returns
+    -------
+    tuple[list, Exception | None]
+        The list of ``(column, error)`` pairs that failed to write, and the
+        index error if `include_index_test` found one (otherwise ``None``).
+
+    See Also
+    --------
+    bullkpy.pp.make_obs_h5ad_safe_strict : coerce the offending columns in place.
+    bullkpy.pp.find_bad_var_cols_by_write : the same check for ``.var``.
+    """
     import anndata as anndata  # local import avoids notebook shadowing
 
     bad = []

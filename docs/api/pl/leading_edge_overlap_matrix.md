@@ -23,7 +23,7 @@ Example Leading edge overlap matrix
 
 ## Parameters
 
-#### Required
+### Required
 
 **pre_res**  
 A GSEApy prerank result object (the pre_res returned by gseapy.prerank(...)).  

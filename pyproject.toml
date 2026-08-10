@@ -4,17 +4,22 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bullkpy"
-version = "0.1.0"
+version = "0.2.0"
 description = "Scanpy-like pipeline for bulk RNA-seq in Python"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { file = "LICENSE" }
-authors = [{ name = "Marcos Malumbres" }, {email = "mmalumbres@vhio.net" }]
+authors = [{ name = "Marcos Malumbres", email = "mmalumbres@vhio.net" }]
 keywords = ["bulk-rnaseq", "tcga", "anndata", "scanpy", "bioinformatics"]
 
 classifiers = [
+  "Development Status :: 3 - Alpha",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   "Intended Audience :: Science/Research",
@@ -32,11 +37,11 @@ dependencies = [
   "statsmodels",
   "gseapy",
   "lifelines",
-  "nbsphinx",
+  "openpyxl",
 ]
 
 [project.optional-dependencies]
-umap = ["umap-learn"]
+umap = ["umap-learn>=0.5.7", "numba>=0.60"]
 leiden = ["igraph", "leidenalg"]
 dev = ["pytest", "ruff", "black", "build", "twine"]
 docs = [
@@ -49,15 +54,45 @@ docs = [
   "sphinx-design>=0.6",
   "ipython",
 ]
+
 [project.urls]
 Homepage = "https://github.com/malumbres/BULLKpy"
 Repository = "https://github.com/malumbres/BULLKpy"
 Issues = "https://github.com/malumbres/BULLKpy/issues"
-ReadTheDocs = "https://bullkpy.readthedocs.io/en/latest/index.html"
-Pypi = "https://pypi.org/project/bullkpy/"
+Documentation = "https://bullkpy.readthedocs.io/en/latest/index.html"
+Changelog = "https://github.com/malumbres/BULLKpy/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
+
+[tool.setuptools.package-data]
+bullkpy = ["py.typed"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = [
+  "E501",   # line length handled by formatter
+  "E741",   # ambiguous variable names (l, I) are common in stats code
+  "B008",   # function call in default arg
+  "B905",   # zip() without strict=
+
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "I001"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]

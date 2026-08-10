@@ -60,7 +60,7 @@ If no p/q column is available, the function still plots the MA scatter but treat
 
 ## Key parameters   
 
-#### Significance & effect thresholds
+### Significance & effect thresholds
 
 **alpha**    
 Significance cutoff on q-values or p-values (depending on use_qval).
@@ -100,7 +100,7 @@ If False, labels can be chosen from significant genes even if fold-change is sma
 
 ## Examples    
 
-#### Basic MA plot (q-values + fold-change cutoff)
+### Basic MA plot (q-values + fold-change cutoff)
 
 ```python
 bk.pl.ma(

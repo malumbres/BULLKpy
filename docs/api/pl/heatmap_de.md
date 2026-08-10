@@ -25,7 +25,7 @@ DE results are expected at:
 ```python
 adata.uns[de_key][contrast][results_key]
 ```
-#### Expected DE table columns
+### Expected DE table columns
 
 Minimum required:  
 - gene (string-like)
@@ -43,7 +43,7 @@ If sort_by is not present, the function falls back to:
 
 ## Parameters
 
-#### Required
+### Required
 
 **adata**: anndata.AnnData. 
 Contains expression (adata.X and/or layers) and sample metadata (adata.obs).  

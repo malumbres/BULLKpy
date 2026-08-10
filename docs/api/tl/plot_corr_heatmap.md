@@ -72,7 +72,7 @@ R = bk.tl.obs_obs_corr_matrix(
     focus=["libsize", "pct_counts_mt", "pct_counts_ribo"],
 )
 
-bk.pl.plot_corr_heatmap(
+bk.tl.plot_corr_heatmap(
     R,
     title="QC metric correlations",
 )
@@ -81,7 +81,7 @@ bk.pl.plot_corr_heatmap(
 2) Fixed correlation scale and annotations
 
 ```python
-bk.pl.plot_corr_heatmap(
+bk.tl.plot_corr_heatmap(
     R,
     vmin=-1,
     vmax=1,
@@ -94,7 +94,7 @@ bk.pl.plot_corr_heatmap(
 3) Large matrices (disable annotations)
 
 ```python
-bk.pl.plot_corr_heatmap(
+bk.tl.plot_corr_heatmap(
     R,
     figsize=(10, 8),
     annot=False,

@@ -37,7 +37,7 @@ Example rankplot.
 
 You can provide DE results in two equivalent ways:  
 
-#### A) Directly via res
+### A) Directly via res
 
 A dataframe with at least:  
 	•	gene column (or first column used as gene name)
@@ -52,7 +52,7 @@ If you ran DE storing results in adata.uns, use:
 
 ## Parameters  
 
-#### Result source  
+### Result source  
 
 **adata**   
 AnnData object containing stored DE results in .uns (optional if res is provided).
@@ -107,7 +107,7 @@ If True, calls plt.show().
 
 ## Examples   
 
-#### Plot top genes from a DE dataframe
+### Plot top genes from a DE dataframe
 
 ```python
 fig, ax = bk.pl.rankplot(

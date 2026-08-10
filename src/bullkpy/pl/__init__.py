@@ -9,6 +9,11 @@ from .association_rankplots import (
 from .clustering_plots import ari_resolution_heatmap, categorical_confusion
 from .corr_heatmap import corr_heatmap, gene_panel_correlation_heatmap
 from .corrplot import corrplot
+
+# These render figures, so they belong in `pl`. They are implemented in
+# tl/correlations.py alongside the statistics they plot, and remain importable
+# from `bk.tl` for backwards compatibility.
+from ..tl.correlations import plot_corr_scatter, plot_corr_heatmap
 from .de import volcano, rankplot, ma 
 from .dotplot import dotplot
 from .gene_plot import gene_plot
@@ -65,10 +70,11 @@ from .oncoprint import oncoprint
 from .gsea_bubbleplot import gsea_bubbleplot
 
 __all__ = ["corrplot",
+           "plot_corr_scatter", "plot_corr_heatmap",
            "qc_metrics", "library_size_vs_genes",
            "mt_fraction_vs_counts", "genes_vs_mt_fraction",
            "qc_scatter_panel",
-           "set_style", "_savefig", "get_palette",
+           "set_style", "get_palette",
            "qc_pairplot", "qc_by_group", "pca_scatter", "umap",
            "volcano", "rankplot", "ma",
            "dotplot",
@@ -80,7 +86,7 @@ __all__ = ["corrplot",
            "gene_plot",
            "rank_genes_groups", "rank_genes_groups_dotplot",
            "sample_distances", "sample_correlation_clustergram",
-           "_get_series", "get_categorical_colors", "categorical_colors_array",
+           "get_categorical_colors", "categorical_colors_array",
            "ari_resolution_heatmap", "categorical_confusion",
            "association_heatmap", "boxplot_with_stats",
            "rankplot_association", "dotplot_association", "heatmap_association",

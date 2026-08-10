@@ -87,7 +87,7 @@ This allows further customization or saving by the caller.
 1) Obs–obs correlation
 
 ```python
-bk.pl.plot_corr_scatter(
+bk.tl.plot_corr_scatter(
     adata,
     x="libsize",
     y="pct_counts_mt",
@@ -98,7 +98,7 @@ bk.pl.plot_corr_scatter(
 2) Gene–obs correlation
 
 ```python
-bk.pl.plot_corr_scatter(
+bk.tl.plot_corr_scatter(
     adata,
     x="PDCD1",
     y="signature_Tcell",
@@ -109,7 +109,7 @@ bk.pl.plot_corr_scatter(
 3) Coloring by a categorical variable
 
 ```python
-bk.pl.plot_corr_scatter(
+bk.tl.plot_corr_scatter(
     adata,
     x="TP53",
     y="MDM2",
@@ -121,7 +121,7 @@ bk.pl.plot_corr_scatter(
 4) Batch-aware correlation visualization
 
 ```python
-bk.pl.plot_corr_scatter(
+bk.tl.plot_corr_scatter(
     adata,
     x="GZMB",
     y="cytotoxic_score",

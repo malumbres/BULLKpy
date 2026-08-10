@@ -55,7 +55,7 @@ adata.layers["log1p_cpm"]
 ```
 ## Examples
 
-#### Default usage (CPM → log1p)
+### Default usage (CPM → log1p)
 
 ```python
 bk.pp.log1p(adata)

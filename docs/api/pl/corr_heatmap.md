@@ -30,7 +30,7 @@ Dependency: requires seaborn for plotting.
 
 ## Parameters
 
-#### Core
+### Core
 
 **adata**   
 AnnData object containing expression matrix and annotations.

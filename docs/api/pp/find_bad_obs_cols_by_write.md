@@ -67,7 +67,7 @@ AnnData object whose `.obs` table will be tested.
 ## Typical usage   
 
 ```python
-bad, index_err = bk.io.find_bad_obs_cols_by_write(adata)
+bad, index_err = bk.pp.find_bad_obs_cols_by_write(adata)
 bad
 ```
  Example output:

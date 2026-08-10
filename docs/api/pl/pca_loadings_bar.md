@@ -31,7 +31,7 @@ Example PCA loadings barplot
 
 ## Parameters
 
-#### Core inputs
+### Core inputs
 
 **adata**: AnnData.   
 Must contain PCA results:

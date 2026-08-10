@@ -10,7 +10,7 @@ This is the standard diagnostic plot used to decide how many principal component
 to retain.
 
 
-```{figure} /_static/pca_svariance_ratio.png
+```{figure} /_static/pca_variance_ratio.png
 :alt: PCA variance ratio
 :width: 500px
 :align: center
@@ -42,7 +42,7 @@ adata.uns[key]["variance_ratio"]
 
 ## Parameters
 
-#### Data source
+### Data source
 
 **key** (str, default "pca").  
 Key in adata.uns where PCA metadata is stored.   

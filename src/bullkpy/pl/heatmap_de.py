@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import scipy.sparse as sp
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 from matplotlib.colors import to_hex
 
 from ._style import set_style, _savefig, _apply_clustergrid_style
@@ -19,7 +18,6 @@ except Exception:  # pragma: no cover
 
 import anndata as ad
 
-from ._style import set_style, _savefig
 
 
 def _get_matrix(adata: ad.AnnData, layer: str | None) -> np.ndarray:

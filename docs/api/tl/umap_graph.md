@@ -33,7 +33,7 @@ If any requirement is missing, a clear KeyError/ImportError is raised.
 
 ## Parameters
 
-#### Graph and initialization
+### Graph and initialization
 
 **graph_key**   
 Key in adata.obsp containing the neighbor graph.  

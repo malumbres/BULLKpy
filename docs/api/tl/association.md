@@ -23,7 +23,10 @@ Depending on the nature of x and y, association dispatches to:
 | x | y | Dispatched function |
 | ---------- | ---------- | -------------------- |
 | gene | categorical obs | gene_categorical_association |
-| numeric obs | categorical obs | obs_categorical_association |
+| numeric obs | categorical obs | `obs_categorical_association` |
+| numeric obs | numeric obs | `obs_obs_corr_matrix` |
+| gene | numeric obs | `top_gene_obs_correlations` |
+| gene | gene | `gene_gene_correlations` |
 | categorical obs | categorical obs | categorical_association |
 
 The goal is to let users write:
@@ -65,7 +68,7 @@ gene ↔ categorical obs
     → gene_categorical_association (single gene)
 
 numeric obs ↔ categorical obs
-    → obs_categorical_association (single variable)
+    → obs_categorical_association
 
 categorical obs ↔ categorical obs
     → categorical_association
@@ -126,7 +129,7 @@ bk.tl.association(
 Equivalent to:
 
 ```python
-bk.tl.obs_categorical_association(
+bk.tl.gene_categorical_association(
     adata,
     obs_keys=["age"],
     groupby="Subtype",
@@ -169,7 +172,7 @@ unsupported cases are rejected
 
 ## See also
 	•	tl.gene_categorical_association
-	•	tl.obs_categorical_association
+	•	tl.gene_categorical_association
 	•	tl.categorical_association
 	•	tl.rank_genes_categorical
 	•	pl.violin

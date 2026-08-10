@@ -11,7 +11,7 @@ from .sanitize import (
 
 from .obs import standardize_tcga_obs, obs_map_categories
 
-__all__ = ["qc_metrics", "_is_integerish",
+__all__ = ["qc_metrics",
            "set_raw_counts", "normalize_cpm", "log1p",
            "highly_variable_genes", "filter_genes", "filter_samples",
            "batch_correct_combat",

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Iterable, Literal, Sequence, Optional, Tuple, Union
+from typing import Literal, Sequence, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -1201,6 +1200,8 @@ def permutation_importance_cindex(
 ):
     from lifelines.utils import concordance_index
 
+    from .signature import signature_score
+
     # ---- infer columns ----
     w = weights.copy()
     if "beta" not in w.columns and "coef" in w.columns:
@@ -1214,7 +1215,7 @@ def permutation_importance_cindex(
         raise ValueError("None of the signature genes are present in adata.var_names.")
 
     # ---- baseline score + baseline c-index ----
-    bk.tl.signature_score(adata, weights=w, layer=layer, key_added=score_key)
+    signature_score(adata, weights=w, layer=layer, key_added=score_key)
     t = pd.to_numeric(adata.obs[time_col], errors="coerce").to_numpy(float)
     e = pd.to_numeric(adata.obs[event_col], errors="coerce").to_numpy(float)
     e = np.where(e > 0, 1, 0).astype(int)
@@ -1383,14 +1384,14 @@ def cox_fit_penalized(
 def cox_univariate(
     adata: AnnData,
     *,
-    time_key: str = "OS.time",
-    event_key: str = "OS",
-    x_keys: Sequence[str] = ("mp_heterogeneity_entropy",),
+    time_key: str,
+    event_key: str,
+    x_keys: Sequence[str],
     x_mode: str = "continuous",   # "continuous" | "binary"
     q: Tuple[float, float] = (0.25, 0.75),
-    groupby: str = "Project_ID",
+    groupby: Optional[str] = None,
     binning: str = "global",      # "global" | "within_group"
-    strata: Union[str, Sequence[str], None] = "Project_ID",
+    strata: Union[str, Sequence[str], None] = None,
     min_per_stratum: int = 10,
     covariates: Optional[Sequence[str]] = None,
     robust: bool = True,
@@ -1584,12 +1585,12 @@ def cox_univariate(
 def cox_interaction(
     adata: AnnData,
     *,
-    time_key: str = "OS.time",
-    event_key: str = "OS",
-    x_key: str = "Neuroendocrine_score",
-    z_key: str = "mp_heterogeneity_entropy",
-    groupby: str = "Project_ID",
-    strata: Union[str, Sequence[str], None] = "Project_ID",
+    time_key: str,
+    event_key: str,
+    x_key: str,
+    z_key: str,
+    groupby: Optional[str] = None,
+    strata: Union[str, Sequence[str], None] = None,
     q: Tuple[float, float] = (0.25, 0.75),
     binning: str = "global",  # "global" | "within_group"
     keep: str = "extremes",   # "extremes" only | "all" (keeps middle as NaN unless you handle)

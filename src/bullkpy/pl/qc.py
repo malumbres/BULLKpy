@@ -6,12 +6,11 @@ from typing import Literal, Sequence
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import scipy.sparse as sp
 import anndata as ad
-import seaborn as sns
 
 from ._style import set_style, _savefig
-from ..logging import info, warn
+from ..logging import warn
+from .._compat import is_categorical_like
 
 
 def qc_metrics(
@@ -60,7 +59,7 @@ def qc_metrics(
         else:
             s = adata.obs[color]
             # If categorical, we'll just pass codes (matplotlib handles numeric colors)
-            if str(s.dtype) == "category" or s.dtype == object:
+            if is_categorical_like(s):
                 color_vals = pd.Categorical(s.astype(str)).codes
             else:
                 color_vals = s.to_numpy()
@@ -473,10 +472,10 @@ def mt_fraction_vs_counts(
         max_y=max_mt,
         logx=logx,
         logy=logy,
-        title=f"{y} vs {x} (QC fail: {(~ok).sum()})"
-        if any(v is not None for v in (min_counts, max_counts, min_mt, max_mt))
-        else f"{y} vs {x}",
+        title=f"{y} vs {x}",
     )
+    if any(v is not None for v in (min_counts, max_counts, min_mt, max_mt)):
+        ax.set_title(f"{y} vs {x} (QC fail: {int((~ok).sum())})")
     fig.tight_layout()
     if save is not None:
         _savefig(fig, save)
@@ -516,10 +515,10 @@ def genes_vs_mt_fraction(
         max_y=max_genes,
         logx=logx,
         logy=logy,
-        title=f"{y} vs {x} (QC fail: {(~ok).sum()})"
-        if any(v is not None for v in (min_mt, max_mt, min_genes, max_genes))
-        else f"{y} vs {x}",
+        title=f"{y} vs {x}",
     )
+    if any(v is not None for v in (min_mt, max_mt, min_genes, max_genes)):
+        ax.set_title(f"{y} vs {x} (QC fail: {int((~ok).sum())})")
     fig.tight_layout()
     if save is not None:
         _savefig(fig, save)
@@ -643,9 +642,20 @@ def qc_by_group(
     if groupby not in adata.obs.columns:
         raise KeyError(f"groupby='{groupby}' not found in adata.obs")
 
-    for k in keys:
-        if k not in adata.obs.columns:
-            raise KeyError(f"Missing '{k}' in adata.obs. Run bk.pp.qc_metrics(adata) first.")
+    # Not every dataset yields every QC metric (e.g. no MT/ribo genes annotated),
+    # so plot whichever of the requested keys are actually available.
+    missing = [k for k in keys if k not in adata.obs.columns]
+    keys = [k for k in keys if k in adata.obs.columns]
+    if missing:
+        warn(
+            f"qc_by_group: skipping missing QC columns {missing}. "
+            "Run bk.pp.qc_metrics(adata) first if you expect them."
+        )
+    if not keys:
+        raise KeyError(
+            "qc_by_group: none of the requested QC columns exist in adata.obs. "
+            "Run bk.pp.qc_metrics(adata) first."
+        )
 
     groups = adata.obs[groupby].astype("category")
     cat = groups.cat.categories.tolist()

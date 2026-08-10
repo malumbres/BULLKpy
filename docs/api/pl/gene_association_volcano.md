@@ -88,7 +88,7 @@ The function:
 
 ## Parameters
 
-#### Required
+### Required
 
 **adata**    
 AnnData with adata.obs[groupby] and gene expression in adata.X or a layer.  

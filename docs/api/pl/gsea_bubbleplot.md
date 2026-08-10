@@ -106,7 +106,7 @@ If save is provided, uses _savefig(fig, save).
 
 ## Parameters
 
-#### Required
+### Required
 - **df_gsea**: DataFrame of GSEA results
 - **pathways**: terms (list) or grouped terms (dict)
 

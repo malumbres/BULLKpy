@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Sequence, Literal, Optional
+from typing import Sequence, Literal
 import json
 import numpy as np
 import pandas as pd
@@ -19,9 +19,9 @@ except Exception:  # pragma: no cover
     def warn(x): print(f"WARNING: {x}")
 
 from sklearn.metrics import roc_auc_score, average_precision_score
-from sklearn.model_selection import StratifiedKFold
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from .._compat import is_categorical_like
 
 
 ############################################
@@ -1183,7 +1183,9 @@ def _to_binary_labels(y: pd.Series, positive_label):
     Convert labels to 0/1.
     positive_label can be 'R', 'NR', 1, True, etc.
     """
-    y = pd.Series(y).astype(str) if y.dtype == object else pd.Series(y)
+    y = pd.Series(y)
+    if is_categorical_like(y):
+        y = y.astype(str)
     if positive_label is None:
         raise ValueError("positive_label must be provided for binary tasks.")
     y01 = (y == positive_label).astype(int).to_numpy()
@@ -1211,7 +1213,7 @@ def recommended_auc_panel(
     adata,
     *,
     genes: Sequence[str],
-    label_col: str = "PFS_6m",
+    label_col: str,
     positive_label: str = "R",
     layer: str | None = "log1p_cpm",
     standardize: bool = True,
@@ -1731,7 +1733,7 @@ def validate_signature_auc_external(
     adata,
     *,
     weights: pd.DataFrame,
-    label_col: str = "PFS_6m",
+    label_col: str,
     positive_label: str = "R",
     layer: str | None = "log1p_cpm",
     intercept: float = 0.0,
@@ -1745,6 +1747,61 @@ def validate_signature_auc_external(
     spec_targets: tuple[float, ...] = (0.3, 0.8, 0.9, 0.95),
     key_added: str | None = None,
 ) -> pd.DataFrame:
+    """
+    Evaluate a locked gene signature on an independent cohort.
+
+    Scores `adata` with the supplied weights, then reports discrimination
+    together with the operating-point metrics that matter clinically: what
+    precision you get at a chosen recall, and what recall you get at a chosen
+    precision or specificity. Weights are applied as given and never refitted,
+    which is what makes this an external validation.
+
+    Parameters
+    ----------
+    adata
+        Validation cohort. Must not have contributed to fitting `weights`.
+    weights
+        Frozen signature, with columns ``gene`` and ``beta``.
+    intercept
+        Intercept accompanying `weights`; required for calibrated probabilities.
+    label_col
+        Binary outcome column in ``adata.obs``.
+    positive_label
+        Level of `label_col` treated as the positive class.
+    layer
+        Expression layer used for scoring; must match the layer used to fit.
+    score_key
+        ``adata.obs`` key to store the score under. A temporary key is used when ``None``.
+    use_proba
+        Convert the linear score to a probability before evaluating. Only affects
+        threshold-based metrics, not ranking metrics such as AUC.
+    metric
+        Headline metric: ``"roc_auc"`` or ``"pr_auc"``. Prefer ``"pr_auc"`` when
+        the positive class is rare.
+    n_boot
+        Bootstrap resamples for confidence intervals. ``0`` disables them.
+    seed
+        Random seed for the bootstrap.
+    ppv_recalls
+        Recall levels at which to report precision (PPV).
+    ppv_targets
+        Precision levels at which to report the achievable recall.
+    spec_targets
+        Specificity levels at which to report sensitivity.
+    key_added
+        Key in ``adata.uns`` to store the result table under, if given.
+
+    Returns
+    -------
+    pandas.DataFrame
+        A single row holding the headline score, its bootstrap interval,
+        prevalence and each requested operating point.
+
+    See Also
+    --------
+    evaluate_signatures_store : run this across a whole bank of signatures.
+    make_signature_frozen : produce the weights this validates.
+    """
     try:
         from sklearn.metrics import (
             roc_auc_score,
@@ -2010,14 +2067,47 @@ def score_signature_on_PPV(
     *,
     weights_df,
     intercept,
-    label_col="NR_6m",
+    label_col,
     positive_label="NR",
     layer="log1p_cpm",
     recall_target=0.5,
     n_boot=200,
     seed=0,
 ):
-    df = bk.tl.validate_signature_auc_external(
+    """
+    Report the precision a signature achieves at a chosen recall.
+
+    A convenience wrapper around :func:`validate_signature_auc_external` for the
+    common question "if we must catch this fraction of positives, how many of the
+    flagged samples are real?".
+
+    Parameters
+    ----------
+    adata_dev
+        Cohort to evaluate on.
+    weights_df
+        Frozen weights, with columns ``gene`` and ``beta``.
+    intercept
+        Intercept accompanying the weights.
+    label_col
+        Binary outcome column in ``adata_dev.obs``.
+    positive_label
+        Level of `label_col` treated as the positive class.
+    layer
+        Expression layer used for scoring.
+    recall_target
+        Recall at which precision is reported.
+    n_boot
+        Bootstrap resamples for the confidence interval.
+    seed
+        Random seed for the bootstrap.
+
+    Returns
+    -------
+    tuple[float, pandas.DataFrame]
+        Precision at `recall_target`, and the full metrics row it came from.
+    """
+    df = validate_signature_auc_external(
         adata_dev,
         weights=weights_df,
         intercept=float(intercept),
@@ -2038,7 +2128,7 @@ def evaluate_signatures_store(
     adata,
     signatures_store: dict,
     *,
-    label_col="PFS_6m",
+    label_col,
     positive_label="NR",
     layer="log1p_cpm",
     use_proba=True,
@@ -2051,12 +2141,54 @@ def evaluate_signatures_store(
     n_boot=200,
     seed=0,
 ):
+    """
+    Evaluate every signature in a bank on one cohort, with clinical operating points.
+
+    Applies each signature's stored weights without refitting and returns one row
+    per signature, so candidates can be compared on the same footing.
+
+    Parameters
+    ----------
+    adata
+        Cohort to evaluate on.
+    signatures_store
+        Mapping of name to signature dict, each with ``weights_df`` and ``intercept``.
+    label_col
+        Binary outcome column in ``adata.obs``.
+    positive_label
+        Level of `label_col` treated as the positive class.
+    layer
+        Expression layer used for scoring.
+    use_proba
+        Convert scores to probabilities before applying thresholds.
+    metric
+        Headline metric, ``"pr_auc"`` or ``"roc_auc"``.
+    ppv_recalls
+        Recall levels at which to report precision.
+    ppv_targets
+        Precision levels at which to report achievable recall.
+    spec_targets
+        Specificity levels at which to report sensitivity.
+    n_boot
+        Bootstrap resamples for confidence intervals.
+    seed
+        Random seed for the bootstrap.
+
+    Returns
+    -------
+    pandas.DataFrame
+        One row per signature, with the headline metric and each operating point.
+
+    See Also
+    --------
+    pick_best_signature : select a winner from this table.
+    """
     rows = []
     for name, sig in signatures_store.items():
         w = sig["weights_df"]
         b0 = float(sig.get("intercept", 0.0))
 
-        df = bk.tl.validate_signature_auc_external(
+        df = validate_signature_auc_external(
             adata,
             weights=w,
             intercept=b0,
@@ -2103,6 +2235,25 @@ def evaluate_signatures_store(
 
 
 def pick_best_signature(df_eval: pd.DataFrame, *, criterion="ppv_at_recall_50", higher_is_better=True):
+    """
+    Choose the best signature from an evaluation table.
+
+    Parameters
+    ----------
+    df_eval
+        Table produced by :func:`evaluate_signatures_store` or
+        :func:`benchmark_signatures_pr_auc`.
+    criterion
+        Column to rank on. Defaults to precision at 50% recall rather than a
+        headline AUC, since that is usually the decision-relevant number.
+    higher_is_better
+        Set ``False`` for criteria where smaller is better (e.g. a Brier score).
+
+    Returns
+    -------
+    tuple[str, pandas.DataFrame]
+        Name of the winning signature, and `df_eval` sorted by `criterion`.
+    """
     df = df_eval.copy()
     if criterion not in df.columns:
         raise KeyError(f"criterion '{criterion}' not found in df_eval columns.")
@@ -2180,7 +2331,7 @@ def make_signature_frozen(
     adata_ext,
     genes,
     *,
-    label_col="PFS_6m",
+    label_col,
     positive_label="NR",
     layer="log1p_cpm",
     standardize=True,
@@ -2191,7 +2342,54 @@ def make_signature_frozen(
     coef_eps=1e-6,
     seed=0,
 ):
+    """
+    Fit a signature on training data and lock it, then score an external cohort.
 
+    Selects the regularisation strength on `adata_train` only, freezes the
+    resulting weights, and evaluates them on `adata_ext`. Keeping the fitting and
+    evaluation cohorts separate is what stops the reported performance being
+    optimistic.
+
+    Parameters
+    ----------
+    name
+        Label for the resulting signature.
+    adata_train
+        Cohort used to fit weights and choose ``C``.
+    adata_ext
+        Independent cohort used only for evaluation.
+    genes
+        Candidate genes; those absent from ``var_names`` are dropped.
+    label_col
+        Binary outcome column present in both cohorts.
+    positive_label
+        Level of `label_col` treated as the positive class.
+    layer
+        Expression layer used for fitting and scoring.
+    standardize
+        Z-score genes before fitting, so coefficients are comparable.
+    l1_ratio
+        Elastic-net mixing: 1.0 is pure lasso (sparser), 0.0 pure ridge.
+    C_grid
+        Inverse regularisation strengths searched, using the training cohort only.
+    max_iter, tol
+        Solver iteration cap and convergence tolerance.
+    coef_eps
+        Coefficients below this magnitude are treated as zero and dropped.
+    seed
+        Random seed for the solver and any cross-validation splits.
+
+    Returns
+    -------
+    tuple[dict, pandas.DataFrame]
+        The frozen signature (``weights_df``, ``intercept``, ``params``) and a
+        one-row frame of its performance on `adata_ext`.
+
+    See Also
+    --------
+    quick_fit_weights : fit without the external evaluation step.
+    validate_signature_auc_external : evaluate an already-frozen signature.
+    """
     # --- freeze requested genes ASAP (before any filtering happens) ---
     genes_req = [str(g) for g in list(genes)]  # full list you *intended* to test
     
@@ -2320,7 +2518,7 @@ def quick_fit_weights(
     adata,
     genes,
     *,
-    label_col="PFS_6m",
+    label_col,
     positive_label="NR",
     layer="log1p_cpm",
     standardize=True,
@@ -2330,6 +2528,41 @@ def quick_fit_weights(
     tol=1e-3,
     seed=0,
 ):
+    """
+    Fit elastic-net logistic weights for a gene panel at a fixed strength.
+
+    A single fit at one value of ``C``, without model selection. Use it to
+    iterate quickly; use :func:`make_signature_frozen` when the result is meant
+    to be reported.
+
+    Parameters
+    ----------
+    adata
+        Cohort to fit on.
+    genes
+        Genes forming the panel; missing genes are dropped.
+    label_col
+        Binary outcome column in ``adata.obs``.
+    positive_label
+        Level of `label_col` treated as the positive class.
+    layer
+        Expression layer used for fitting.
+    standardize
+        Z-score genes before fitting.
+    C
+        Inverse regularisation strength; smaller values shrink harder.
+    l1_ratio
+        Elastic-net mixing between lasso (1.0) and ridge (0.0).
+    max_iter, tol
+        Solver iteration cap and convergence tolerance.
+    seed
+        Random seed for the solver.
+
+    Returns
+    -------
+    tuple[pandas.DataFrame, float]
+        Weights with columns ``gene`` and ``beta``, and the fitted intercept.
+    """
     from sklearn.linear_model import LogisticRegression
     from sklearn.preprocessing import StandardScaler
 
@@ -2371,7 +2604,7 @@ def quick_fit_weights_frozen(
     adata_train,
     genes,
     *,
-    label_col="PFS_6m",
+    label_col,
     positive_label="NR",
     layer="log1p_cpm",
     standardize=True,
@@ -2383,7 +2616,7 @@ def quick_fit_weights_frozen(
     seed=0,
 ):
     # Use the SAME function as your whole pipeline
-    sig_obj, _row = bk.tl.make_signature_frozen(
+    sig_obj, _row = make_signature_frozen(
         name="__tmp__",
         adata_train=adata_train,
         adata_ext=adata_train,   # dummy; we won't use metrics_ext
@@ -2401,38 +2634,50 @@ def quick_fit_weights_frozen(
     )
     return sig_obj["weights_df"], float(sig_obj["intercept"]), sig_obj
 
-def add_signature_from_genes(
-    sigs: dict,
-    name: str,
-    adata_train,
-    genes,
-    *,
-    label_col="PFS_6m",
-    positive_label="NR",
-    layer="log1p_cpm",
-    **fit_kwargs,
-):
-    w, b0, sig_obj = quick_fit_weights_frozen(
-        adata_train,
-        genes,
-        label_col=label_col,
-        positive_label=positive_label,
-        layer=layer,
-        **fit_kwargs,
-    )
-    sigs[name] = {"weights_df": w, "intercept": b0, "sig_obj": sig_obj}
-    return sigs
-
 def benchmark_signatures_pr_auc(
     adata,
     sigs: dict,
     *,
-    label_col="PFS_6m",
+    label_col,
     positive_label="NR",
     layer="log1p_cpm",
     n_boot=200,
     seed=0,
 ):
+    """
+    Compare several signatures by precision-recall AUC on one cohort.
+
+    Every signature is applied with its stored weights, so this ranks fixed
+    candidates rather than refitting them.
+
+    Parameters
+    ----------
+    adata
+        Cohort to evaluate on.
+    sigs
+        Mapping of name to signature dict, each with ``weights_df`` and
+        optionally ``intercept``.
+    label_col
+        Binary outcome column in ``adata.obs``.
+    positive_label
+        Level of `label_col` treated as the positive class.
+    layer
+        Expression layer used for scoring.
+    n_boot
+        Bootstrap resamples for confidence intervals.
+    seed
+        Random seed for the bootstrap.
+
+    Returns
+    -------
+    pandas.DataFrame
+        One row per signature, sorted by decreasing PR-AUC.
+
+    See Also
+    --------
+    evaluate_signatures_store : adds clinical operating points to the comparison.
+    pick_best_signature : choose a winner from the resulting table.
+    """
     rows = []
 
     for name, sig in sigs.items():
@@ -2488,7 +2733,7 @@ def add_signature_from_genes(
     adata_train,
     adata_dev=None,
     adata_test=None,
-    label_col="NR_6m",
+    label_col,
     positive_label="NR",
     layer="log1p_cpm",
     # fitter settings
@@ -2500,6 +2745,59 @@ def add_signature_from_genes(
     coef_eps=1e-6,
     seed=0,
 ):
+    """
+    Fit a signature from a gene list and add it to a signature bank.
+
+    Wraps :func:`make_signature_frozen` and stores the frozen result under `name`,
+    so several candidate panels can be accumulated in one dict and compared later
+    with :func:`evaluate_signatures_store`.
+
+    Parameters
+    ----------
+    signatures_store
+        Bank to add to; mutated in place and also returned.
+    name
+        Key to store the signature under.
+    genes
+        Candidate genes for this panel.
+    adata_train
+        Cohort used to fit the weights.
+    adata_dev
+        Cohort used for the accompanying evaluation. Falls back to `adata_train`
+        when ``None``, in which case the reported metrics are in-sample and
+        optimistic.
+    adata_test
+        Accepted for symmetry with the rest of the workflow; held-out evaluation
+        is done separately via :func:`evaluate_signatures_store`.
+    label_col
+        Binary outcome column present in the cohorts used.
+    positive_label
+        Level of `label_col` treated as the positive class.
+    layer
+        Expression layer used for fitting and scoring.
+    standardize
+        Z-score genes before fitting.
+    l1_ratio
+        Elastic-net mixing between lasso (1.0) and ridge (0.0).
+    C_grid
+        Inverse regularisation strengths searched on the training cohort.
+    max_iter, tol
+        Solver iteration cap and convergence tolerance.
+    coef_eps
+        Coefficients below this magnitude are treated as zero and dropped.
+    seed
+        Random seed for the solver and splits.
+
+    Returns
+    -------
+    tuple[dict, dict, pandas.DataFrame]
+        The updated bank, the frozen signature object, and its one-row metrics frame.
+
+    See Also
+    --------
+    build_signature_bank_from_genes : build a whole bank from several gene lists.
+    evaluate_signatures_store : compare everything in the bank on one cohort.
+    """
     # if you don't want to evaluate inside, you can pass adata_dev=adata_train (or None and skip)
     adata_ext = adata_dev if adata_dev is not None else adata_train
 
@@ -2543,7 +2841,7 @@ def build_signature_bank_from_genes(
     adata_train,
     adata_dev=None,
     adata_test=None,
-    label_col="PFS_6m",
+    label_col,
     positive_label="NR",
     layer="log1p_cpm",
     l1_ratio=0.8,
@@ -2562,7 +2860,6 @@ def build_signature_bank_from_genes(
     """
     import numpy as np
     import pandas as pd
-    import bullkpy as bk
 
     train_genes = set(map(str, adata_train.var_names))
     dev_genes = set(map(str, adata_dev.var_names)) if adata_dev is not None else None
@@ -2649,6 +2946,28 @@ def build_signature_bank_from_genes(
 ########################################################
 
 def save_signature_bank(sig_bank: dict, outdir: str):
+    """
+    Write a bank of signatures to disk.
+
+    Each signature becomes a weights table plus a JSON sidecar holding its
+    intercept and fit parameters, so a bank can be version-controlled and
+    reloaded without refitting.
+
+    Parameters
+    ----------
+    sig_bank
+        Mapping of name to signature dict (``weights_df``, ``intercept``, ``params``).
+    outdir
+        Destination directory; created if absent.
+
+    Returns
+    -------
+    None
+
+    See Also
+    --------
+    load_signature_bank : read a bank back.
+    """
     outdir = Path(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
 
@@ -2680,6 +2999,20 @@ def save_signature_bank(sig_bank: dict, outdir: str):
 
 
 def load_signature_bank(indir: str):
+    """
+    Load a bank of signatures previously written by :func:`save_signature_bank`.
+
+    Parameters
+    ----------
+    indir
+        Directory containing the saved weights tables and their JSON sidecars.
+
+    Returns
+    -------
+    dict
+        Mapping of name to signature dict, ready to pass to
+        :func:`evaluate_signatures_store` or :func:`benchmark_signatures_pr_auc`.
+    """
     indir = Path(indir)
     with open(indir / "sig_bank.json", "r") as f:
         meta = json.load(f)

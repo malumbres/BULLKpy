@@ -45,7 +45,7 @@ bk.pp.qc_metrics(adata)
 
 ## Parameters
 
-#### Grouping
+### Grouping
 
 **groupby ** (str, required). 
 Categorical column in adata.obs used to group samples

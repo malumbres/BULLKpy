@@ -26,7 +26,7 @@ labels; silhouette measures intrinsic cluster compactness/separation.
 
 ## Parameters
 
-#### Required
+### Required
 
 **adata**  
 AnnData object containing both ground-truth and clustering labels in adata.obs.

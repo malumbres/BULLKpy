@@ -39,7 +39,7 @@ res must be a pandas.DataFrame containing at least:
 
 ## Parameters
 
-#### Core columns
+### Core columns
 
 **gene_col**   
 Column containing gene names.
@@ -117,7 +117,7 @@ Whether to display the plot with plt.show().
 
 ## Examples
 
-#### Basic volcano plot
+### Basic volcano plot
 
 ```python
 fig, ax = bk.pl.volcano(res)

@@ -57,7 +57,7 @@ When save is set, the function estimates the output image size in pixels and red
 
 ## Parameters
 
-#### Core inputs. 
+### Core inputs. 
 
 **adata**: AnnData.    
 Data container. Mutation status is read from adata.obs. Expression tracks use layer/adata.X.   
@@ -201,7 +201,7 @@ bk.pl.oncoprint(
 )
 ```
 
-```{figure} /_static/oncoprint_plus_exp.png
+```{figure} /_static/oncoprint_plus_expr.png
 :alt: Oncoprint
 :width: 600px
 :align: center

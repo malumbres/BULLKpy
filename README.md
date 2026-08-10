@@ -28,6 +28,31 @@ https://pypi.org/project/bullkpy/
 ```bash
 pip install bullkpy
 ```
+
+BULLKpy requires **Python 3.10 or newer**.
+
+Optional extras:
+
+```bash
+pip install "bullkpy[umap]"      # bk.tl.umap / bk.pl.umap
+pip install "bullkpy[leiden]"    # bk.tl.cluster(method="leiden")
+```
+
+--- 
+
+## 🛠️ Development
+
+```bash
+git clone https://github.com/malumbres/BULLKpy.git
+cd BULLKpy
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev,docs,umap,leiden]"
+
+pytest                                  # run the test suite
+ruff check src/                         # lint
+python -m sphinx -b html docs docs/_build/html   # build the docs
+```
+
 --- 
 
 ## 🚀 Tutorials

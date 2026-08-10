@@ -12,6 +12,8 @@ boxplot_with_stats
 categorical_colors_array
 categorical_confusion
 corrplot
+plot_corr_scatter
+plot_corr_heatmap
 corr_heatmap
 cox_forest
 cox_forest_from_uns

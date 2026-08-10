@@ -17,7 +17,6 @@ except Exception:  # pragma: no cover
 
 import anndata as ad
 
-from ._style import set_style, _savefig
 
 
 def _get_matrix(adata: ad.AnnData, layer: str | None) -> np.ndarray:
@@ -70,7 +69,6 @@ def corr_heatmap(
 
     import numpy as np
     import pandas as pd
-    import matplotlib.pyplot as plt
     import matplotlib as mpl
 
     X = _get_matrix(adata, layer)
@@ -346,11 +344,13 @@ def gene_panel_correlation_heatmap(
 
     # --- clustered heatmap (optional) ---
     if cluster:
+        # NB: do not import matplotlib.pyplot here -- a function-local import
+        # would make `plt` local to the whole function and break the
+        # non-clustered branch below with UnboundLocalError.
         try:
             import seaborn as sns
-            import matplotlib.pyplot as plt
         except Exception as e:
-            raise ImportError(f"cluster=True requires seaborn/matplotlib. ({e})")
+            raise ImportError(f"cluster=True requires seaborn. ({e})")
 
         g = sns.clustermap(
             dfC,

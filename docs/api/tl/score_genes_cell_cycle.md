@@ -46,7 +46,7 @@ S_score, G2M_score, phase
 ```
 ## Parameters
 
-#### Required
+### Required
 
 **adata**    
 AnnData object containing expression data.

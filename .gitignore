@@ -2,23 +2,15 @@
 # Large data & results (local)
 # ===============================
 data/
-*.h5ad
-*.h5
-*.loom
-*.rds
-*.parquet
-*.npz
-*.pkl
 results/
-
-# ===============================
-# AnnData / bioinformatics files
-# ===============================
 *.h5ad
 *.h5
 *.loom
 *.mtx
+*.rds
+*.parquet
 *.npz
+*.pkl
 
 # ===============================
 # Figures & temporary outputs
@@ -35,10 +27,28 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .build/
+build/
 dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
+# ===============================
+# Virtual environments
+# ===============================
+.venv/
+venv/
+env/
+
+# ===============================
 # Sphinx build
+# ===============================
 docs/_build/
+
+# Notebooks are copied into docs/notebooks/ at build time (see .readthedocs.yaml);
+# the canonical copies live in notebooks/.
+docs/notebooks/*.ipynb
 
 # ===============================
 # Jupyter
@@ -52,11 +62,8 @@ docs/_build/
 Thumbs.db
 .vscode/
 .idea/
-.DS_Store
 
-# NEVER COMMIT
-/data/
-*.h5ad
-/docs/_build/
-docs/_build/
-/notebooks/.ipynb_checkpoints/
+# ===============================
+# Local tooling / scratch
+# ===============================
+chrome_profile_notebooklm/

@@ -32,7 +32,7 @@ Each gene set is processed independently, but all share the same:
 
 ## Parameters
 
-#### Required
+### Required
 
 **adata**   
 AnnData object containing expression data.

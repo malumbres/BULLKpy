@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use BULLKpy in your research, please cite both the software and the preprint below."
+title: "BULLKpy: An AnnData-Inspired Unified Framework for Comprehensive Bulk OMICs Analysis"
+abstract: >-
+  BULLKpy is a Python framework for comprehensive bulk OMICs analysis, built on
+  AnnData and inspired by the Scanpy/scverse ecosystem. It provides quality
+  control, normalisation, dimensionality reduction, clustering, differential
+  expression, gene set enrichment, metaprogram and survival analyses, together
+  with publication-ready visualisation, in a single consistent workflow.
+type: software
+license: MIT
+version: 0.2.0
+repository-code: "https://github.com/malumbres/BULLKpy"
+url: "https://bullkpy.readthedocs.io/en/latest/"
+keywords:
+  - bulk RNA-seq
+  - transcriptomics
+  - bioinformatics
+  - AnnData
+  - cancer research
+  - TCGA
+authors:
+  - family-names: Malumbres
+    given-names: Marcos
+    email: mmalumbres@vhio.net
+    affiliation: "Vall d'Hebron Institute of Oncology (VHIO)"
+
+preferred-citation:
+  type: article
+  title: "BULLKpy: An AnnData-Inspired Unified Framework for Comprehensive Bulk OMICs Analysis"
+  year: 2026
+  journal: bioRxiv
+  doi: 10.64898/2026.01.26.701768
+  url: "https://www.biorxiv.org/content/10.64898/2026.01.26.701768v1"
+  authors:
+    - family-names: Malumbres
+      given-names: Marcos
+      email: mmalumbres@vhio.net
+      affiliation: "Vall d'Hebron Institute of Oncology (VHIO)"

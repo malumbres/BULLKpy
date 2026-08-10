@@ -72,7 +72,7 @@ Whether to display the plot using plt.show().
 
 ## Example  
 
-#### Basic volcano plot
+### Basic volcano plot
 
 ```python
 fig, ax = bk.pl.volcano_categorical(

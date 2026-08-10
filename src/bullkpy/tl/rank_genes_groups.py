@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Literal, Sequence
 import numpy as np
-import pandas as pd
 import scipy.sparse as sp
 import anndata as ad
 

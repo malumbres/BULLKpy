@@ -40,7 +40,7 @@ If groupby is provided, it must also exist in adata.obs.
 
 ## Parameters
 
-#### Axes
+### Axes
 
 **x** (str, default "pct_counts_mt").  
 Column in adata.obs used for the x-axis (mitochondrial fraction).   

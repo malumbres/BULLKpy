@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Sequence, Mapping, Any, Optional, Tuple
+from typing import Literal, Sequence, Any, Optional, Tuple
 import numpy as np
 import pandas as pd
 import scipy.sparse as sp
@@ -14,7 +14,7 @@ try:
 except Exception:  # pragma: no cover
     stats = None
 
-from ..logging import info, warn
+from ..logging import info
 
 
 
@@ -224,6 +224,155 @@ def gene_categorical_association(
     return out
 
 
+def obs_categorical_association(
+    adata: ad.AnnData,
+    *,
+    groupby: str,
+    obs_keys: Sequence[str] | None = None,
+    test: Literal["auto", "kruskal", "anova"] = "auto",
+    method: Literal["auto", "kruskal", "anova"] | None = None,
+    effect_size: Literal["auto", "epsilon2", "eta2", "none"] = "auto",
+    min_group_size: int = 2,
+    adjust: Literal["bh", "none"] = "bh",
+) -> pd.DataFrame:
+    """
+    Scan numeric ``.obs`` columns for association with a categorical obs column.
+
+    This is the obs-level analogue of :func:`gene_categorical_association`: it
+    answers "which sample-level numeric variables (QC metrics, scores, clinical
+    values) differ across the categories in ``adata.obs[groupby]``?"
+
+    Parameters
+    ----------
+    adata
+        AnnData with samples in `.obs`.
+    groupby
+        Categorical column in `adata.obs` defining groups (e.g. subtype, cluster).
+    obs_keys
+        Numeric obs columns to test. If None, every numeric column in
+        `adata.obs` is used (excluding `groupby` itself).
+    test
+        - "kruskal": Kruskal-Wallis (non-parametric; robust default)
+        - "anova": one-way ANOVA (parametric)
+        - "auto": uses "kruskal"
+    method
+        Alias for `test`, accepted for convenience. If both are given, `method` wins.
+    effect_size
+        - "epsilon2": for Kruskal-Wallis
+        - "eta2": for ANOVA
+        - "auto": epsilon2 if kruskal/auto, else eta2
+        - "none": skip effect
+    min_group_size
+        Minimum samples per group to include that group in the test.
+    adjust
+        Multiple testing correction: "bh" (Benjamini-Hochberg FDR) or "none".
+
+    Returns
+    -------
+    DataFrame
+        One row per obs variable, with columns
+        ``['obs','groupby','n_groups','test','statistic','pval','qval','effect']``
+        plus a ``mean_<group>`` column per group, sorted by qval then pval.
+
+    Examples
+    --------
+    Test all numeric obs columns across batches::
+
+        res = bk.tl.obs_categorical_association(adata, groupby="Batch")
+
+    Test selected scores across tumour subtypes::
+
+        res = bk.tl.obs_categorical_association(
+            adata, groupby="Subtype", obs_keys=["purity", "NE_score"],
+        )
+
+    See Also
+    --------
+    gene_categorical_association : same test, but scanning genes.
+    categorical_association : categorical vs categorical.
+    """
+    _require_scipy()
+
+    if groupby not in adata.obs.columns:
+        raise KeyError(f"groupby='{groupby}' not found in adata.obs")
+
+    cats = _as_categorical(adata.obs[groupby])
+    levels = list(pd.Categorical(cats).categories)
+
+    if obs_keys is None:
+        keys_use = [
+            c
+            for c in adata.obs.columns
+            if c != groupby and pd.api.types.is_numeric_dtype(adata.obs[c])
+        ]
+    else:
+        keys_use = [str(k) for k in obs_keys]
+        missing = [k for k in keys_use if k not in adata.obs.columns]
+        if missing:
+            raise KeyError(f"obs_keys not found in adata.obs: {missing}")
+
+    if len(keys_use) == 0:
+        raise ValueError("No numeric obs columns to test.")
+
+    test_use = method if method is not None else test
+    test_use = "kruskal" if test_use in ("auto", "kruskal") else "anova"
+    eff_use = effect_size
+    if eff_use == "auto":
+        eff_use = "epsilon2" if test_use == "kruskal" else "eta2"
+
+    info(
+        f"obs_categorical_association: {len(keys_use)} obs keys vs '{groupby}' "
+        f"({len(levels)} groups), test={test_use}"
+    )
+
+    rows: list[dict[str, Any]] = []
+    for k in keys_use:
+        y = pd.to_numeric(adata.obs[k], errors="coerce").to_numpy(dtype=float)
+        df = pd.DataFrame({"y": y, "grp": cats}).dropna(subset=["y", "grp"])
+
+        gv: list[np.ndarray] = []
+        means: dict[str, float] = {}
+        for lv in levels:
+            v = df.loc[df["grp"].astype(str) == str(lv), "y"].to_numpy(dtype=float)
+            means[f"mean_{lv}"] = float(np.mean(v)) if v.size else np.nan
+            if v.size >= int(min_group_size):
+                gv.append(v)
+
+        if len(gv) < 2 or all(np.ptp(v) == 0 for v in gv):
+            stat_val, p_val, eff = np.nan, np.nan, np.nan
+        elif test_use == "kruskal":
+            stat_val, p_val = stats.kruskal(*gv)
+            eff = (
+                _epsilon2_from_kruskal(
+                    float(stat_val), n=int(sum(v.size for v in gv)), k=int(len(gv))
+                )
+                if eff_use == "epsilon2"
+                else np.nan
+            )
+        else:
+            stat_val, p_val = stats.f_oneway(*gv)
+            eff = _eta2_from_anova(gv) if eff_use == "eta2" else np.nan
+
+        row = {
+            "obs": str(k),
+            "groupby": str(groupby),
+            "n_groups": int(len(levels)),
+            "test": test_use,
+            "statistic": float(stat_val) if np.isfinite(stat_val) else np.nan,
+            "pval": float(p_val) if np.isfinite(p_val) else np.nan,
+            "effect": float(eff) if np.isfinite(eff) else np.nan,
+        }
+        row.update(means)
+        rows.append(row)
+
+    out = pd.DataFrame(rows)
+    if out.empty:
+        return out
+
+    out["qval"] = _bh_fdr(out["pval"].to_numpy()) if adjust == "bh" else np.nan
+    return out.sort_values(["qval", "pval"], na_position="last").reset_index(drop=True)
+
+
 # -----------------------------
 # B) Fast “rank_genes_groups”-like for one group vs reference/rest
 # -----------------------------
@@ -259,7 +408,9 @@ def rank_genes_groups_fast(
     grp = adata.obs[groupby].astype(str)
     m1 = grp.eq(str(group)).to_numpy()
 
-    if reference is None:
+    # `None` and the literal sentinel "rest" both mean "all other samples",
+    # unless a real category happens to be named "rest".
+    if reference is None or (str(reference) == "rest" and not grp.eq("rest").any()):
         m2 = ~m1
         ref_name = "rest"
     else:
@@ -447,37 +598,97 @@ def association(
     layer: str | None = "log1p_cpm",
 ) -> Any:
     """
-    Minimal association dispatcher (categorical focus).
+    Test the association between any two variables, picking the right test.
 
-    - gene vs categorical obs -> rank_genes_groups_fast-like is not applicable (needs a target group),
-      so we run the global scan (gene_categorical_association) for that categorical obs.
-    - categorical vs categorical -> categorical_association
+    `x` and `y` may each be a gene name or an ``.obs`` column; the appropriate
+    test is chosen from what they turn out to be:
 
-    For numeric correlations, keep using correlations.py utilities.
+    ==========================  ==================================================
+    Pair                        Dispatches to
+    ==========================  ==================================================
+    categorical vs categorical  :func:`categorical_association`
+    gene vs categorical         :func:`gene_categorical_association`
+    numeric obs vs categorical  :func:`obs_categorical_association`
+    numeric vs numeric          :func:`~bullkpy.tl.gene_gene_correlations` or
+                                :func:`~bullkpy.tl.obs_obs_corr_matrix`
+    ==========================  ==================================================
+
+    Reach for the specific function directly when you need its full set of
+    options; this is a convenience entry point for exploratory work.
+
+    Parameters
+    ----------
+    adata
+        Annotated data matrix.
+    x, y
+        A gene name (matched against ``adata.var_names``) or a column in
+        ``adata.obs``. Order does not matter.
+    layer
+        Expression layer used whenever one side is a gene.
+
+    Returns
+    -------
+    Any
+        Whatever the dispatched function returns — a tidy ``DataFrame`` for the
+        gene/obs scans, a dict for :func:`categorical_association`, and a
+        correlation result for numeric pairs.
+
+    Raises
+    ------
+    KeyError
+        If `x` or `y` matches neither a gene nor an ``.obs`` column.
+
+    Examples
+    --------
+    >>> bk.tl.association(adata, x="Subtype", y="Batch")         # cat vs cat
+    >>> bk.tl.association(adata, x="MKI67", y="Subtype")         # gene vs cat
+    >>> bk.tl.association(adata, x="purity", y="Subtype")        # numeric vs cat
+    >>> bk.tl.association(adata, x="purity", y="age")            # numeric vs numeric
     """
+    from .correlations import gene_gene_correlations, obs_obs_corr_matrix
+
     x_is_gene = x in adata.var_names
     y_is_gene = y in adata.var_names
     x_in_obs = x in adata.obs.columns
     y_in_obs = y in adata.obs.columns
 
-    if x_is_gene and y_in_obs:
-        if _is_numeric_series(adata.obs[y]):
-            raise ValueError("Use correlations utilities for gene↔numeric obs.")
-        return gene_categorical_association(adata, groupby=y, genes=[x], layer=layer)
+    if not (x_is_gene or x_in_obs):
+        raise KeyError(f"'{x}' is neither a gene in adata.var_names nor a column in adata.obs")
+    if not (y_is_gene or y_in_obs):
+        raise KeyError(f"'{y}' is neither a gene in adata.var_names nor a column in adata.obs")
 
-    if y_is_gene and x_in_obs:
-        if _is_numeric_series(adata.obs[x]):
-            raise ValueError("Use correlations utilities for gene↔numeric obs.")
-        return gene_categorical_association(adata, groupby=x, genes=[y], layer=layer)
+    # --- gene vs gene -> correlation across samples
+    if x_is_gene and y_is_gene:
+        return gene_gene_correlations(adata, gene=x, genes=[y], layer=layer)
 
-    if x_in_obs and y_in_obs:
-        sx_num = _is_numeric_series(adata.obs[x])
-        sy_num = _is_numeric_series(adata.obs[y])
-        if (not sx_num) and (not sy_num):
-            return categorical_association(adata, key1=x, key2=y)
-        raise ValueError("This dispatcher only covers categorical↔categorical and gene↔categorical.")
+    # --- gene vs obs
+    for gene, obs_key in ((x, y), (y, x)):
+        if gene in adata.var_names and obs_key in adata.obs.columns:
+            if _is_numeric_series(adata.obs[obs_key]):
+                # numeric obs -> correlate the gene against it
+                return _gene_numeric_obs(adata, gene=gene, obs_key=obs_key, layer=layer)
+            return gene_categorical_association(adata, groupby=obs_key, genes=[gene], layer=layer)
 
-    raise KeyError("Could not resolve x/y as gene or obs columns.")
+    # --- obs vs obs
+    sx_num = _is_numeric_series(adata.obs[x])
+    sy_num = _is_numeric_series(adata.obs[y])
+
+    if not sx_num and not sy_num:
+        return categorical_association(adata, key1=x, key2=y)
+
+    if sx_num and sy_num:
+        return obs_obs_corr_matrix(adata, focus=x, against=[y])
+
+    # exactly one numeric -> numeric variable tested across the categorical groups
+    numeric_key, group_key = (x, y) if sx_num else (y, x)
+    return obs_categorical_association(adata, groupby=group_key, obs_keys=[numeric_key])
+
+
+def _gene_numeric_obs(adata, *, gene: str, obs_key: str, layer: str | None):
+    """Correlate one gene's expression against a numeric ``.obs`` column."""
+    from .correlations import top_gene_obs_correlations
+
+    return top_gene_obs_correlations(adata, gene=gene, obs=[obs_key], layer=layer)
 
 
 def posthoc_per_gene(

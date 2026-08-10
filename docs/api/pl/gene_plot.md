@@ -66,7 +66,7 @@ Returns a small stats_dict with:
 
 ## Parameters
 
-#### Required
+### Required
 
 **adata**   
 AnnData with expression and group metadata.  

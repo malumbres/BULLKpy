@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import Literal
 import numpy as np
 import pandas as pd
 import scipy.sparse as sp
@@ -8,6 +7,7 @@ from scipy import stats
 import anndata as ad
 import warnings
 
+from .._compat import is_categorical_like
 from ..logging import info
 from ._nb_utils import deseq2_size_factors, estimate_dispersion_mom, shrink_dispersion_to_trend
 
@@ -175,9 +175,7 @@ def _design_matrix_from_formula(obs: pd.DataFrame, formula: str, *, add_intercep
             raise KeyError(f"'{t}' not found in adata.obs")
 
         s = obs[t]
-        is_cat = (str(s.dtype) == "category") or (s.dtype == object)
-
-        if is_cat:
+        if is_categorical_like(s):
             cats = s.astype("category")
             # one-hot encode, drop first level as reference
             levels = list(cats.cat.categories)

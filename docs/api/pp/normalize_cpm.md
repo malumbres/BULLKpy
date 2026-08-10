@@ -58,7 +58,7 @@ bk.pp.log1p(adata, layer="cpm", out_layer="log1p_cpm")
 
 ## Examples
 
-#### Basic CPM normalization
+### Basic CPM normalization
 
 ```python
 bk.pp.normalize_cpm(adata)

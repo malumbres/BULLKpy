@@ -49,7 +49,7 @@ Z = linkage(d, method=method).
 
 ## Parameters
 
-#### Core data / distance
+### Core data / distance
 
 **adata** (AnnData): Input object.  
 

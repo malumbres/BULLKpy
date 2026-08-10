@@ -47,7 +47,7 @@ distance = 1.0 - correlation
 
 ## Parameters
 
-#### Core computation
+### Core computation
 
 **adata** (AnnData): Input object.  
 

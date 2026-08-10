@@ -31,7 +31,7 @@ For each requested PC:
 
 ## Parameters
 
-#### Inputs / keys
+### Inputs / keys
 
 **adata**   
 AnnData with PCA loadings stored in adata.varm[loadings_key].
@@ -116,7 +116,7 @@ Each DataFrame contains:
 - <gene_col> (gene name)
 - loading (raw loading value)
 
-#### Stored in adata.uns
+### Stored in adata.uns
 
 Results are stored under:
 ```python

@@ -74,7 +74,7 @@ bk.pp.make_obs_h5ad_safe_strict(
 )
 
 # Combined with diagnostic
-bad, _ = bk.io.find_bad_obs_cols_by_write(adata)
+bad, _ = bk.pp.find_bad_obs_cols_by_write(adata)
 
 if bad:
     cols = [c for c, _ in bad]

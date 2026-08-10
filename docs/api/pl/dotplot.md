@@ -50,7 +50,7 @@ By default this uses raw-ish counts (fraction_layer="counts") so the “expressi
 
 ## Parameters
 
-#### Gene selection
+### Gene selection
 
 **var_names**   
 List of gene names to plot (must exist in adata.var_names).  

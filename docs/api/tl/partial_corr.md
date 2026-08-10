@@ -79,7 +79,7 @@ r, p, n = bk.tl.partial_corr(
 2) Gene–obs partial correlation adjusting for batch and purity
 
 ```python
-x = bk.tl._get_gene_vector(adata, "PDCD1", layer="log1p_cpm")
+x = bk.get.vector(adata, key="PDCD1", layer="log1p_cpm")
 y = adata.obs["signature_Tcell"].to_numpy()
 
 r, p, n = bk.tl.partial_corr(

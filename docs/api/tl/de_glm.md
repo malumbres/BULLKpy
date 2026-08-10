@@ -25,7 +25,7 @@ You should provide raw counts in adata.layers["counts"] (or another layer via la
 
 ## Parameters
 
-#### Core inputs
+### Core inputs
 
 **adata**  
 AnnData with samples in rows (n_obs) and genes in columns (n_vars).

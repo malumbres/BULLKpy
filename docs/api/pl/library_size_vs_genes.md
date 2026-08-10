@@ -38,7 +38,7 @@ Samples failing any bound are outliers (QC fail) and can be highlighted if show_
 
 ## Parameters
 
-#### Data selection
+### Data selection
 **x**: str (default "total_counts")  
 obs column for library size / total counts.  
 

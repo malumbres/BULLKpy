@@ -24,7 +24,7 @@ and stored it in adata.obsm.
 
 ## Parameters
 
-#### Input / representation
+### Input / representation
 
 **adata**   
 AnnData object with samples in rows.

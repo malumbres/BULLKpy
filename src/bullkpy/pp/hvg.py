@@ -5,7 +5,7 @@ import pandas as pd
 import scipy.sparse as sp
 import anndata as ad
 
-from ..logging import info, warn
+from ..logging import info
 
 
 def highly_variable_genes(

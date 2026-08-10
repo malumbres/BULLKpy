@@ -43,7 +43,7 @@ EPCAM  +2.34  q=1.2e-05
 
 ## Parameters
 
-#### Core
+### Core
 
 **adata** (AnnData): Annotated data matrix containing DE results in adata.uns.  
 

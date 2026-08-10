@@ -39,7 +39,7 @@ For categorical colors, optionally highlights only selected categories and greys
 
 ## Parameters
 
-#### Embedding selection
+### Embedding selection
 
 **basis** (str, default "X_pca"). 
 Key in adata.obsm that contains PCA coordinates with shape (n_obs, n_comps).  

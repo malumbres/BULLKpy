@@ -53,7 +53,7 @@ No additional dependencies are required.
 
 ## Parameters
 
-#### Common parameters
+### Common parameters
 
 **method**   
 Clustering algorithm to use:  

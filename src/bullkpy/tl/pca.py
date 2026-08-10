@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Iterable, Literal, Sequence
+from typing import Literal, Sequence
 
 import numpy as np
 import pandas as pd
@@ -20,6 +20,67 @@ def pca(
     use_highly_variable: bool = False,
     key_added: str = "pca",
 ) -> None:
+    """
+    Principal component analysis of the sample x gene matrix.
+
+    Computed by SVD on the centred (and optionally scaled) matrix. Genes are the
+    features, so the resulting components describe how samples differ.
+
+    Parameters
+    ----------
+    adata
+        Annotated data matrix.
+    layer
+        Layer to decompose. Defaults to ``"log1p_cpm"``; pass ``None`` to use
+        ``adata.X``. PCA assumes roughly homoscedastic input, so a log-transformed
+        layer is normally the right choice rather than raw counts.
+    n_comps
+        Number of components to keep. Silently reduced to
+        ``min(n_comps, n_obs - 1, n_genes)`` when the data cannot support that many.
+    center
+        Subtract the per-gene mean before decomposition. Leave enabled unless the
+        matrix is already centred.
+    scale
+        Divide each gene by its standard deviation, giving every gene equal weight.
+        Disabled by default, so highly expressed and highly variable genes dominate.
+    use_highly_variable
+        Restrict to genes flagged in ``adata.var["highly_variable"]``
+        (see :func:`bullkpy.pp.highly_variable_genes`). Falls back to all genes,
+        with a warning, when the column is absent.
+    key_added
+        Key under which run parameters and variance statistics are stored in
+        ``adata.uns``.
+
+    Returns
+    -------
+    None
+        Results are written in place:
+
+        - ``adata.obsm["X_pca"]`` — sample scores, shape ``(n_obs, n_comps)``
+        - ``adata.varm["PCs"]`` — gene loadings, in full ``var`` space; genes
+          excluded by `use_highly_variable` are zero-filled
+        - ``adata.uns[key_added]`` — ``variance``, ``variance_ratio`` and the
+          parameters used
+
+    Examples
+    --------
+    >>> bk.pp.normalize_cpm(adata)
+    >>> bk.pp.log1p(adata)
+    >>> bk.tl.pca(adata, n_comps=30)
+    >>> adata.obsm["X_pca"].shape
+    (60, 30)
+
+    Restrict to highly variable genes:
+
+    >>> bk.pp.highly_variable_genes(adata, n_top_genes=2000)
+    >>> bk.tl.pca(adata, n_comps=30, use_highly_variable=True)
+
+    See Also
+    --------
+    bullkpy.tl.pca_loadings : top positively/negatively loading genes per component.
+    bullkpy.pl.pca_scatter : plot sample scores.
+    bullkpy.pl.pca_variance_ratio : elbow plot for choosing `n_comps`.
+    """
     X = adata.layers[layer] if layer is not None else adata.X
 
     # Track which genes are used so we can write loadings back to full var space

@@ -62,7 +62,7 @@ Typical columns include (depending on pairwise_posthoc implementation):
 
 ## Parameters
 
-#### Gene selection
+### Gene selection
 
 **genes**
 List of gene names to test.  
@@ -88,11 +88,11 @@ Pairwise test to apply:
 
 ## Examples
 
-#### Pairwise testing after global association
+### Pairwise testing after global association
 
 ```python
 # Global test
-res = bk.tl.rank_genes_categorical(
+res = bk.tl.rank_genes_groups_fast(
     adata,
     groupby="Subtype",
     group="Basal",
@@ -126,7 +126,7 @@ posthoc = bk.tl.posthoc_per_gene(
 ## Typical workflow
 
 **1. Global test**.   
-rank_genes_categorical or cat_cat_association
+rank_genes_groups_fast or categorical_association
 
 **2. Select genes of interest**.  
 Based on q-value and effect size
@@ -146,7 +146,7 @@ posthoc_per_gene
 	•	Non-parametric tests are recommended for heterogeneous bulk cohorts.
 
 ## See also
-	•	tl.rank_genes_categorical
+	•	tl.rank_genes_groups_fast
 	•	tl.pairwise_posthoc
 	•	pl.violin
 	•	pl.rankplot

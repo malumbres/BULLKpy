@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, Optional, Sequence, Tuple, Union
+from typing import Optional, Sequence, Tuple, Union
 import re
 import numpy as np
 import pandas as pd
@@ -126,7 +126,7 @@ def metaprogram_scores_get(
 def metaprogram_sample_metrics(
     adata: AnnData,
     *,
-    groupby: str = "Project_ID",
+    groupby: str,
     mp_source: str = "auto",
     out_prefix: str = "mp",
     heterogeneity: str = "entropy",   # "entropy" | "gini" | "dominance"
@@ -221,7 +221,7 @@ def metaprogram_sample_metrics(
 def metaprogram_dispersion_by_group(
     adata: AnnData,
     *,
-    groupby: str = "Project_ID",
+    groupby: str,
     method: str = "mad",             # "mad" | "iqr" | "std"
     out_key: str = "metaprogram_dispersion",
 ) -> pd.DataFrame:
@@ -536,6 +536,45 @@ def mp_dispersion_metrics(
     temperature=1.0,
     eps=1e-12,
 ):
+    """
+    Summarise how concentrated each sample's metaprogram scores are.
+
+    Converts the per-sample metaprogram score vector into a probability
+    distribution, then measures its spread. A sample dominated by one program
+    has low entropy; a sample spreading weight across many programs has high
+    entropy and is, in this sense, more heterogeneous.
+
+    Parameters
+    ----------
+    adata
+        Annotated data matrix with metaprogram scores in ``.obsm``.
+    mp_key
+        Key in ``adata.obsm`` holding the sample x metaprogram score matrix.
+    key_added
+        Prefix for the columns written to ``adata.obs``.
+    transform
+        How to turn scores into a distribution:
+
+        - ``"softmax"`` — exponential weighting; sensitive to `temperature`
+        - ``"absnorm"`` — normalise absolute values; keeps relative magnitudes
+    temperature
+        Softmax temperature. Values below 1 sharpen the distribution (making
+        dominance more pronounced), values above 1 flatten it. Ignored when
+        `transform="absnorm"`.
+    eps
+        Numerical floor used when normalising, to avoid division by zero.
+
+    Returns
+    -------
+    None
+        Dispersion columns are written to ``adata.obs`` under `key_added`,
+        including a normalised entropy in ``[0, 1]``.
+
+    See Also
+    --------
+    bullkpy.tl.metaprogram_heterogeneity : dispersion computed per sample group.
+    bullkpy.tl.score_metaprograms : produce the score matrix this consumes.
+    """
     S = np.asarray(adata.obsm[mp_key], float)
     # fill NaN -> 0 for dispersion calc (or you can row-mask)
     S = np.where(np.isfinite(S), S, 0.0)
@@ -589,6 +628,38 @@ def metaprogram_heterogeneity(
     mp_names=None,
     stat="sd",
 ):
+    """
+    Measure how variable each metaprogram is within each sample group.
+
+    For every group in ``adata.obs[groupby]``, computes a spread statistic across
+    samples for each metaprogram. High values mark programs that vary within a
+    group (heterogeneous), low values mark programs expressed consistently.
+
+    Parameters
+    ----------
+    adata
+        Annotated data matrix with metaprogram scores in ``.obsm``.
+    groupby
+        Categorical column in ``adata.obs`` defining the groups (e.g. tumour type).
+    obsm_key
+        Key in ``adata.obsm`` holding the sample x metaprogram matrix.
+    mp_names
+        Names for the metaprogram columns. Falls back to ``adata.uns["mp_names"]``,
+        then to ``MP1 … MPn``.
+    stat
+        Spread statistic per group: ``"sd"`` (standard deviation), or ``"mad"``
+        for a median-based, outlier-resistant alternative.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Groups as rows, metaprograms as columns, holding the chosen statistic.
+
+    See Also
+    --------
+    bullkpy.tl.mp_dispersion_metrics : per-sample dispersion instead of per-group.
+    bullkpy.pl.metaprogram_dispersion_heatmap : plot the resulting matrix.
+    """
     if groupby not in adata.obs.columns:
         raise KeyError(f"groupby='{groupby}' not found in adata.obs")
 
@@ -642,7 +713,29 @@ def metaprogram_heterogeneity(
 
 
 
-def summarize_by_group(adata, group_col="Project ID", cols=("MP_dispersion_entropy_norm",)):
+def summarize_by_group(adata, group_col, cols=("MP_dispersion_entropy_norm",)):
+    """
+    Mean and standard deviation of numeric ``.obs`` columns per group.
+
+    A small convenience wrapper for reporting: one row per group, with the
+    sample count and a ``_mean``/``_sd`` pair for each requested column.
+
+    Parameters
+    ----------
+    adata
+        Annotated data matrix.
+    group_col
+        Column in ``adata.obs`` to group by.
+    cols
+        Numeric ``.obs`` columns to summarise. Non-numeric values are coerced to
+        ``NaN`` and ignored by the statistics.
+
+    Returns
+    -------
+    pandas.DataFrame
+        One row per group with ``group``, ``n`` and the per-column statistics,
+        sorted by decreasing group size.
+    """
     out = []
     for g, d in adata.obs.groupby(group_col):
         row = {"group": g, "n": int(d.shape[0])}
@@ -687,7 +780,7 @@ def metaprogram_heterogeneity_and_dispersion(
     adata,
     *,
     mp_key=None,
-    groupby="Project_ID",
+    groupby,
     out_prefix="mp",
 ):
     df = get_metaprogram_matrix(adata)

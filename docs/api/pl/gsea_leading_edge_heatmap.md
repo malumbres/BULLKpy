@@ -17,7 +17,7 @@ It works by:
 
 ## Parameters
 
-#### Required
+### Required
 
 **adata**: anndata.AnnData    
 Contains expression values (adata.X or adata.layers[layer]) and sample annotations (adata.obs).  

@@ -5,7 +5,7 @@ import scipy.sparse as sp
 from scipy.spatial import cKDTree
 import anndata as ad
 
-from ..logging import info, warn
+from ..logging import info
 
 
 def neighbors(

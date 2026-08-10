@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Sequence, Literal, Optional, Union, Tuple
+from typing import Sequence, Literal, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,6 @@ from anndata import AnnData
 
 from ._style import set_style, _savefig
 
-from ..logging import warn
 
 
 
@@ -320,7 +319,7 @@ def cox_forest(
 
 
 def km_plot_signature(
-    adata: ad.AnnData,
+    adata: AnnData,
     *,
     time_col: str,
     event_col: str,
@@ -1012,7 +1011,7 @@ def pr_curve_signatures(
     adata,
     *,
     sigs: dict,
-    label_col: str = "PFS_6m",
+    label_col: str,
     positive_label: str = "NR",
     layer: str | None = "log1p_cpm",
     use_proba: bool = True,
@@ -1422,14 +1421,9 @@ def run_cox_per_group(
     group_col: str,
     min_n: int = 30,
     dropna_group: bool = True,
-    time_key: str = "OS.time",
-    event_key: str = "OS",
-    x_keys=(
-        "mp_heterogeneity_entropy",
-        "mp_dispersion_mad_zwithin_Project_ID",
-        "Neuroendocrine_score",
-        "Proliferation_score",
-    ),
+    time_key: str,
+    event_key: str,
+    x_keys,
     x_mode: str = "continuous",
     strata: str | None = None,
     out_key_prefix: str = "cox_",
@@ -1442,8 +1436,6 @@ def run_cox_per_group(
     Returns dict:
       {group_value: payload_dict}  where payload_dict is the same object stored in adata.uns[out_key].
     """
-    import numpy as np
-    import pandas as pd
 
     # IMPORTANT: import the function directly (no 'bk' global)
     # Adjust the relative import to your actual module layout:
@@ -1520,7 +1512,7 @@ def metaprogram_rank1_composition_stackedbar(
     adata: AnnData,
     *,
     topk_key: str = "mp_topk",
-    groupby: str = "Project_ID",
+    groupby: str,
     rank: int = 1,
     top_groups: int = 12,
     top_mps: int = 12,
@@ -1618,11 +1610,11 @@ def metaprogram_rank1_composition_stackedbar(
 def km_univariate(
     adata: AnnData,
     *,
-    x_key: str = "mp_heterogeneity_entropy",
+    x_key: str,
     x_source: Literal["auto", "obs", "gene"] = "auto",
     layer: str | None = None,
-    time_key: str = "OS.time",
-    event_key: str = "OS",
+    time_key: str,
+    event_key: str,
     group_col: str | None = "surv_group_1d",
     groupby_for_binning: Optional[str] = None,
     binning: str = "global",
@@ -1906,13 +1898,13 @@ def km_univariate(
 def km_2x2_interaction(
     adata,
     *,
-    x_key: str = "Neuroendocrine_score",
-    z_key: str = "mp_heterogeneity_entropy",
+    x_key: str,
+    z_key: str,
     x_source: Literal["auto", "obs", "gene"] = "auto",
     z_source: Literal["auto", "obs", "gene"] = "auto",
     layer: str | None = None,
-    time_key: str = "OS.time",
-    event_key: str = "OS",
+    time_key: str,
+    event_key: str,
     group_col: str | None = "surv_group_2x2",
     groupby_for_binning: Optional[str] = None,
     binning: str = "global",  # "global" | "within_group"

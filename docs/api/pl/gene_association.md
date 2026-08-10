@@ -73,7 +73,7 @@ If post-hoc annotation fails for a gene, it emits a warning and continues plotti
 
 ## Parameters
 
-#### Required
+### Required
 
 **adata**   
 AnnData object containing expression and metadata.  

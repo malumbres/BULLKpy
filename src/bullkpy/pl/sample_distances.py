@@ -8,7 +8,7 @@ import pandas as pd
 import scipy.sparse as sp
 
 import anndata as ad
-from matplotlib.colors import to_hex
+import matplotlib.pyplot as plt
 from ._colors import categorical_colors_array, get_categorical_colors
 
 
@@ -164,7 +164,6 @@ def sample_distances(
     if save is not None:
         _savefig(cg.fig, save)
     if show:
-        import matplotlib.pyplot as plt
         plt.show()
 
     return cg
@@ -243,7 +242,6 @@ def sample_correlation_clustergram(
         x0 = 1.02
         y0 = 1.0
         dy = 0.06
-        import matplotlib.pyplot as plt
         for j, (col, cmap) in enumerate(legend_maps.items()):
             y = y0 - j * (dy * (len(cmap) + 1))
             ax.text(x0, y, col, transform=ax.transAxes, ha="left", va="top", fontsize=plt.rcParams["font.size"])
@@ -256,7 +254,6 @@ def sample_correlation_clustergram(
     if save is not None:
         _savefig(cg.fig, save)
     if show:
-        import matplotlib.pyplot as plt
         plt.show()
 
     return cg

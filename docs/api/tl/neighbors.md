@@ -33,7 +33,7 @@ If use_rep is missing, a KeyError is raised.
 
 ## Parameters
 
-#### Core parameters
+### Core parameters
 
 **n_neighbors**   
 Number of nearest neighbors (k).  

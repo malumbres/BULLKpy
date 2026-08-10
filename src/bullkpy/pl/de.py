@@ -8,7 +8,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import anndata as ad
 
-from ..logging import warn
 from ._style import set_style, _savefig
 
 
@@ -331,9 +330,10 @@ def rankplot(
 
 
 def ma(
+    res: pd.DataFrame | None = None,
     *,
-    result: pd.DataFrame,
-    mean_col: str = "mean_norm",
+    result: pd.DataFrame | None = None,
+    mean_col: str | None = None,
     fc_col: str = "log2FC",
     gene_col: str = "gene",
     pval_col: str | None = "pval",
@@ -385,10 +385,26 @@ def ma(
     """
     set_style()
 
-    if result is None or not isinstance(result, pd.DataFrame):
-        raise TypeError("ma(...): 'result' must be a pandas DataFrame.")
+    # `res` matches volcano()/rankplot(); `result` is kept for backwards compatibility.
+    if res is not None and result is not None:
+        raise TypeError("ma(...): pass either 'res' or 'result', not both.")
+    res = res if res is not None else result
+    if res is None or not isinstance(res, pd.DataFrame):
+        raise TypeError("ma(...): 'res' must be a pandas DataFrame.")
 
-    df = result.copy()
+    df = res.copy()
+
+    if mean_col is None:
+        # bk.tl.de() reports per-group means rather than a single "mean_norm"
+        for candidate in ("mean_norm", "baseMean", "mean_group", "mean_expr"):
+            if candidate in df.columns:
+                mean_col = candidate
+                break
+        else:
+            raise KeyError(
+                "ma(...): could not infer the mean-expression column. Pass "
+                "mean_col= explicitly (bk.tl.de output uses 'mean_group')."
+            )
 
     for c in (mean_col, fc_col):
         if c not in df.columns:

@@ -53,7 +53,7 @@ Typical covariates:
 
 ## Examples
 
-#### 1) Correct by sequencing center / batch and store to a new layer
+### 1) Correct by sequencing center / batch and store to a new layer
 
 ```python
 import bullkpy as bk

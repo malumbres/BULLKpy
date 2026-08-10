@@ -27,6 +27,7 @@ evaluate_signatures_store
 filter_genes_var
 fit_intercept_only
 gene_categorical_association
+obs_categorical_association
 gene_corr_redundancy
 gene_gene_correlations
 gene_metadata_association_scan
@@ -44,7 +45,6 @@ metaprogram_scores_get
 metaprogram_topk_contribution
 mp_dispersion_metrics
 neighbors
-obs_categorical_association
 obs_obs_corr_matrix
 pairwise_posthoc
 panel_size_cindex
@@ -57,7 +57,6 @@ plot_corr_scatter
 posthoc_per_gene
 quantile_groups
 quick_fit_weights
-rank_genes_categorical
 rank_genes_groups
 rank_genes_groups_fast
 rank_genes_univariate_pr

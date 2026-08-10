@@ -35,12 +35,6 @@ extensions = [
     "sphinx_design",
 ]
 
-# Do NOT execute notebooks on RTD
-nbsphinx_execute = "never"
-
-# Better notebook rendering
-nbsphinx_allow_errors = False
-
 templates_path = ["_templates"]
 exclude_patterns = [
     "_build",
@@ -125,10 +119,12 @@ source_suffix = {
 html_show_sourcelink = True
 html_show_sphinx = False
 
+# Only mock genuinely optional/heavy dependencies. Everything listed in
+# [project.dependencies] is installed on RTD, so mocking it would produce
+# empty or misleading signatures (notably for AnnData, the core type).
 autodoc_mock_imports = [
     "scanpy",
-    "anndata",
-    "lifelines",
-    "gseapy",
-    # añade aquí los que den guerra
+    "umap",
+    "igraph",
+    "leidenalg",
 ]

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Literal, Iterable, Sequence
+from typing import Literal, Sequence
 
 import numpy as np
 import pandas as pd
@@ -19,7 +18,6 @@ except Exception:  # pragma: no cover
 
 import matplotlib.pyplot as plt
 
-from ..logging import info, warn
 
 
 Method = Literal["pearson", "spearman"]

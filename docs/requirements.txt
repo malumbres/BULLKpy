@@ -1,16 +1,9 @@
-sphinx>=7.0
-myst-nb
-myst-parser
-nbsphinx
-ipython
+# Documentation dependencies.
+#
+# The canonical list lives in pyproject.toml under [project.optional-dependencies].docs
+# and Read the Docs installs it via `extra_requirements: [docs]` (see .readthedocs.yaml).
+#
+# This file is kept only for building the docs locally without the extra:
+#     pip install -r docs/requirements.txt
+-e .[docs]
 ipykernel
-matplotlib
-numpy
-pandas
-anndata
-scanpy
-sphinx-rtd-theme
-sphinx-autodoc-typehints
-sphinx-copybutton
-sphinx-design
-pydata-sphinx-theme

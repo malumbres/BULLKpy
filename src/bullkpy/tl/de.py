@@ -1,7 +1,6 @@
 from __future__ import annotations
 import warnings
-from ._nb_utils import _as_dense, deseq2_size_factors, estimate_dispersion_mom, shrink_dispersion_to_trend
-from dataclasses import dataclass
+from ._nb_utils import deseq2_size_factors, estimate_dispersion_mom, shrink_dispersion_to_trend
 from typing import Literal
 
 import numpy as np
@@ -10,11 +9,8 @@ import scipy.sparse as sp
 from scipy import stats
 import anndata as ad
 
-from ..logging import info, warn
+from ..logging import info
 
-from pathlib import Path
-from typing import Sequence
-import matplotlib.pyplot as plt
 
 def de(
     adata: ad.AnnData,

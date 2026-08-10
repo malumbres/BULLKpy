@@ -66,7 +66,7 @@ This keeps the size meaningful (detection) while coloring by effect size.
 
 ## Parameters
 
-#### Inputs / selection
+### Inputs / selection
 
 **groupby** (str, required).   
 adata.obs[groupby] defines the groups (clusters / conditions) used for plotting

@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Dict, Any, Sequence
+from typing import Literal, Dict, Any, Sequence
 import numpy as np
 import pandas as pd
 import anndata as ad
 
-from dataclasses import dataclass
 
 from ..logging import info, warn
 from .associations import categorical_association
@@ -323,7 +322,7 @@ def cluster_metrics(
     adata,
     *,
     true_key: str,
-    cluster_key: str = "leiden",
+    cluster_key: str = "clusters",  # matches the default key_added of cluster()
     use_rep: str = "X_pca",
     layer: str | None = None,
     n_pcs: int | None = None,
@@ -346,7 +345,10 @@ def cluster_metrics(
     if true_key not in adata.obs:
         raise KeyError(f"true_key='{true_key}' not in adata.obs")
     if cluster_key not in adata.obs:
-        raise KeyError(f"cluster_key='{cluster_key}' not in adata.obs")
+        raise KeyError(
+            f"cluster_key='{cluster_key}' not in adata.obs. "
+            "Run bk.tl.cluster(adata) first, or pass the key you stored it under."
+        )
 
     y_true = adata.obs[true_key]
     y_pred = adata.obs[cluster_key]

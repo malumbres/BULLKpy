@@ -29,7 +29,7 @@ This makes the score robust to global expression biases and library-size effects
 
 ## Parameters
 
-#### Required
+### Required
 
 **adata** 
 AnnData object containing expression data.

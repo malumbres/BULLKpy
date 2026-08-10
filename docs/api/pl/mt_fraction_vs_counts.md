@@ -35,7 +35,7 @@ If groupby is provided, that column must also exist in adata.obs.
 
 ## Parameters
 
-#### Axes
+### Axes
 
 **x** (str, default "total_counts"): Column in adata.obs used for the x-axis (library size).  
 **y** (str, default "pct_counts_mt"): Column in adata.obs used for the y-axis (mitochondrial fraction, typically in %).

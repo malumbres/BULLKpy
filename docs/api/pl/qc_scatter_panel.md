@@ -45,7 +45,7 @@ Custom column names can be supplied via the *_key parameters.
 
 ## Parameters
 
-#### Grouping
+### Grouping
 **groupby** (str | None, default None). 
 Optional categorical column in adata.obs used to color samples
 (e.g. "Batch", "Subtype").  

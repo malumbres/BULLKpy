@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, Optional, Sequence, Tuple
-import numpy as np
+from typing import Optional, Sequence, Tuple
 import pandas as pd
 from anndata import AnnData
 

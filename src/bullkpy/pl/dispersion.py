@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence, Literal, Tuple
+from typing import Optional, Sequence, Literal
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -238,7 +238,7 @@ def metaprogram_heatmap(
     obsm_key="X_mp",
     mp_names=None,
     use_obs_prefix=False,
-    groupby="Project_ID",
+    groupby,
     agg="mean",                      # "mean" or "median"
     scale="zscore_cols",             # None, "zscore_cols", "zscore_rows"
     order_groups="size",             # "size", "alpha", None, "cluster"
@@ -578,9 +578,9 @@ def metaprogram_dispersion_heatmap(
 def metaprogram_metrics_summary(
     adata: AnnData,
     *,
-    groupby: str = "Project_ID",
-    heterogeneity_key: str = "mp_heterogeneity_entropy",
-    dispersion_key: str = "mp_dispersion_mad_zwithin_Project_ID",
+    groupby: str,
+    heterogeneity_key: str,
+    dispersion_key: str,
     title: str = "Metaprogram heterogeneity and dispersion by tumor type",
     figsize=(12, 3),
     show: bool = True,
@@ -631,8 +631,8 @@ def metaprogram_ne_scatter(
     adata: AnnData,
     *,
     ne_key: str,
-    x_key: str = "mp_heterogeneity_entropy",
-    groupby: Optional[str] = "Project_ID",
+    x_key: str,
+    groupby: Optional[str] = None,
     max_groups: int = 10,
     title: Optional[str] = None,
     figsize=(5, 4),
@@ -678,7 +678,7 @@ def metaprogram_ne_scatter(
 def metaprogram_dominance_ridgeplot_like(
     adata,
     *,
-    groupby: str = "Project_ID",
+    groupby: str,
     topk_key: str = "mp_topk",
     rank: int = 1,
     weight_key: str = "weight",
@@ -700,7 +700,6 @@ def metaprogram_dominance_ridgeplot_like(
       - figsize control
     """
     import numpy as np
-    import pandas as pd
     import matplotlib.pyplot as plt
 
     if topk_key not in adata.uns:

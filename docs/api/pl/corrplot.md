@@ -210,7 +210,7 @@ bk.pl.corrplot(
 	- plot_corr_scatter
 
 ## See also
-	•	bk.pl.plot_corr_scatter
+	•	bk.tl.plot_corr_scatter
 	•	bk.tl.obs_obs_corr_matrix
 	•	bk.tl.top_obs_obs_correlations
-	•	bk.pl.plot_corr_heatmap
+	•	bk.tl.plot_corr_heatmap

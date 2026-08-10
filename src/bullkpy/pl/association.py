@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal, Sequence, Mapping, Any, Optional, Tuple
+from typing import Literal
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import anndata as ad
 
-import scipy.sparse as sp
-from scipy.stats import spearmanr
-from statsmodels.stats.multitest import multipletests
 
 from ._style import set_style, _savefig
 
@@ -193,7 +190,6 @@ def categorical_confusion(
     """
     #set_style()
 
-    from ..tl.associations import categorical_association
 
     res = categorical_association(adata, key1=key1, key2=key2, ) 
     #metrics=("chi2", "cramers_v", "ari", "nmi")

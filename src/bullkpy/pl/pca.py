@@ -11,9 +11,9 @@ import matplotlib as mpl
 from matplotlib.colors import to_hex
 import anndata as ad
 
-from ..logging import info, warn
-from .._settings import settings
+from ..logging import warn
 from ..pl._style import set_style, _savefig
+from .._compat import is_categorical_like
 
 try:
     import seaborn as sns
@@ -75,7 +75,7 @@ def _get_gene_vector(adata: ad.AnnData, gene: str, *, layer: str | None) -> np.n
 
 
 def _is_categorical_series(s: pd.Series) -> bool:
-    return pd.api.types.is_categorical_dtype(s.dtype) or (s.dtype == object)
+    return is_categorical_like(s)
 
 
 def _is_numeric_series(s: pd.Series) -> bool:

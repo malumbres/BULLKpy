@@ -47,7 +47,7 @@ run a QC computation step first (e.g., bk.pp.qc_metrics).
 
 ## Parameters
 
-#### Core inputs
+### Core inputs
 
 **adata** (anndata.AnnData). 
 Annotated data matrix with QC metrics stored in adata.obs.  

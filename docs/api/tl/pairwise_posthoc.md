@@ -105,7 +105,7 @@ post
 **Post-hoc after categorical association**
 
 ```python
-res = bk.tl.rank_genes_categorical(
+res = bk.tl.rank_genes_groups_fast(
     adata,
     groupby="Subtype",
 )
@@ -128,7 +128,7 @@ for g in ["TP53", "RB1"]:
 	•	q-values are computed across all pairwise tests
 
 ## See also
-	•	tl.rank_genes_categorical
+	•	tl.rank_genes_groups_fast
 	•	tl.posthoc_per_gene
 	•	pl.violin
 	•	pl.rankplot

@@ -42,7 +42,7 @@ bk.pp.qc_metrics(adata)
 
 ## Parameters
 
-#### QC metrics
+### QC metrics
 **keys** (Sequence[str], default. 
 ("total_counts", "n_genes_detected", "pct_counts_mt")). 
 QC metrics to include in the pairplot.  

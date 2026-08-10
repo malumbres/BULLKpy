@@ -40,7 +40,7 @@ def _format_p(p: float) -> str:
     if not np.isfinite(p):
         return "p = NA"
     if p < 1e-4:
-        return f"p < 1e-4"
+        return "p < 1e-4"
     if p < 1e-3:
         return f"p = {p:.1e}"
     return f"p = {p:.3g}"

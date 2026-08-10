@@ -26,7 +26,7 @@ PC, optionally separating positive/negative contributors and clustering genes (a
 
 ## Parameters
 
-#### Core inputs
+### Core inputs
 
 **adata**: AnnData.   
 Must contain PCA loadings at adata.varm[loadings_key] (typically from bk.tl.pca()).   

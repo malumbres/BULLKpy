@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, Optional, Sequence
-import re
+from typing import Optional, Sequence
 import numpy as np
 import pandas as pd
 from anndata import AnnData
@@ -17,7 +16,7 @@ def sample_dispersion(
     *,
     layer: str = "log1p_cpm",
     genes: Optional[Sequence[str]] = None,
-    groupby: Optional[str] = "Project_ID",
+    groupby: Optional[str] = None,
     standardize_within_group: bool = True,
     method: str = "mad",  # "mad" | "iqr" | "std"
     out_key: str = "dispersion_sample",
@@ -97,7 +96,7 @@ def signature_dispersion_by_group(
     adata: AnnData,
     *,
     score_keys: Sequence[str],
-    groupby: str = "Project_ID",
+    groupby: str,
     method: str = "mad",
     out_key: str = "signature_dispersion",
 ) -> pd.DataFrame:

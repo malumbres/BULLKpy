@@ -24,7 +24,7 @@ Example Leading edge Jaccard heatmap
 
 ## Parameters
 
-#### Required
+### Required
 
 **pre_res**  
 A GSEApy prerank result object (the pre_res returned by gseapy.prerank(...)).  

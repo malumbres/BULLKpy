@@ -1,16 +1,13 @@
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Sequence, Literal, Optional
+from typing import Optional
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from anndata import AnnData
 
-from ._style import set_style, _savefig
 
-from ..logging import warn
 
 from sklearn.metrics import precision_recall_curve, average_precision_score
 
@@ -76,7 +73,7 @@ def pr_curve_signatures(
     adata,
     *,
     sigs: dict,
-    label_col: str = "PFS_6m",
+    label_col: str,
     positive_label: str = "NR",
     layer: str | None = "log1p_cpm",
     use_proba: bool = True,
@@ -233,7 +230,7 @@ def plot_pr_curves_signatures(
     adata,
     signatures: dict,
     *,
-    label_col="PFS_6m",
+    label_col,
     positive_label="NR",
     layer="log1p_cpm",
     use_proba=True,
@@ -441,7 +438,7 @@ def plot_pr_curves_signatures_bootstrap(
     adata,
     signatures: dict,
     *,
-    label_col="PFS_6m",
+    label_col,
     positive_label="NR",
     layer="log1p_cpm",
     use_proba=True,
@@ -555,7 +552,7 @@ def plot_pub_template_pr(
     *,
     adata,
     signatures,
-    label_col="PFS_6m",
+    label_col,
     positive_label="NR",
     layer="log1p_cpm",
     use_proba=True,

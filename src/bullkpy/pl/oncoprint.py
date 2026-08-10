@@ -11,7 +11,7 @@ import matplotlib as mpl
 from matplotlib.gridspec import GridSpec
 import anndata as ad
 
-from ._style import set_style, _savefig
+from ._style import set_style
 from ..logging import warn
 
 
