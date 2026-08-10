@@ -181,9 +181,14 @@ def _adata_with_illegal_keys(adata):
 
 
 def test_write_h5ad_fails_on_slash_keys(tmp_path, adata):
-    """Baseline: this is the failure make_h5ad_safe exists to prevent."""
+    """Baseline: this is the failure make_h5ad_safe exists to prevent.
+
+    The exception type depends on the anndata version — newer releases raise
+    ValueError("Forward slashes are not allowed in keys"), older ones surface
+    the underlying h5py TypeError — so assert only that writing fails.
+    """
     a = _adata_with_illegal_keys(adata)
-    with pytest.raises(ValueError, match="[Ff]orward slashes"):
+    with pytest.raises((ValueError, TypeError)):
         a.write(tmp_path / "bad.h5ad", compression="gzip")
 
 
