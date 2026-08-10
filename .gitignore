@@ -67,3 +67,6 @@ Thumbs.db
 # Local tooling / scratch
 # ===============================
 chrome_profile_notebooklm/
+
+# Local assistant notes, not part of the published package
+CLAUDE.md
