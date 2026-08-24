@@ -91,26 +91,64 @@ bullkpy-skeleton/
 ```
 ---
 
-## 🧪 Typical workflow
+## 🧪 Quick start
 
-```bash
+```python
 import bullkpy as bk
-import pandas
-import seaborn as sns
-import anndata as ad
 
+# ---- load -------------------------------------------------------------
+adata = bk.io.read_counts("counts.tsv", sep="\t", orientation="genes_by_samples")
+bk.io.add_metadata(adata, "metadata.tsv", sep="\t", index_col="sample")
+
+# ---- QC and normalisation --------------------------------------------
+bk.pp.set_raw_counts(adata)
+bk.pp.qc_metrics(adata)
+bk.pl.qc_metrics(adata)
+bk.pp.normalize_cpm(adata)
+bk.pp.log1p(adata)
+
+# ---- dimensionality reduction and clustering -------------------------
+bk.pp.highly_variable_genes(adata, n_top_genes=2000)
+bk.tl.pca(adata, n_comps=30, use_highly_variable=True)
+bk.pl.pca_scatter(adata, color="Subtype")
+bk.tl.neighbors(adata, n_neighbors=15)
+bk.tl.cluster(adata, method="leiden", resolution=1.0)   # -> adata.obs["clusters"]
+bk.tl.cluster_metrics(adata, true_key="Subtype")
+
+# ---- differential expression -----------------------------------------
+bk.tl.de(adata, groupby="Subtype", group="Basal", reference="Luminal")
+res = adata.uns["de"]["Subtype_Basal_vs_Luminal"]["results"]
+bk.pl.volcano(res)
+bk.pl.heatmap_de(adata, contrast="Subtype_Basal_vs_Luminal", groupby="Subtype")
+
+# ---- associations and survival ---------------------------------------
+bk.tl.gene_categorical_association(adata, groupby="Subtype", genes=["MKI67", "TP53"])
+bk.tl.cox_gene_association(adata, time_col="OS.time", event_col="OS", genes=["MKI67"])
+
+# ---- save -------------------------------------------------------------
+bk.pp.make_h5ad_safe(adata)          # rename keys HDF5 cannot represent
+adata.write("results.h5ad", compression="gzip")
+```
+
+Every call above is checked against the real signatures by the test suite.
+
+---
+## 📚 Function index
+
+A map of what is available, grouped by task. See the
+[API reference](https://bullkpy.readthedocs.io/en/latest/api/index.html) for the
+arguments each one takes.
+
+```text
 # Load data
 adata = bk.io.read_counts("counts.tsv", sep="\t")
-
 # Load metadata
 adata = bk.add_metadata(adata, "metadata.tsv", sep="\t")
-
 # QC
 bk.pp.qc_metrics(adata)
 bk.pl.qc_metrics(adata)
 bk.pp.filter_genes(adata)
 bk.pp.filter_samples(adata)
-
 # PCA + UMAP
 bk.pp.highly_variable_genes(adata)
 bk.tl.pca(adata)
@@ -123,18 +161,15 @@ bk.tl.neighbors(adata)
 bk.tl.umap(adata)
 bk.tl.umap_graph(adata)
 bk.pl.umap(adata)
-
 # Clustering
 bk.tl.leiden_resolution_scan(adata)
 bk.pl.ari_resolution_heatmap(adata)
 bk.tl.cluster(adata, method="leiden")
 bk.tl.cluster(adata, method="means")
 bk.tl.cluster_metrics(adata)
-
 # Genes and gene signatures
 bk.tl.score_genes(adata, signature)
 bk.tl.score_genes_cell_cycle(adata)
-
 # Correlations and associations
 bk.pl.corr_heatmap(adata)
 bk.tl.gene_gene_correlations(adata)
@@ -157,14 +192,12 @@ bk.tl.rank_genes_groups_fast(adata)
 bk.pl.rankplot_association(dfo)
 bk.pl.volcano_categorical(res)
 bk.tl.posthoc_per_gene(adata)
-
 # Marker genes and Differential expression
 bk.tl.de(adata)
 bk.tl.de_glm(adata)  # DESeq-like   
 bk.pl.volcano(res)
 bk.pl.rankplot(res)
 bk.pl.ma(res)
-
 # GSEA, genesets and pathway analysis
 bk.tl.gsea_preranked(adata)
 bk.pl.gsea_bubbleplot(df_gsea)
@@ -172,7 +205,6 @@ bk.pl.gsea_leading_edge_heatmap(adata)
 bk.pl.leading_edge_jaccard_heatmap(pre_res)
 bk.pl.leading_edge_overlap_matrix(pre_res)
 bk.tl.list_enrichr_libraries()
-
 # Metaprograms
 bk.tl.score_metaprograms(adata)
 bk.tl.metaprogram_heterogeneity(adata)
@@ -187,7 +219,6 @@ bk.pl.metaprogram_metrics_summary(adata)
 bk.pl.metaprogram_ne_scatter(adata)
 bk.pl.metaprogram_dominance_ridgeplot_like(adata)
 bk.pl.metaprogram_rank1_composition_stackedbar(adata)
-
 # Survival analysis
 bk.tl.cox_univariate(adata)
 bk.pl.cox_forest_from_uns(adata)
@@ -195,7 +226,6 @@ bk.pl.run_cox_per_group(adata)
 bk.tl.cox_interaction(adata)
 bk.pl.km_univariate(adata)
 bk.pl.km_2x2_interaction(adata)
-
 # Plots
 bk.pl.violin(adata)
 bk.pl.dotplot(adata)
@@ -204,14 +234,13 @@ bk.pl.sample_distances(adata)
 bk.pl.sample_correlation_clustergram(adata)
 bk.pl.gene_plot(adata)
 bk.pl.oncoprint(adata)
-
 # Other Utilities
+bk.pp.make_h5ad_safe(adata)
 bk.pp.find_bad_obs_cols_by_write(adata)
 bk.pp.find_bad_var_cols_by_write(adata)
 bk.pp.make_obs_h5ad_safe_strict(adata)
 bk.pp.make_var_h5ad_safe_strict(adata)
 bk.pp.batch_correct_combat(adata)
-
 ```
 
 ---
@@ -231,7 +260,24 @@ bk.pp.batch_correct_combat(adata)
 
 	•	data/ and results/ are not versioned
 	•	Designed for small or large datasets (TCGA-scale)
-	•	Requires Python ≥ 3.9
+	•	Requires Python ≥ 3.10
+
+---
+## Upgrading to 0.2.0
+
+0.2.0 fixes several defects that silently produced wrong results, so re-running
+existing analyses is worthwhile. Two changes affect existing code:
+
+- **`io.read_counts()` no longer casts non-integer matrices to `int64`.** It
+  previously truncated them without warning (`10.77` became `10`), which
+  corrupts any file distributed as log2(count+1) — UCSC Xena's tables among
+  them. Such files are now loaded unchanged, with a warning.
+- **Parameters that defaulted to one study's column names are now required.**
+  Calls relying on defaults such as `time_key="OS.time"`, `groupby="Project_ID"`
+  or `label_col="PFS_6m"` must now name the column explicitly. A missing
+  argument raises `TypeError` naming the parameter.
+
+See [CHANGELOG.md](CHANGELOG.md) for the full list.
 
 ---
 ## Changelog

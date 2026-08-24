@@ -135,6 +135,15 @@ Repository-wide audit and cleanup ahead of the first fully public release.
   `AnnData` type produced misleading API signatures.
 - Private helpers (`_is_integerish`, `_savefig`, `_get_series`) removed from
   public `__all__`; `io` now declares one.
+- README rewritten around a runnable quick start, replacing a schematic call
+  list that was fenced as shell, contained Python, and could never have run as
+  written (`bk.tl.de(adata)` has always required `groupby`). The remaining call
+  list is relabelled as a function index. A test now binds every `bk.*` call in
+  the README against the real signatures.
+- `docs/install.md` documents the Python floor, the optional extras and the
+  upgrade path; the README no longer claims Python 3.9 in one place and 3.10 in
+  another.
+- Dropped four unused image assets (1.6 MB), including a stale 1 MB logo.
 
 ---
 
