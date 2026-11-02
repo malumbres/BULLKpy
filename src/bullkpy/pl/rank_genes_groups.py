@@ -12,6 +12,7 @@ import anndata as ad
 from ._style import set_style, _savefig
 from ..get.rank_genes_groups_df_all import rank_genes_groups_df_all
 from .dotplot import dotplot
+from .._genes import gene_indexer as _gene_indexer
 
 def rank_genes_groups(
     adata: ad.AnnData,
@@ -166,9 +167,9 @@ def rank_genes_groups_dotplot(
             else (adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X)
         )
         if hasattr(Xf, "toarray"):
-            Xf = Xf[:, adata.var_names.get_indexer(genes_needed)].toarray()
+            Xf = Xf[:, _gene_indexer(adata, genes_needed)].toarray()
         else:
-            Xf = np.asarray(Xf[:, adata.var_names.get_indexer(genes_needed)], dtype=float)
+            Xf = np.asarray(Xf[:, _gene_indexer(adata, genes_needed)], dtype=float)
 
         # group labels
         g = adata.obs[groupby].astype(str)
@@ -256,7 +257,7 @@ def rank_genes_groups_dotplot(
     for gname, glist in var_groups.items():
         all_genes.extend(glist)
     all_genes = list(dict.fromkeys(all_genes))  # unique, preserve order
-    gidx = adata.var_names.get_indexer(all_genes)
+    gidx = _gene_indexer(adata, all_genes)
 
     # Build logFC lookup: (group,gene)->log2FC
     lfc_lookup = {}

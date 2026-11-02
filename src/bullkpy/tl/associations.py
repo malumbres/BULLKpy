@@ -15,6 +15,7 @@ except Exception:  # pragma: no cover
     stats = None
 
 from ..logging import info
+from .._genes import gene_loc as _gene_loc, gene_indexer as _gene_indexer
 
 
 
@@ -61,7 +62,7 @@ def _get_gene_vector(adata: ad.AnnData, gene: str, layer: str | None = None) -> 
     if gene not in adata.var_names:
         raise KeyError(f"Gene '{gene}' not in adata.var_names.")
     X = _get_matrix(adata, layer=layer)
-    j = int(adata.var_names.get_loc(gene))
+    j = int(_gene_loc(adata, gene))
     if sp.issparse(X):
         return np.asarray(X[:, j].toarray()).ravel().astype(float)
     return np.asarray(X[:, j], dtype=float).ravel()
@@ -425,7 +426,7 @@ def rank_genes_groups_fast(
         raise ValueError("No genes provided.")
 
     X = _get_matrix(adata, layer=layer)
-    idx = adata.var_names.get_indexer(genes_use)
+    idx = _gene_indexer(adata, genes_use)
     if np.any(idx < 0):
         miss = [genes_use[i] for i in np.where(idx < 0)[0][:10]]
         raise KeyError(f"Genes not in adata.var_names (first 10): {miss}")

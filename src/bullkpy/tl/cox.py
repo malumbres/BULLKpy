@@ -13,6 +13,7 @@ except Exception:  # pragma: no cover
     PHReg = None
 
 from ..logging import info, warn
+from .._genes import gene_indexer as _gene_indexer
 
 
 
@@ -44,7 +45,7 @@ def _get_expr_matrix(
     layer: str | None = "log1p_cpm",
 ) -> np.ndarray:
     X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    idx = adata.var_names.get_indexer(genes)
+    idx = _gene_indexer(adata, genes)
     if np.any(idx < 0):
         missing = [g for g, i in zip(genes, idx) if i < 0]
         raise KeyError(f"Genes not found in adata.var_names (first 10): {missing[:10]}")
@@ -330,7 +331,7 @@ def cox_multivariate(
 
     # expression (samples x genes)
     X = _get_matrix(adata, layer=layer, use="samples")
-    gidx = adata.var_names.get_indexer(genes)
+    gidx = _gene_indexer(adata, genes)
     M = X[:, gidx]
     M = M.toarray() if hasattr(M, "toarray") else np.asarray(M, dtype=float)
 
@@ -514,7 +515,7 @@ def _prepare_cox_df(
 
     # expression matrix (samples x genes_present)
     X = _get_matrix(adata, layer=layer, use="samples")  # samples x all_genes
-    gidx = adata.var_names.get_indexer(genes_present)
+    gidx = _gene_indexer(adata, genes_present)
     M = X[:, gidx]
     M = M.toarray() if hasattr(M, "toarray") else np.asarray(M, dtype=float)
 
@@ -1229,7 +1230,7 @@ def permutation_importance_cindex(
 
     # ---- pull expression matrix for signature genes ----
     X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    gidx = adata.var_names.get_indexer(genes)
+    gidx = _gene_indexer(adata, genes)
     M = X[:, gidx].toarray() if hasattr(X, "toarray") else np.asarray(X[:, gidx], dtype=float)
     M = M[ok, :]  # align to ok samples
 

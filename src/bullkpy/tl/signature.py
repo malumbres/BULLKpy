@@ -22,6 +22,7 @@ from sklearn.metrics import roc_auc_score, average_precision_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from .._compat import is_categorical_like
+from .._genes import gene_loc as _gene_loc, gene_indexer as _gene_indexer
 
 
 ############################################
@@ -36,7 +37,7 @@ def _get_matrix(adata, layer, use="samples"):
 def get_expr_matrix(adata, genes, *, layer="log1p_cpm"):
     genes = [g for g in genes if g in adata.var_names]
     X = adata.layers[layer] if (layer is not None and layer in getattr(adata, "layers", {})) else adata.X
-    idx = adata.var_names.get_indexer(genes)
+    idx = _gene_indexer(adata, genes)
     M = X[:, idx]
     M = M.toarray() if hasattr(M, "toarray") else np.asarray(M, float)
     return genes, M
@@ -355,7 +356,7 @@ def signature_score(
 
     # expression matrix: samples x genes
     X = _get_matrix(adata, layer=layer, use="samples")  # must return dense or sparse
-    gidx = adata.var_names.get_indexer(genes)
+    gidx = _gene_indexer(adata, genes)
     M = X[:, gidx]
     M = M.toarray() if hasattr(M, "toarray") else np.asarray(M, dtype=float)
 
@@ -892,7 +893,7 @@ def correlation_redundancy_filter(
         raise ValueError("None of ranked_genes are in adata.var_names.")
 
     # index lookup
-    idx = adata.var_names.get_indexer(ranked)
+    idx = _gene_indexer(adata, ranked)
 
     # extract samples x genes
     M = X[:, idx]
@@ -1061,8 +1062,8 @@ def redundancy_filter_by_corr(
             sel.append(g)
         else:
             # compute corr(g, each selected)
-            gidx = int(adata.var_names.get_loc(g))
-            sidx = [int(adata.var_names.get_loc(x)) for x in sel if x in adata.var_names]
+            gidx = int(_gene_loc(adata, g))
+            sidx = [int(_gene_loc(adata, x)) for x in sel if x in adata.var_names]
             v = X[:, gidx].toarray().ravel() if hasattr(X[:, gidx], "toarray") else np.asarray(X[:, gidx]).ravel()
             S = X[:, sidx].toarray() if hasattr(X[:, sidx], "toarray") else np.asarray(X[:, sidx])
 
@@ -1106,7 +1107,7 @@ def _get_expr_matrix(adata, genes: Sequence[str], layer: str | None = "log1p_cpm
     if len(genes) == 0:
         raise ValueError("No provided genes found in adata.var_names.")
     X = adata.layers[layer] if (layer is not None and layer in getattr(adata, "layers", {})) else adata.X
-    gidx = adata.var_names.get_indexer(genes)
+    gidx = _gene_indexer(adata, genes)
     M = X[:, gidx]
     M = M.toarray() if hasattr(M, "toarray") else np.asarray(M, dtype=float)
     return genes, np.asarray(M, dtype=float)
@@ -2273,7 +2274,7 @@ def _build_Xy(adata, genes, *, label_col, positive_label, layer="log1p_cpm"):
         raise ValueError("No genes found in adata.var_names")
 
     X = adata.layers[layer] if (layer is not None and layer in getattr(adata, "layers", {})) else adata.X
-    idx = adata.var_names.get_indexer(genes)
+    idx = _gene_indexer(adata, genes)
     M = X[:, idx]
     M = M.toarray() if hasattr(M, "toarray") else np.asarray(M, float)
 
@@ -2301,7 +2302,7 @@ def _eval_with_frozen_weights(adata, weights_df, intercept, *, label_col, positi
     betas = w["beta"].to_numpy(float)
 
     X = adata.layers[layer] if (layer is not None and layer in getattr(adata, "layers", {})) else adata.X
-    idx = adata.var_names.get_indexer(genes)
+    idx = _gene_indexer(adata, genes)
     M = X[:, idx]
     M = M.toarray() if hasattr(M, "toarray") else np.asarray(M, float)
 

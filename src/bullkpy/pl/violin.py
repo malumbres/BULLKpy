@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import anndata as ad
 
 from ._style import set_style, _savefig
+from .._genes import gene_loc as _gene_loc
 
 
 def _get_matrix_for_layer(adata: ad.AnnData, layer: str | None):
@@ -102,7 +103,7 @@ def violin(
     # add gene expression columns
     if gene_keys:
         X = _get_matrix_for_layer(adata, layer)
-        gidx = [adata.var_names.get_loc(g) for g in gene_keys]
+        gidx = [_gene_loc(adata, g) for g in gene_keys]
         if sp.issparse(X):
             M = X[:, gidx].toarray()
         else:

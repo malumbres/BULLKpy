@@ -13,6 +13,7 @@ import anndata as ad
 
 from ._style import set_style
 from ..logging import warn
+from .._genes import gene_loc as _gene_loc
 
 
 def _get_expr_matrix(
@@ -26,7 +27,7 @@ def _get_expr_matrix(
         raise KeyError(f"Genes not in adata.var_names (first 10): {missing[:10]}")
 
     X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    gidx = [adata.var_names.get_loc(g) for g in genes]
+    gidx = [_gene_loc(adata, g) for g in genes]
     M = X[:, gidx].toarray() if sp.issparse(X) else np.asarray(X[:, gidx], dtype=float)
     return pd.DataFrame(M, index=adata.obs_names.astype(str), columns=[str(g) for g in genes])
 

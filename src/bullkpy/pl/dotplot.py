@@ -19,6 +19,7 @@ except Exception:  # pragma: no cover
 import anndata as ad
 
 from ._style import set_style, _savefig
+from .._genes import gene_loc as _gene_loc
 
 
 # -----------------------------------------------------------------------------
@@ -122,7 +123,7 @@ def _get_feature_matrix(
         raise KeyError(f"Genes not found in adata.var_names (first 10): {missing[:10]}")
 
     X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    gidx = [adata.var_names.get_loc(g) for g in feats]
+    gidx = [_gene_loc(adata, g) for g in feats]
     M = X[:, gidx].toarray() if sp.issparse(X) else np.asarray(X[:, gidx], dtype=float)
     return M
 
@@ -278,7 +279,7 @@ def dotplot(
                 if (fraction_layer is not None and fraction_layer in adata.layers)
                 else (adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X)
             )
-            gidx = [adata.var_names.get_loc(g) for g in feature_names]
+            gidx = [_gene_loc(adata, g) for g in feature_names]
             M_frac = X_frac[:, gidx].toarray() if sp.issparse(X_frac) else np.asarray(X_frac[:, gidx], dtype=float)
         M_size = M_frac
         size_mode = "fraction"

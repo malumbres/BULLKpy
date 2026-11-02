@@ -14,13 +14,14 @@ from scipy import stats
 from ..logging import warn
 from ._style import set_style, _savefig
 from ..tl.posthoc import pairwise_posthoc
+from .._genes import gene_loc as _gene_loc
 
 
 def _get_gene_vector(adata: ad.AnnData, gene: str, *, layer: str | None = "log1p_cpm") -> np.ndarray:
     if gene not in adata.var_names:
         raise KeyError(f"Gene '{gene}' not in adata.var_names")
     X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    idx = adata.var_names.get_loc(gene)
+    idx = _gene_loc(adata, gene)
     v = X[:, idx]
     if sp.issparse(v):
         v = v.toarray().ravel()
@@ -243,7 +244,7 @@ def gene_association_volcano(
         if miss:
             raise KeyError(f"Genes not in adata.var_names (first 10): {miss[:10]}")
 
-    idx = [adata.var_names.get_loc(g) for g in genes_use]
+    idx = [_gene_loc(adata, g) for g in genes_use]
     M = X[:, idx]
     if sp.issparse(M):
         M = M.toarray()

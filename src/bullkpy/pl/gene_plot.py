@@ -21,13 +21,14 @@ except Exception:  # pragma: no cover
 import anndata as ad
 
 from ._style import set_style, _savefig
+from .._genes import gene_loc as _gene_loc
 
 
 def _get_vector(adata: ad.AnnData, gene: str, layer: str | None) -> np.ndarray:
     if gene not in adata.var_names:
         raise KeyError(f"gene '{gene}' not found in adata.var_names")
     X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    j = int(adata.var_names.get_loc(gene))
+    j = int(_gene_loc(adata, gene))
     v = X[:, j]
     if sp.issparse(v):
         v = np.asarray(v.toarray()).ravel()

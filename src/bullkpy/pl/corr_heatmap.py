@@ -16,6 +16,7 @@ except Exception:  # pragma: no cover
     sns = None
 
 import anndata as ad
+from .._genes import gene_indexer as _gene_indexer
 
 
 
@@ -313,7 +314,7 @@ def gene_panel_correlation_heatmap(
         raise ValueError("Need at least 2 genes present in adata.var_names.")
 
     X = adata.layers[layer] if (layer is not None and layer in getattr(adata, "layers", {})) else adata.X
-    gidx = adata.var_names.get_indexer(genes)
+    gidx = _gene_indexer(adata, genes)
     M = X[:, gidx]
     M = M.toarray() if hasattr(M, "toarray") else np.asarray(M, dtype=float)
 

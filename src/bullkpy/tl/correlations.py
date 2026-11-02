@@ -17,6 +17,7 @@ except Exception:  # pragma: no cover
     sns = None
 
 import matplotlib.pyplot as plt
+from .._genes import gene_loc as _gene_loc
 
 
 
@@ -47,7 +48,7 @@ def _get_gene_vector(adata: ad.AnnData, gene: str, *, layer: str | None) -> np.n
     if gene not in adata.var_names:
         raise KeyError(f"Gene '{gene}' not in adata.var_names")
     X = _get_layer_matrix(adata, layer)
-    j = adata.var_names.get_loc(gene)
+    j = _gene_loc(adata, gene)
     return np.asarray(X[:, j], dtype=float).ravel()
 
 
@@ -334,7 +335,7 @@ def top_gene_gene_correlations(
     if missing:
         raise KeyError(f"Genes not found: {missing[:10]}")
 
-    idx = [adata.var_names.get_loc(g) for g in genes]
+    idx = [_gene_loc(adata, g) for g in genes]
     M = np.asarray(X[:, idx], dtype=float)  # n_obs x n_genes
     names = [adata.var_names[i] for i in idx]
 
@@ -408,7 +409,7 @@ def gene_gene_correlations(
         missing = [g for g in genes if g not in adata.var_names]
         if missing:
             raise KeyError(f"Genes not found: {missing[:10]}")
-        idx = [adata.var_names.get_loc(g) for g in genes if g != gene]
+        idx = [_gene_loc(adata, g) for g in genes if g != gene]
         names = [adata.var_names[i] for i in idx]
 
     rows = []

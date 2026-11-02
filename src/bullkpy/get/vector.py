@@ -3,6 +3,7 @@ from __future__ import annotations
 import numpy as np
 import scipy.sparse as sp
 import anndata as ad
+from .._genes import gene_loc as _gene_loc
 
 
 def vector(
@@ -31,7 +32,7 @@ def vector(
 
     if allow_gene and key in adata.var_names:
         X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-        j = int(adata.var_names.get_loc(key))
+        j = int(_gene_loc(adata, key))
         v = X[:, j]
         if sp.issparse(v):
             v = v.toarray()

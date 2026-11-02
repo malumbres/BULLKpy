@@ -12,6 +12,7 @@ import scipy.sparse as sp
 import anndata as ad
 
 from ._style import set_style, _savefig
+from .._genes import gene_loc as _gene_loc
 
 
 def _get_color_vector(
@@ -35,7 +36,7 @@ def _get_color_vector(
     # gene
     if key in adata.var_names:
         X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-        gidx = int(adata.var_names.get_loc(key))
+        gidx = int(_gene_loc(adata, key))
         if sp.issparse(X):
             vals = np.asarray(X[:, gidx].toarray()).ravel()
         else:
@@ -68,7 +69,7 @@ def _get_numeric_vector(
         if g not in adata.var_names:
             raise KeyError(f"Gene '{g}' not found in adata.var_names (source='gene').")
         X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-        j = int(adata.var_names.get_loc(g))
+        j = int(_gene_loc(adata, g))
         v = X[:, j]
         if sp.issparse(v):
             v = v.toarray()

@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from anndata import AnnData
 
 from ._style import set_style, _savefig
+from .._genes import gene_loc as _gene_loc
 
 
 
@@ -1659,7 +1660,7 @@ def km_univariate(
         if gene not in _adata.var_names:
             raise KeyError(f"Gene '{gene}' not found in adata.var_names")
         X = _adata.layers[_layer] if (_layer is not None and _layer in _adata.layers) else _adata.X
-        j = _adata.var_names.get_loc(gene)
+        j = _gene_loc(_adata, gene)
         v = X[:, j]
         try:
             import scipy.sparse as sp
@@ -1951,7 +1952,7 @@ def km_2x2_interaction(
         if gene not in _adata.var_names:
             raise KeyError(f"Gene '{gene}' not found in adata.var_names")
         X = _adata.layers[_layer] if (_layer is not None and _layer in _adata.layers) else _adata.X
-        j = _adata.var_names.get_loc(gene)
+        j = _gene_loc(_adata, gene)
         v = X[:, j]
         try:
             import scipy.sparse as sp

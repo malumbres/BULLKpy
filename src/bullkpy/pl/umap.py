@@ -15,6 +15,7 @@ import anndata as ad
 from ..logging import warn
 from ._style import set_style, _savefig
 from .._compat import is_categorical_like
+from .._genes import gene_loc as _gene_loc
 
 try:
     import seaborn as sns
@@ -58,7 +59,7 @@ def _get_gene_vector(adata: ad.AnnData, gene: str, *, layer: str | None) -> np.n
         raise KeyError(f"Gene '{gene}' not in adata.var_names")
 
     X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    j = adata.var_names.get_loc(gene)
+    j = _gene_loc(adata, gene)
     v = X[:, j]
 
     if sp.issparse(v):

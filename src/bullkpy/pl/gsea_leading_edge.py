@@ -13,6 +13,7 @@ except Exception:
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from .._genes import gene_loc as _gene_loc
 
 try:
     import scipy.sparse as sp  # type: ignore
@@ -429,7 +430,7 @@ def gsea_leading_edge_heatmap(
         raise ValueError("None of the leading-edge genes are present in adata.var_names.")
 
     X = adata.layers[layer] if (layer is not None and layer in getattr(adata, "layers", {})) else adata.X
-    gidx = [adata.var_names.get_loc(g) for g in genes]
+    gidx = [_gene_loc(adata, g) for g in genes]
     M = X[:, gidx].toarray() if (sp is not None and sp.issparse(X)) else np.asarray(X[:, gidx], dtype=float)
 
     if use not in {"samples", "group_mean"}:

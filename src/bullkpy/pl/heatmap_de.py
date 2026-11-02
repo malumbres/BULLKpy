@@ -17,6 +17,7 @@ except Exception:  # pragma: no cover
     sns = None
 
 import anndata as ad
+from .._genes import gene_loc as _gene_loc
 
 
 
@@ -140,7 +141,7 @@ def heatmap_de(
 
     # --- expression matrix: genes x samples ---
     X = _get_matrix(adata, layer)
-    gidx = [adata.var_names.get_loc(g) for g in genes]
+    gidx = [_gene_loc(adata, g) for g in genes]
     Xg = X[:, gidx]          # samples x genes
     Xg = Xg[obs_mask, :]     # subset samples
     Xh = Xg.T                # genes x samples
