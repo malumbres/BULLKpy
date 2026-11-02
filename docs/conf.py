@@ -86,6 +86,10 @@ html_logo = None
 html_favicon = None
 
 html_theme_options = {
+    "announcement": (
+        "The TCGA tutorial outputs predate the 0.2.0 loader fix and may show values "
+        "computed from truncated data. Updated tutorials are in preparation."
+    ),
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
     "navigation_depth": 4,
     "navigation_with_keys": True,

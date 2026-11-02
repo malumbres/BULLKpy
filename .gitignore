@@ -17,6 +17,8 @@ results/
 # ===============================
 figs/
 my_figures/
+notebooks/gsea/
+notebooks/backup/
 *.pdf
 *.svg
 

@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [0.2.0] - 2026-08-10
+## [0.2.0] - 2026-11-02
 
 Repository-wide audit and cleanup ahead of the first fully public release.
 
@@ -55,6 +55,15 @@ Repository-wide audit and cleanup ahead of the first fully public release.
 - Corrected three broken image references and six references to non-existent
   functions in the API documentation.
 - Removed a duplicate PyPI publishing workflow that fired twice per release.
+- Replaced `mpl.cm.get_cmap`, removed in matplotlib 3.9, which made plots raise
+  `AttributeError` on unknown palette names and in several other code paths.
+- Gene lookups now work when `var_names` holds duplicates or `NaN`, unless a
+  requested gene is itself ambiguous, in which case the error names it.
+  Previously `get_loc` could return a slice or mask instead of one position.
+- `pl.heatmap_de()` lists the available contrasts when it cannot find one, and
+  the `tl.de()` docstring now gives the real results key format.
+- License metadata now matches the BSD 3-Clause `LICENSE` file; `pyproject.toml`,
+  the README and `CITATION.cff` wrongly said MIT.
 
 ### Breaking
 - Parameters that defaulted to column names from one particular study
