@@ -145,3 +145,14 @@ def test_rank_genes_groups_rest_excludes_samples_without_a_label(adata):
     group = a["names"].dtype.names[0] if hasattr(a["names"], "dtype") and a["names"].dtype.names else "Basal"
     assert list(a["names"][group]) == list(b["names"][group])
     assert base.n_obs == adata.n_obs
+
+
+def test_km_2x2_interaction_with_two_quantile_binned_scores(adata):
+    pytest.importorskip("lifelines")
+    rng = np.random.default_rng(0)
+    adata.obs["score_x"] = rng.normal(size=adata.n_obs)
+    adata.obs["score_z"] = rng.normal(size=adata.n_obs)
+    bk.pl.km_2x2_interaction(
+        adata, x_key="score_x", z_key="score_z", time_key="OS_time", event_key="OS",
+        q=(0.5, 0.5), min_n=1, show=False,
+    )

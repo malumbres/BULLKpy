@@ -2099,7 +2099,7 @@ def km_2x2_interaction(
             from bullkpy.tl.cox import surv_1d_bins
             surv_1d_bins(
                 adata,
-                z_key=z_obs_key,
+                x_key=z_obs_key,
                 time_key=time_key,
                 event_key=event_key,
                 groupby=groupby_for_binning,
