@@ -153,6 +153,6 @@ def test_km_2x2_interaction_with_two_quantile_binned_scores(adata):
     adata.obs["score_x"] = rng.normal(size=adata.n_obs)
     adata.obs["score_z"] = rng.normal(size=adata.n_obs)
     bk.pl.km_2x2_interaction(
-        adata, x_key="score_x", z_key="score_z", time_key="OS_time", event_key="OS",
+        adata, x_key="score_x", z_key="score_z", time_key="OS_time", event_key="OS_event",
         q=(0.5, 0.5), min_n=1, show=False,
     )
