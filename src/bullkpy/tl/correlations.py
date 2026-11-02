@@ -18,6 +18,7 @@ except Exception:  # pragma: no cover
 
 import matplotlib.pyplot as plt
 from .._genes import gene_loc as _gene_loc
+from .._stats import bh_fdr as _bh_fdr
 
 
 
@@ -73,31 +74,6 @@ def _numeric_obs_df(adata: ad.AnnData, *, obs_keys: list[str] | None = None) -> 
             if not pd.api.types.is_numeric_dtype(df[c]):
                 raise TypeError(f"Obs column '{c}' is not numeric (dtype={df[c].dtype})")
         return df
-
-
-def _bh_fdr(p: np.ndarray) -> np.ndarray:
-    """Benjamini–Hochberg FDR correction."""
-    p = np.asarray(p, dtype=float)
-    q = np.full_like(p, np.nan, dtype=float)
-
-    m = np.isfinite(p)
-    if not np.any(m):
-        return q
-
-    pv = p[m]
-    n = pv.size
-    order = np.argsort(pv)
-    ranks = np.empty(n, dtype=int)
-    ranks[order] = np.arange(1, n + 1)
-
-    qv = pv * (n / ranks)
-    # monotone
-    qv_sorted = qv[order]
-    qv_sorted = np.minimum.accumulate(qv_sorted[::-1])[::-1]
-    qv[order] = np.clip(qv_sorted, 0.0, 1.0)
-
-    q[m] = qv
-    return q
 
 
 def _corr_pearson(x: np.ndarray, y: np.ndarray) -> tuple[float, float, int]:

@@ -91,7 +91,7 @@ def set_style(figsize: tuple[float, float] | None = None) -> None:
 
 def _savefig(fig: plt.Figure, path: str | Path) -> None:
     """
-    Save figure respecting bk.settings.figdir and dpi.
+    Save figure at ``bk.settings.plot_dpi``, creating parent folders.
     """
     path = Path(path)
     if not path.parent.exists():

@@ -630,7 +630,7 @@ def time_dependent_roc(
     except Exception as e:
         raise ImportError(
             "time_dependent_roc requires scikit-survival.\n"
-            "Install with: pip install scikit-survival\n"
+            "Install with: pip install 'bullkpy[survival-ml]'\n"
             f"Original error: {e}"
         )
 

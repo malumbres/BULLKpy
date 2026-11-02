@@ -674,11 +674,13 @@ def metaprogram_heterogeneity(
     if mp_names is None or len(mp_names) != X.shape[1]:
         mp_names = [f"MP{i+1}" for i in range(X.shape[1])]
 
-    g = adata.obs[groupby].astype(str).to_numpy()
+    # Samples without a group label are skipped: NaN cannot be sorted with strings.
+    labels = adata.obs[groupby]
+    g = labels.astype(object).where(labels.notna(), None).to_numpy()
 
     rows = []
-    for grp in np.unique(g):
-        idx = np.flatnonzero(g == grp)
+    for grp in sorted({str(x) for x in g if x is not None}):
+        idx = np.flatnonzero([x is not None and str(x) == grp for x in g])
         if idx.size < 2:
             continue
 

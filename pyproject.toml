@@ -38,11 +38,13 @@ dependencies = [
   "gseapy",
   "lifelines",
   "openpyxl",
+  "lxml",                         # gseapy MSigDB utilities
 ]
 
 [project.optional-dependencies]
 umap = ["umap-learn>=0.5.7", "numba>=0.60"]
 leiden = ["igraph", "leidenalg"]
+survival-ml = ["scikit-survival"]   # pl.time_dependent_roc
 network = ["networkx"]          # GSEA leading-edge network layouts
 notebook = ["ipykernel", "jupyterlab", "networkx"]
 dev = ["pytest", "ruff", "black", "build", "twine"]

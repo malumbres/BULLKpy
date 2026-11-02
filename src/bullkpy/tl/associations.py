@@ -16,6 +16,7 @@ except Exception:  # pragma: no cover
 
 from ..logging import info
 from .._genes import gene_loc as _gene_loc, gene_indexer as _gene_indexer
+from .._stats import bh_fdr as _bh_fdr
 
 
 
@@ -25,29 +26,6 @@ from .._genes import gene_loc as _gene_loc, gene_indexer as _gene_indexer
 def _require_scipy() -> None:
     if stats is None:
         raise ImportError("associations requires scipy. Please install scipy.")
-
-
-def _bh_fdr(pvals: np.ndarray) -> np.ndarray:
-    """Benjamini–Hochberg FDR correction. Keeps NaNs."""
-    p = np.asarray(pvals, dtype=float)
-    out = np.full_like(p, np.nan, dtype=float)
-
-    ok = np.isfinite(p)
-    if ok.sum() == 0:
-        return out
-
-    p0 = p[ok]
-    n = p0.size
-    order = np.argsort(p0)
-    ranked = p0[order]
-    q = ranked * n / (np.arange(1, n + 1))
-    q = np.minimum.accumulate(q[::-1])[::-1]
-    q = np.clip(q, 0, 1)
-
-    out_ok = np.empty_like(p0)
-    out_ok[order] = q
-    out[ok] = out_ok
-    return out
 
 
 def _get_matrix(adata: ad.AnnData, layer: str | None = None) -> Any:
@@ -555,7 +533,10 @@ def store_gene_categorical_association(
     res = gene_categorical_association(adata, groupby=groupby, **kwargs)
 
     adata.uns.setdefault(key, {})
-    adata.uns[key][subkey] = res
+    adata.uns[key][subkey] = {
+        "results": res,
+        "params": {"groupby": groupby, **kwargs},
+    }
     info(f"Stored gene_categorical_association results in adata.uns['{key}']['{subkey}']")
 
     return res
@@ -582,7 +563,10 @@ def store_rank_genes_groups_fast(
     res = rank_genes_groups_fast(adata, groupby=groupby, group=group, reference=reference, **kwargs)
 
     adata.uns.setdefault(key, {})
-    adata.uns[key][subkey] = res
+    adata.uns[key][subkey] = {
+        "results": res,
+        "params": {"groupby": groupby, "group": group, "reference": ref_name, **kwargs},
+    }
     info(f"Stored rank_genes_groups_fast results in adata.uns['{key}']['{subkey}']")
 
     return res

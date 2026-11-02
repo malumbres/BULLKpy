@@ -6,16 +6,13 @@ import scipy.sparse as sp
 import anndata as ad
 
 from ..logging import info, warn
+from .._stats import bh_fdr as _bh_fdr
 
 try:
     from scipy import stats
 except Exception:  # pragma: no cover
     stats = None
 
-try:
-    from statsmodels.stats.multitest import multipletests
-except Exception:  # pragma: no cover
-    multipletests = None
 
 
 def _get_X(adata: ad.AnnData, layer: str | None) -> np.ndarray:
@@ -23,21 +20,6 @@ def _get_X(adata: ad.AnnData, layer: str | None) -> np.ndarray:
     if sp.issparse(X):
         X = X.toarray()
     return np.asarray(X, dtype=float)
-
-
-def _bh_fdr(p: np.ndarray) -> np.ndarray:
-    p = np.asarray(p, dtype=float)
-    p = np.clip(p, 0.0, 1.0)
-    if multipletests is not None:
-        return multipletests(p, method="fdr_bh")[1]
-    # fallback BH
-    n = p.size
-    order = np.argsort(p)
-    ranked = np.empty(n, dtype=float)
-    ranked[order] = p[order] * n / (np.arange(n) + 1.0)
-    # enforce monotonicity
-    ranked = np.minimum.accumulate(ranked[::-1])[::-1]
-    return np.clip(ranked, 0.0, 1.0)
 
 
 def rank_genes_groups(

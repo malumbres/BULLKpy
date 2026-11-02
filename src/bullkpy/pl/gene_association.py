@@ -15,6 +15,7 @@ from ..logging import warn
 from ._style import set_style, _savefig
 from ..tl.posthoc import pairwise_posthoc
 from .._genes import gene_loc as _gene_loc
+from .._stats import bh_fdr as _bh_fdr
 
 
 def _get_gene_vector(adata: ad.AnnData, gene: str, *, layer: str | None = "log1p_cpm") -> np.ndarray:
@@ -175,25 +176,6 @@ def gene_association(
     if show:
         plt.show()
     return fig, np.array(axes, dtype=object)
-
-def _bh_fdr(pvals: np.ndarray) -> np.ndarray:
-    p = np.asarray(pvals, dtype=float)
-    out = np.full_like(p, np.nan, dtype=float)
-    ok = np.isfinite(p)
-    if ok.sum() == 0:
-        return out
-    p0 = p[ok]
-    n = p0.size
-    order = np.argsort(p0)
-    ranked = p0[order]
-    q = ranked * n / (np.arange(1, n + 1))
-    q = np.minimum.accumulate(q[::-1])[::-1]
-    q = np.clip(q, 0, 1)
-    out_ok = np.empty_like(p0)
-    out_ok[order] = q
-    out[ok] = out_ok
-    return out
-
 
 def gene_association_volcano(
     adata: ad.AnnData,

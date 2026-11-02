@@ -33,10 +33,8 @@ def _verbosity_to_level(verbosity) -> int:
         return _logging.INFO
 
     if verbosity <= 0:
-        return _logging.ERROR
-    elif verbosity == 1:
         return _logging.WARNING
-    elif verbosity == 2:
+    elif verbosity == 1:
         return _logging.INFO
     else:
         return _logging.DEBUG
