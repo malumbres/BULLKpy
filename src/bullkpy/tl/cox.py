@@ -15,6 +15,7 @@ except Exception:  # pragma: no cover
 from ..logging import info, warn
 from .._genes import gene_indexer as _gene_indexer
 from .._stats import bh_fdr as _bh_fdr
+from .._compat import ensure_actual as _ensure_actual
 
 
 
@@ -1839,7 +1840,7 @@ def surv_1d_bins(
     If copy=True returns AnnData, else None (modifies adata in place).
     """
     ad = adata.copy() if copy else adata
-    obs = ad.obs
+    obs = _ensure_actual(ad).obs
 
     for k in [x_key, time_key, event_key]:
         if k not in obs:
@@ -1942,7 +1943,7 @@ def surv_2x2_bins(
     If copy=True returns AnnData, else None (modifies adata in place).
     """
     ad = adata.copy() if copy else adata
-    obs = ad.obs
+    obs = _ensure_actual(ad).obs
 
     for k in [x_key, z_key, time_key, event_key]:
         if k not in obs:

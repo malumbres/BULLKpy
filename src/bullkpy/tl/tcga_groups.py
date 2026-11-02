@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Optional
 import pandas as pd
 from anndata import AnnData
+from .._compat import ensure_actual as _ensure_actual
 
 
 def tcga_define_groups(
@@ -27,7 +28,7 @@ def tcga_define_groups(
     Returns AnnData if copy=True else modifies in place.
     """
     ad = adata.copy() if copy else adata
-    obs = ad.obs
+    obs = _ensure_actual(ad).obs
 
     if project_key not in obs:
         raise KeyError(f"{project_key!r} not found in adata.obs")

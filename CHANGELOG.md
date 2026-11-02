@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Replaced `boxplot(labels=)`, removed in matplotlib 3.11, in the dispersion and
   metaprogram summary plots. BULLKpy now requires matplotlib 3.9 or newer.
 - `pl.km_2x2_interaction()` failed whenever the Z variable needed quantile binning.
+- Survival binning and other functions that write to `.obs` now work on AnnData views
+  (`adata[mask]` without `.copy()`); new columns were being lost.
 - One Benjamini-Hochberg implementation (`_stats.bh_fdr`) replaces eight copies that
   treated `NaN` differently, including an incorrect fallback in `rank_genes_groups`.
 - `store_rank_genes_groups_fast()` and `store_gene_categorical_association()` now store

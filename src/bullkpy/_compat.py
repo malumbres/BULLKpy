@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-__all__ = ["group_labels", "is_categorical_like", "is_numeric_like", "is_true_categorical"]
+__all__ = ["ensure_actual", "group_labels", "is_categorical_like", "is_numeric_like", "is_true_categorical"]
 
 
 def is_numeric_like(s) -> bool:
@@ -47,3 +47,14 @@ def group_labels(s: pd.Series) -> pd.Series:
     it as a float on pandas 3, where it then cannot be sorted with the strings.
     """
     return s.astype(object).where(s.notna()).map(str, na_action="ignore")
+
+
+def ensure_actual(adata):
+    """Turn an AnnData view into a real object, in place, before writing to it.
+
+    Writing to a view makes AnnData replace its tables, so a column written through
+    an ``obs = adata.obs`` reference taken earlier would be lost.
+    """
+    if adata.is_view:
+        adata._init_as_actual(adata.copy())
+    return adata
