@@ -22,6 +22,7 @@ import anndata as ad
 
 from ._style import set_style, _savefig
 from .._genes import gene_loc as _gene_loc
+from .._compat import group_labels as _group_labels
 
 
 def _get_vector(adata: ad.AnnData, gene: str, layer: str | None) -> np.ndarray:
@@ -94,10 +95,10 @@ def gene_plot(
         raise KeyError(f"groupby '{groupby}' not found in adata.obs")
 
     y = _get_vector(adata, gene, layer)
-    g = adata.obs[groupby].astype(str).copy()
+    g = _group_labels(adata.obs[groupby]).copy()
 
     # subset groups
-    mask = np.ones(adata.n_obs, dtype=bool)
+    mask = g.notna().to_numpy()
     if groups is not None:
         groups = [str(x) for x in groups]
         mask = g.isin(groups).to_numpy()

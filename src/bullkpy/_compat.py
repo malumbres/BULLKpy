@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-__all__ = ["is_categorical_like", "is_numeric_like", "is_true_categorical"]
+__all__ = ["group_labels", "is_categorical_like", "is_numeric_like", "is_true_categorical"]
 
 
 def is_numeric_like(s) -> bool:
@@ -38,3 +38,12 @@ def is_categorical_like(s) -> bool:
     if pd.api.types.is_datetime64_any_dtype(dtype):
         return False
     return bool(dtype == object or pd.api.types.is_string_dtype(dtype))
+
+
+def group_labels(s: pd.Series) -> pd.Series:
+    """Group labels as strings, with missing values kept as missing.
+
+    ``Series.astype(str)`` turns NaN into the group ``"nan"`` on pandas 2 and leaves
+    it as a float on pandas 3, where it then cannot be sorted with the strings.
+    """
+    return s.astype(object).where(s.notna()).map(str, na_action="ignore")

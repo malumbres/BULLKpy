@@ -83,3 +83,65 @@ def test_metaprogram_heterogeneity_skips_missing_groups():
     kw = {"obsm_key": "X_mp"} if "obsm_key" in params else {}
     df = bk.tl.metaprogram_heterogeneity(a, groupby="grp", stat="sd", **kw)
     assert set(df[[c for c in df.columns if df[c].astype(str).isin(["A"]).any()][0]]) == {"A", "B"}
+
+
+@pytest.fixture
+def adata_missing_groups(adata):
+    labels = adata.obs["Subtype"].astype(object).copy()
+    labels.iloc[:3] = np.nan
+    adata.obs["Subtype"] = labels
+    return adata
+
+
+def test_group_labels_keep_missing_values_missing():
+    from bullkpy._compat import group_labels
+
+    out = group_labels(pd.Series(["a", np.nan, 1.0], dtype=object))
+    assert out.iloc[0] == "a" and pd.isna(out.iloc[1]) and out.iloc[2] == "1.0"
+
+
+def test_gene_plot_skips_samples_without_a_group(adata_missing_groups, genes):
+    bk.pl.gene_plot(adata_missing_groups, gene=genes[0], groupby="Subtype", show=False)
+
+
+def test_association_never_tests_a_nan_group(adata_missing_groups, genes):
+    df = bk.tl.gene_categorical_association(
+        adata_missing_groups, groupby="Subtype", genes=list(genes[:3]), layer="log1p_cpm"
+    )
+    assert not df.astype(str).isin(["nan"]).drop(columns=df.select_dtypes("number").columns).any().any()
+
+
+def test_de_with_missing_groups_excludes_those_samples(adata_missing_groups):
+    bk.tl.rank_genes_groups_fast(
+        adata_missing_groups, groupby="Subtype", group="Basal", reference="rest", layer="log1p_cpm"
+    )
+    bk.pl.corr_heatmap(adata_missing_groups, use="samples", col_colors="Subtype", show=False)
+
+
+def test_rest_reference_excludes_samples_without_a_label(adata, genes):
+    gene = genes[0]
+    x = np.asarray(adata[:, gene].layers["log1p_cpm"]).ravel().astype(float)
+    labels = adata.obs["Subtype"].astype(object).copy()
+    is_basal = (labels == "Basal").to_numpy()
+    expected = x[~is_basal][3:].mean()
+    missing = np.flatnonzero(~is_basal)[:3]
+    labels.iloc[missing] = np.nan
+    adata.obs["Subtype"] = labels
+    res = bk.tl.rank_genes_groups_fast(
+        adata, groupby="Subtype", group="Basal", reference="rest", genes=[gene], layer="log1p_cpm"
+    )
+    assert res["mean_ref"].iloc[0] == pytest.approx(expected)
+
+
+def test_rank_genes_groups_rest_excludes_samples_without_a_label(adata):
+    labels = adata.obs["Subtype"].astype(object).copy()
+    base = adata.copy()
+    labels.iloc[:3] = np.nan
+    adata.obs["Subtype"] = labels
+    keep = adata[adata.obs["Subtype"].notna()].copy()
+    bk.tl.rank_genes_groups(adata, groupby="Subtype", layer="log1p_cpm")
+    bk.tl.rank_genes_groups(keep, groupby="Subtype", layer="log1p_cpm")
+    a, b = adata.uns["rank_genes_groups"], keep.uns["rank_genes_groups"]
+    group = a["names"].dtype.names[0] if hasattr(a["names"], "dtype") and a["names"].dtype.names else "Basal"
+    assert list(a["names"][group]) == list(b["names"][group])
+    assert base.n_obs == adata.n_obs

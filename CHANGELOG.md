@@ -17,7 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `tl.de_glm()`, and no longer count towards the number of tests. They were previously
   set to `p = 1`, which made q-values slightly too conservative.
 
+- Samples with a missing group label are now excluded from analyses. With
+  `reference="rest"` they used to be counted in the comparison group, and on pandas 2
+  they could also form a group called `"nan"` in tests and plots.
+
 ### Fixed
+- `pl.gene_plot()` and other functions no longer fail on pandas 3 when the grouping
+  column has missing values.
 - One Benjamini-Hochberg implementation (`_stats.bh_fdr`) replaces eight copies that
   treated `NaN` differently, including an incorrect fallback in `rank_genes_groups`.
 - `store_rank_genes_groups_fast()` and `store_gene_categorical_association()` now store

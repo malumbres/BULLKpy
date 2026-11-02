@@ -17,6 +17,7 @@ except Exception:  # pragma: no cover
 from ..logging import info
 from .._genes import gene_loc as _gene_loc, gene_indexer as _gene_indexer
 from .._stats import bh_fdr as _bh_fdr
+from .._compat import group_labels as _group_labels
 
 
 
@@ -384,13 +385,13 @@ def rank_genes_groups_fast(
     if groupby not in adata.obs.columns:
         raise KeyError(f"groupby='{groupby}' not found in adata.obs")
 
-    grp = adata.obs[groupby].astype(str)
+    grp = _group_labels(adata.obs[groupby])
     m1 = grp.eq(str(group)).to_numpy()
 
     # `None` and the literal sentinel "rest" both mean "all other samples",
     # unless a real category happens to be named "rest".
     if reference is None or (str(reference) == "rest" and not grp.eq("rest").any()):
-        m2 = ~m1
+        m2 = ~m1 & grp.notna().to_numpy()
         ref_name = "rest"
     else:
         ref_name = str(reference)
@@ -494,8 +495,8 @@ def categorical_association(
     if key2 not in adata.obs.columns:
         raise KeyError(f"'{key2}' not found in adata.obs")
 
-    s1 = adata.obs[key1].astype(str)
-    s2 = adata.obs[key2].astype(str)
+    s1 = _group_labels(adata.obs[key1])
+    s2 = _group_labels(adata.obs[key2])
     table = pd.crosstab(s1, s2)
 
     if table.size == 0:
@@ -703,7 +704,7 @@ def posthoc_per_gene(
     if gene not in adata.var_names:
         raise KeyError(f"gene='{gene}' not found in adata.var_names")
 
-    grp = adata.obs[groupby].astype(str)
+    grp = _group_labels(adata.obs[groupby])
     cats = list(pd.Categorical(grp).categories)
 
     y = _get_gene_vector(adata, gene, layer=layer)

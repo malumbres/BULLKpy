@@ -10,6 +10,7 @@ import anndata as ad
 
 
 from ._style import set_style, _savefig
+from .._compat import group_labels as _group_labels
 
 
 def association_heatmap(
@@ -112,7 +113,7 @@ def boxplot_with_stats(
         raise KeyError(f"'{groupby}' not in adata.obs")
 
     s = pd.to_numeric(adata.obs[y], errors="coerce")
-    g = adata.obs[groupby].astype(str)
+    g = _group_labels(adata.obs[groupby])
     df = pd.DataFrame({"y": s, "g": g}).dropna()
 
     cats = list(pd.Categorical(df["g"]).categories)

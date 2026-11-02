@@ -11,6 +11,7 @@ import anndata as ad
 
 from ..logging import info
 from .._stats import bh_fdr as _bh_fdr
+from .._compat import group_labels as _group_labels
 
 
 def de(
@@ -45,7 +46,7 @@ def de(
     if groupby not in adata.obs.columns:
         raise KeyError(f"groupby='{groupby}' not found in adata.obs")
 
-    labels = adata.obs[groupby].astype(str)
+    labels = _group_labels(adata.obs[groupby])
     g_mask = labels == str(group)
     r_mask = labels == str(reference)
 

@@ -104,7 +104,7 @@ def rank_genes_groups(
             continue
 
         if reference == "rest":
-            idx_r = np.setdiff1d(np.arange(adata.n_obs), idx_g)
+            idx_r = np.setdiff1d(np.flatnonzero(g.notna().to_numpy()), idx_g)
         else:
             idx_r = group_to_idx[reference]
 
