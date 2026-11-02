@@ -8,7 +8,7 @@ abstract: >-
   expression, gene set enrichment, metaprogram and survival analyses, together
   with publication-ready visualisation, in a single consistent workflow.
 type: software
-license: MIT
+license: BSD-3-Clause
 version: 0.2.0
 repository-code: "https://github.com/malumbres/BULLKpy"
 url: "https://bullkpy.readthedocs.io/en/latest/"
