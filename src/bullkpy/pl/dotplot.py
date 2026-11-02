@@ -395,7 +395,7 @@ def dotplot(
     vmin_eff = vmin if vmin is not None else float(np.nanmin(plot_vals))
     vmax_eff = vmax if vmax is not None else float(np.nanmax(plot_vals))
     norm = mpl.colors.Normalize(vmin=vmin_eff, vmax=vmax_eff)
-    cmap_obj = mpl.colormaps.get_cmap(cmap) if hasattr(mpl, "colormaps") else mpl.cm.get_cmap(cmap)
+    cmap_obj = mpl.colormaps.get_cmap(cmap)
 
     has_row_dendro = bool(dendrogram_rows and (Z_row is not None) and (len(row_labels) > 2))
     has_top_dendro = bool(dendrogram_top and (Z_col is not None) and (len(col_labels) > 2))

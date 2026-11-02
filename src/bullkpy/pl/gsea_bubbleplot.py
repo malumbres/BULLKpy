@@ -164,7 +164,7 @@ def gsea_bubbleplot(
             # keep TwoSlopeNorm; it will work, but not symmetric.
             # We'll keep as given.
     norm = mpl.colors.TwoSlopeNorm(vmin=vmin_eff, vcenter=float(center), vmax=vmax_eff)
-    cmap_obj = mpl.cm.get_cmap(cmap)
+    cmap_obj = mpl.colormaps.get_cmap(cmap)
 
     # ---- autosize figure ----
     if figsize is None:

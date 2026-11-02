@@ -705,7 +705,7 @@ def leading_edge_overlap_matrix(
         figsize = (w, h)
 
     # ensure 0 is white even if user uses a different cmap
-    cm = mpl.cm.get_cmap(cmap)
+    cm = mpl.colormaps.get_cmap(cmap)
     if hasattr(cm, "with_extremes"):
         cm = cm.with_extremes(under="white")
     # but easiest: vmin=0 and df is 0/1

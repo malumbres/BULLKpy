@@ -166,9 +166,9 @@ def _plot_one(
             cats = pd.Categorical(pd.Series(vals).astype(str))
             names = list(cats.categories)
 
-            pal = mpl.cm.get_cmap(palette) if palette in plt.colormaps() else None
+            pal = mpl.colormaps.get_cmap(palette) if palette in plt.colormaps() else None
             if pal is None:
-                pal = mpl.cm.get_cmap("tab20")
+                pal = mpl.colormaps.get_cmap("tab20")
             cmap_map = {str(n): pal(i % pal.N) for i, n in enumerate(names)}
 
             for name in names:

@@ -97,6 +97,34 @@ def test_umap_plot(adata_pca):
     bk.pl.umap(adata_pca, color="Subtype", show=False)
 
 
+def test_categorical_palette_unknown_name_falls_back():
+    # An unrecognised palette name takes the matplotlib fallback branch, which
+    # called mpl.cm.get_cmap -- removed in matplotlib 3.9.
+    import importlib
+
+    for mod in ("bullkpy.pl.umap", "bullkpy.pl.pca"):
+        cols = importlib.import_module(mod)._categorical_palette(["a", "b", "c"], "NotAPalette")
+        assert set(cols) == {"a", "b", "c"}
+
+
+def test_pca_scatter_unknown_palette_falls_back(adata_pca):
+    bk.pl.pca_scatter(adata_pca, color="Subtype", palette="NotAPalette", show=False)
+
+
+def test_no_removed_matplotlib_get_cmap():
+    # mpl.cm.get_cmap was removed in matplotlib 3.9; use mpl.colormaps.get_cmap.
+    import pathlib
+    import re
+
+    root = pathlib.Path(bk.__file__).parent
+    bad = [
+        str(p.relative_to(root))
+        for p in root.rglob("*.py")
+        if re.search(r"(?:mpl|matplotlib)\.cm\.get_cmap\(", p.read_text())
+    ]
+    assert not bad, f"removed API mpl.cm.get_cmap still used in: {bad}"
+
+
 # ------------------------------------------------------------- expression
 def test_violin(adata, genes):
     bk.pl.violin(adata, keys=genes[:3], groupby="Subtype", layer=LAYER, show=False)

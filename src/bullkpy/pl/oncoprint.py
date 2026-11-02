@@ -293,7 +293,7 @@ def oncoprint(
         row_i += 1
 
         cats = list(pd.Categorical(groups).categories)
-        cmap = mpl.cm.get_cmap("tab20" if len(cats) <= 20 else "hsv")
+        cmap = mpl.colormaps.get_cmap("tab20" if len(cats) <= 20 else "hsv")
         cols = [mpl.colors.to_hex(cmap(i / max(1, len(cats) - 1))) for i in range(len(cats))]
         m = {str(c): cols[i] for i, c in enumerate(cats)}
 

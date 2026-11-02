@@ -179,7 +179,7 @@ def dotplot_association(
     if vmax is None:
         vmax = float(np.nanmax(eff))
     norm = mpl.colors.TwoSlopeNorm(vmin=vmin, vcenter=0.0, vmax=vmax) if (vmin < 0 < vmax) else mpl.colors.Normalize(vmin=vmin, vmax=vmax)
-    cm = mpl.cm.get_cmap(cmap)
+    cm = mpl.colormaps.get_cmap(cmap)
 
     xs = np.arange(piv_eff.shape[1])
     ys = np.arange(piv_eff.shape[0])

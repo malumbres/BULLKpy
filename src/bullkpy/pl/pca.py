@@ -55,7 +55,7 @@ def _categorical_palette(categories: Sequence[str], palette: str = "Set1") -> di
             pass
 
     # fallback to matplotlib colormap
-    cmap = mpl.cm.get_cmap(palette) if palette in plt.colormaps() else mpl.cm.get_cmap("tab20")
+    cmap = mpl.colormaps.get_cmap(palette) if palette in plt.colormaps() else mpl.colormaps.get_cmap("tab20")
     return {cats[i]: to_hex(cmap(i / max(n - 1, 1))) for i in range(n)}
 
 
