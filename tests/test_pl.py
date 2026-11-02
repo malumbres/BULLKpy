@@ -226,3 +226,17 @@ def test_heatmap_de_missing_contrast_lists_available(adata):
     adata.uns["de"] = {"grp_A_vs_B": {"results": None}}
     with pytest.raises(KeyError, match=r"Available contrasts.*grp_A_vs_B"):
         bk.pl.heatmap_de(adata, contrast="A_vs_B", groupby="grp", show=False)
+
+
+def test_no_removed_boxplot_labels_argument():
+    # Axes.boxplot(labels=) was removed in matplotlib 3.11; use tick_labels.
+    import pathlib
+    import re
+
+    root = pathlib.Path(bk.__file__).parent
+    bad = [
+        str(p.relative_to(root))
+        for p in root.rglob("*.py")
+        if re.search(r"\.boxplot\([^\n]*\blabels=", p.read_text().replace("tick_labels=", ""))
+    ]
+    assert not bad, f"removed boxplot(labels=) still used in: {bad}"

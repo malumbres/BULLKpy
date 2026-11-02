@@ -30,7 +30,7 @@ dependencies = [
   "numpy",
   "pandas",
   "scipy",
-  "matplotlib",
+  "matplotlib>=3.9",
   "anndata",
   "seaborn",
   "scikit-learn",

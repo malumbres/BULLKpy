@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Fixed
 - `pl.gene_plot()` and other functions no longer fail on pandas 3 when the grouping
   column has missing values.
+- Replaced `boxplot(labels=)`, removed in matplotlib 3.11, in the dispersion and
+  metaprogram summary plots. BULLKpy now requires matplotlib 3.9 or newer.
 - One Benjamini-Hochberg implementation (`_stats.bh_fdr`) replaces eight copies that
   treated `NaN` differently, including an incorrect fallback in `rank_genes_groups`.
 - `store_rank_genes_groups_fast()` and `store_gene_categorical_association()` now store
