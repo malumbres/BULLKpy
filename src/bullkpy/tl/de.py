@@ -31,7 +31,7 @@ def de(
     Two-group differential expression.
 
     Stores results in:
-      adata.uns[key_added][f"{groupby}:_{group}_vs_{reference}"] = DataFrame-like dict
+      adata.uns[key_added][f"{groupby}_{group}_vs_{reference}"] = DataFrame-like dict
 
     Methods
     -------

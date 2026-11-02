@@ -72,8 +72,15 @@ def heatmap_de(
     try:
         res = adata.uns[de_key][contrast][results_key]
     except KeyError as e:
+        available = list(adata.uns[de_key]) if de_key in adata.uns else []
+        hint = (
+            f" Available contrasts in adata.uns['{de_key}']: {available}."
+            if available
+            else f" adata.uns has no '{de_key}' entry; run bk.tl.de first"
+            f" (or pass de_key='de_glm' after bk.tl.de_glm)."
+        )
         raise KeyError(
-            f"Could not find DE results at adata.uns['{de_key}']['{contrast}']['{results_key}']"
+            f"Could not find DE results at adata.uns['{de_key}']['{contrast}']['{results_key}'].{hint}"
         ) from e
 
     if not isinstance(res, pd.DataFrame):

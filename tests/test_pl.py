@@ -220,3 +220,9 @@ def test_categorical_colors_array_matches_n_obs(adata):
 def test_set_style_is_idempotent():
     bk.pl.set_style()
     bk.pl.set_style()
+
+
+def test_heatmap_de_missing_contrast_lists_available(adata):
+    adata.uns["de"] = {"grp_A_vs_B": {"results": None}}
+    with pytest.raises(KeyError, match=r"Available contrasts.*grp_A_vs_B"):
+        bk.pl.heatmap_de(adata, contrast="A_vs_B", groupby="grp", show=False)
