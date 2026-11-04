@@ -14,6 +14,7 @@ except Exception:
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from .._genes import gene_loc as _gene_loc
+from ._style import set_style, _savefig
 
 try:
     import scipy.sparse as sp  # type: ignore
@@ -36,20 +37,6 @@ except Exception:
 # ---------------------------------------------------------------------
 # Your existing style helpers (adapt as needed)
 # ---------------------------------------------------------------------
-def set_style():
-    """Minimal style hook (use your existing bullkpy set_style if available)."""
-    try:
-        plt.rcParams["figure.dpi"] = 120
-    except Exception:
-        pass
-
-
-def _savefig(fig, save: str | Path):
-    save = Path(save)
-    save.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(save, bbox_inches="tight")
-
-
 def _rotate_gene_labels(ax: plt.Axes, fontsize: float = 7.0):
     for lab in ax.get_xticklabels():
         lab.set_rotation(90)
@@ -563,7 +550,7 @@ def leading_edge_jaccard_heatmap(
     title, show_title
         Title text, and whether to draw it.
     save
-        Path to write the figure to; respects ``bk.settings.figdir``.
+        Path to write the figure to.
     show
         Call ``plt.show()`` before returning.
 

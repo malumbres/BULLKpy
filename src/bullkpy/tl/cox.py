@@ -14,30 +14,14 @@ except Exception:  # pragma: no cover
 
 from ..logging import info, warn
 from .._genes import gene_indexer as _gene_indexer
+from .._stats import bh_fdr as _bh_fdr
+from .._compat import ensure_actual as _ensure_actual
 
 
 
 def _get_matrix(adata, layer, use="samples"):
     X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
     return X
-
-def _bh_fdr(pvals: np.ndarray) -> np.ndarray:
-    p = np.asarray(pvals, dtype=float)
-    out = np.full_like(p, np.nan, dtype=float)
-    ok = np.isfinite(p)
-    if ok.sum() == 0:
-        return out
-    p0 = p[ok]
-    n = p0.size
-    order = np.argsort(p0)
-    ranked = p0[order]
-    q = ranked * n / (np.arange(1, n + 1))
-    q = np.minimum.accumulate(q[::-1])[::-1]
-    q = np.clip(q, 0, 1)
-    out_ok = np.empty_like(p0)
-    out_ok[order] = q
-    out[ok] = out_ok
-    return out
 
 def _get_expr_matrix(
     adata: ad.AnnData,
@@ -1856,7 +1840,7 @@ def surv_1d_bins(
     If copy=True returns AnnData, else None (modifies adata in place).
     """
     ad = adata.copy() if copy else adata
-    obs = ad.obs
+    obs = _ensure_actual(ad).obs
 
     for k in [x_key, time_key, event_key]:
         if k not in obs:
@@ -1959,7 +1943,7 @@ def surv_2x2_bins(
     If copy=True returns AnnData, else None (modifies adata in place).
     """
     ad = adata.copy() if copy else adata
-    obs = ad.obs
+    obs = _ensure_actual(ad).obs
 
     for k in [x_key, z_key, time_key, event_key]:
         if k not in obs:

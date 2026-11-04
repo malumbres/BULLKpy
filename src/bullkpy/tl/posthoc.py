@@ -5,29 +5,8 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 from scipy import stats
+from .._stats import bh_fdr as _bh_fdr
 
-
-
-def _bh_fdr(pvals: np.ndarray) -> np.ndarray:
-    """Benjamini–Hochberg FDR correction."""
-    p = np.asarray(pvals, dtype=float)
-    out = np.full_like(p, np.nan, dtype=float)
-    ok = np.isfinite(p)
-    if ok.sum() == 0:
-        return out
-
-    p0 = p[ok]
-    n = p0.size
-    order = np.argsort(p0)
-    ranked = p0[order]
-    q = ranked * n / (np.arange(1, n + 1))
-    q = np.minimum.accumulate(q[::-1])[::-1]
-    q = np.clip(q, 0, 1)
-
-    out_ok = np.empty_like(p0)
-    out_ok[order] = q
-    out[ok] = out_ok
-    return out
 
 
 def _rank_biserial_from_u(U: float, n1: int, n2: int) -> float:

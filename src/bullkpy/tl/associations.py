@@ -16,6 +16,8 @@ except Exception:  # pragma: no cover
 
 from ..logging import info
 from .._genes import gene_loc as _gene_loc, gene_indexer as _gene_indexer
+from .._stats import bh_fdr as _bh_fdr
+from .._compat import group_labels as _group_labels
 
 
 
@@ -25,29 +27,6 @@ from .._genes import gene_loc as _gene_loc, gene_indexer as _gene_indexer
 def _require_scipy() -> None:
     if stats is None:
         raise ImportError("associations requires scipy. Please install scipy.")
-
-
-def _bh_fdr(pvals: np.ndarray) -> np.ndarray:
-    """Benjamini–Hochberg FDR correction. Keeps NaNs."""
-    p = np.asarray(pvals, dtype=float)
-    out = np.full_like(p, np.nan, dtype=float)
-
-    ok = np.isfinite(p)
-    if ok.sum() == 0:
-        return out
-
-    p0 = p[ok]
-    n = p0.size
-    order = np.argsort(p0)
-    ranked = p0[order]
-    q = ranked * n / (np.arange(1, n + 1))
-    q = np.minimum.accumulate(q[::-1])[::-1]
-    q = np.clip(q, 0, 1)
-
-    out_ok = np.empty_like(p0)
-    out_ok[order] = q
-    out[ok] = out_ok
-    return out
 
 
 def _get_matrix(adata: ad.AnnData, layer: str | None = None) -> Any:
@@ -406,13 +385,13 @@ def rank_genes_groups_fast(
     if groupby not in adata.obs.columns:
         raise KeyError(f"groupby='{groupby}' not found in adata.obs")
 
-    grp = adata.obs[groupby].astype(str)
+    grp = _group_labels(adata.obs[groupby])
     m1 = grp.eq(str(group)).to_numpy()
 
     # `None` and the literal sentinel "rest" both mean "all other samples",
     # unless a real category happens to be named "rest".
     if reference is None or (str(reference) == "rest" and not grp.eq("rest").any()):
-        m2 = ~m1
+        m2 = ~m1 & grp.notna().to_numpy()
         ref_name = "rest"
     else:
         ref_name = str(reference)
@@ -516,8 +495,8 @@ def categorical_association(
     if key2 not in adata.obs.columns:
         raise KeyError(f"'{key2}' not found in adata.obs")
 
-    s1 = adata.obs[key1].astype(str)
-    s2 = adata.obs[key2].astype(str)
+    s1 = _group_labels(adata.obs[key1])
+    s2 = _group_labels(adata.obs[key2])
     table = pd.crosstab(s1, s2)
 
     if table.size == 0:
@@ -555,7 +534,10 @@ def store_gene_categorical_association(
     res = gene_categorical_association(adata, groupby=groupby, **kwargs)
 
     adata.uns.setdefault(key, {})
-    adata.uns[key][subkey] = res
+    adata.uns[key][subkey] = {
+        "results": res,
+        "params": {"groupby": groupby, **kwargs},
+    }
     info(f"Stored gene_categorical_association results in adata.uns['{key}']['{subkey}']")
 
     return res
@@ -582,7 +564,10 @@ def store_rank_genes_groups_fast(
     res = rank_genes_groups_fast(adata, groupby=groupby, group=group, reference=reference, **kwargs)
 
     adata.uns.setdefault(key, {})
-    adata.uns[key][subkey] = res
+    adata.uns[key][subkey] = {
+        "results": res,
+        "params": {"groupby": groupby, "group": group, "reference": ref_name, **kwargs},
+    }
     info(f"Stored rank_genes_groups_fast results in adata.uns['{key}']['{subkey}']")
 
     return res
@@ -719,7 +704,7 @@ def posthoc_per_gene(
     if gene not in adata.var_names:
         raise KeyError(f"gene='{gene}' not found in adata.var_names")
 
-    grp = adata.obs[groupby].astype(str)
+    grp = _group_labels(adata.obs[groupby])
     cats = list(pd.Categorical(grp).categories)
 
     y = _get_gene_vector(adata, gene, layer=layer)

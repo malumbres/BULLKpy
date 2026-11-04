@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from pathlib import Path
+from dataclasses import dataclass, field, fields
 from typing import Literal, Any
 
 
@@ -40,9 +39,6 @@ class Settings:
     # Existing core settings
     # -----------------------------
     _verbosity: Verbosity = field(default_factory=Verbosity)
-    figdir: Path = Path("figures")
-    autoshow: bool = True
-    autosave: bool = False
 
     # -----------------------------
     # Plot settings (new)
@@ -87,6 +83,11 @@ class Settings:
         if where not in ("obs", "var"):
             raise ValueError("where must be 'obs' or 'var'")
         self.categorical_palette_overrides[(where, key)] = str(palette)
+
+    def reset(self) -> None:
+        """Restore every setting to its default value."""
+        for f, value in zip(fields(self), vars(Settings()).values()):
+            setattr(self, f.name, value)
 
     def reset_colors(self) -> None:
         """Clear cached categorical colors (forces regeneration on next plot)."""

@@ -10,6 +10,8 @@ from scipy import stats
 import anndata as ad
 
 from ..logging import info
+from .._stats import bh_fdr as _bh_fdr
+from .._compat import group_labels as _group_labels
 
 
 def de(
@@ -44,7 +46,7 @@ def de(
     if groupby not in adata.obs.columns:
         raise KeyError(f"groupby='{groupby}' not found in adata.obs")
 
-    labels = adata.obs[groupby].astype(str)
+    labels = _group_labels(adata.obs[groupby])
     g_mask = labels == str(group)
     r_mask = labels == str(reference)
 
@@ -96,18 +98,6 @@ def _get_matrix(adata: ad.AnnData, layer: str) -> np.ndarray:
     return np.asarray(X, dtype=float)
 
 
-def _bh_fdr(p: np.ndarray) -> np.ndarray:
-    p = np.asarray(p, dtype=float)
-    n = p.size
-    order = np.argsort(p)
-    ranked = p[order]
-    q = ranked * n / (np.arange(n) + 1)
-    q = np.minimum.accumulate(q[::-1])[::-1]
-    out = np.empty_like(q)
-    out[order] = np.clip(q, 0, 1)
-    return out
-
-
 def _de_welch_ttest(
     adata: ad.AnnData,
     g_mask: np.ndarray,
@@ -121,14 +111,13 @@ def _de_welch_ttest(
     Xg = X[g_mask, :]
     Xr = X[r_mask, :]
 
-    # logFC as difference in means on log scale (interpretable as log fold-change approx)
+    # Layers from pp.log1p use natural logs, so convert the difference in means to log2.
     mean_g = Xg.mean(axis=0)
     mean_r = Xr.mean(axis=0)
-    logfc = mean_g - mean_r
+    logfc = (mean_g - mean_r) / np.log(2.0)
 
     # Welch t-test per gene
     t, p = stats.ttest_ind(Xg, Xr, axis=0, equal_var=False, nan_policy="omit")
-    p = np.nan_to_num(p, nan=1.0)
 
     q = _bh_fdr(p)
 
@@ -198,7 +187,7 @@ def _de_nb_glm(
     n_genes = Y.shape[1]
     coef = np.zeros(n_genes, dtype=float)
     se = np.zeros(n_genes, dtype=float)
-    pval = np.ones(n_genes, dtype=float)
+    pval = np.full(n_genes, np.nan, dtype=float)
 
     # avoid warning spam globally
     with warnings.catch_warnings():

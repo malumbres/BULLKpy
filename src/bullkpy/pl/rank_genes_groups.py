@@ -13,6 +13,7 @@ from ._style import set_style, _savefig
 from ..get.rank_genes_groups_df_all import rank_genes_groups_df_all
 from .dotplot import dotplot
 from .._genes import gene_indexer as _gene_indexer
+from .._compat import group_labels as _group_labels
 
 def rank_genes_groups(
     adata: ad.AnnData,
@@ -172,7 +173,7 @@ def rank_genes_groups_dotplot(
             Xf = np.asarray(Xf[:, _gene_indexer(adata, genes_needed)], dtype=float)
 
         # group labels
-        g = adata.obs[groupby].astype(str)
+        g = _group_labels(adata.obs[groupby])
         cats = pd.unique(df["group"].astype(str)) if groups is None else [str(x) for x in groups]
         cats = [c for c in cats if c in set(g)]
 
@@ -266,7 +267,7 @@ def rank_genes_groups_dotplot(
 
     # Create matrix (n_obs x n_genes_selected)
     tmp = np.zeros((adata.n_obs, len(all_genes)), dtype=float)
-    gobs = adata.obs[groupby].astype(str).to_numpy()
+    gobs = _group_labels(adata.obs[groupby]).to_numpy()
     for i in range(adata.n_obs):
         gi = gobs[i]
         for j, gene in enumerate(all_genes):

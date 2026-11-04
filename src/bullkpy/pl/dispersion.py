@@ -84,7 +84,7 @@ def dispersion_summary(
 
     fig, ax = plt.subplots(figsize=(8, 3))
     data = [df.loc[df[groupby] == g, dispersion_key].to_numpy() for g in order]
-    ax.boxplot(data, labels=[str(g) for g in order], showfliers=False)
+    ax.boxplot(data, tick_labels=[str(g) for g in order], showfliers=False)
     ax.set_ylabel(dispersion_key)
     ax.set_title(title or f"{dispersion_key} by {groupby}")
     ax.tick_params(axis="x", labelrotation=90)
@@ -606,14 +606,14 @@ def metaprogram_metrics_summary(
 
     # heterogeneity
     data_h = [df.loc[df[groupby] == g, heterogeneity_key].to_numpy() for g in order]
-    axes[0].boxplot(data_h, labels=order, showfliers=False)
+    axes[0].boxplot(data_h, tick_labels=order, showfliers=False)
     axes[0].set_title("Per-sample heterogeneity (entropy)")
     axes[0].set_ylabel(heterogeneity_key)
     axes[0].tick_params(axis="x", labelrotation=90)
 
     # dispersion
     data_d = [df.loc[df[groupby] == g, dispersion_key].to_numpy() for g in order]
-    axes[1].boxplot(data_d, labels=order, showfliers=False)
+    axes[1].boxplot(data_d, tick_labels=order, showfliers=False)
     axes[1].set_title("Per-sample dispersion (MAD of z-scored MPs)")
     axes[1].set_ylabel(dispersion_key)
     axes[1].tick_params(axis="x", labelrotation=90)

@@ -18,6 +18,7 @@ except Exception:  # pragma: no cover
 
 import anndata as ad
 from .._genes import gene_loc as _gene_loc
+from .._compat import group_labels as _group_labels
 
 
 
@@ -130,7 +131,7 @@ def heatmap_de(
     if groupby is not None:
         if groupby not in adata.obs.columns:
             raise KeyError(f"groupby='{groupby}' not found in adata.obs")
-        g = adata.obs[groupby].astype(str)
+        g = _group_labels(adata.obs[groupby])
 
         if groups is not None:
             groups = [str(x) for x in groups]
@@ -139,7 +140,7 @@ def heatmap_de(
         g_sub = g[obs_mask]
         # keep group order as provided if groups given; else alphabetical
         if groups is None:
-            cat_order = sorted(g_sub.unique())
+            cat_order = sorted(g_sub.dropna().unique())
         else:
             cat_order = [x for x in groups if x in set(g_sub)]
         col_order = np.argsort(pd.Categorical(g_sub, categories=cat_order, ordered=True))

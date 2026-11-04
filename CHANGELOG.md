@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [Unreleased]
+
+### Results may change
+- `tl.de()` reported `log2FC` as a difference of natural logs, about 1.44 times too
+  small on `pp.log1p` layers. It is now on the log2 scale, matching the column name,
+  `tl.de_glm()` and `tl.rank_genes_groups()`.
+- Genes that cannot be tested now get `NaN` for `pval` and `qval` in `tl.de()` and
+  `tl.de_glm()`, and no longer count towards the number of tests. They were previously
+  set to `p = 1`, which made q-values slightly too conservative.
+
+- Samples with a missing group label are now excluded from analyses. With
+  `reference="rest"` they used to be counted in the comparison group, and on pandas 2
+  they could also form a group called `"nan"` in tests and plots.
+
+### Fixed
+- `pl.gene_plot()` and other functions no longer fail on pandas 3 when the grouping
+  column has missing values.
+- Replaced `boxplot(labels=)`, removed in matplotlib 3.11, in the dispersion and
+  metaprogram summary plots. BULLKpy now requires matplotlib 3.9 or newer.
+- `pl.km_2x2_interaction()` failed whenever the Z variable needed quantile binning.
+- Survival binning and other functions that write to `.obs` now work on AnnData views
+  (`adata[mask]` without `.copy()`); new columns were being lost.
+- One Benjamini-Hochberg implementation (`_stats.bh_fdr`) replaces eight copies that
+  treated `NaN` differently, including an incorrect fallback in `rank_genes_groups`.
+- `store_rank_genes_groups_fast()` and `store_gene_categorical_association()` now store
+  `{"results", "params"}`, the layout plotting functions read.
+- `tl.metaprogram_heterogeneity()` no longer fails when the grouping column has missing
+  values; those samples are skipped.
+- `get.vector()` raises on a missing layer instead of silently using `.X`.
+- Added `settings.reset()`, and made integer verbosity levels mean the same everywhere.
+- `lxml` is now installed, as gseapy's MSigDB utilities need it; `scikit-survival` is
+  available through the `survival-ml` extra.
+
+### Removed
+- `settings.figdir`, `autoshow` and `autosave`, which no code ever read.
+
+### Added
+- `scripts/make_tcga_lung_subset.py` builds the TCGA lung tutorial data with integer counts.
+
 ## [0.2.0] - 2026-11-02
 
 Repository-wide audit and cleanup ahead of the first fully public release.

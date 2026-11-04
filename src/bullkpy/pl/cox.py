@@ -10,6 +10,7 @@ from anndata import AnnData
 
 from ._style import set_style, _savefig
 from .._genes import gene_loc as _gene_loc
+from .._compat import group_labels as _group_labels
 
 
 
@@ -630,7 +631,7 @@ def time_dependent_roc(
     except Exception as e:
         raise ImportError(
             "time_dependent_roc requires scikit-survival.\n"
-            "Install with: pip install scikit-survival\n"
+            "Install with: pip install 'bullkpy[survival-ml]'\n"
             f"Original error: {e}"
         )
 
@@ -1550,7 +1551,7 @@ def metaprogram_rank1_composition_stackedbar(
     topk[groupby] = adata.obs.loc[topk["sample"], groupby].astype(str).to_numpy()
 
     # pick top groups by sample count (from full obs)
-    top_group_names = adata.obs[groupby].astype(str).value_counts().head(top_groups).index.astype(str)
+    top_group_names = _group_labels(adata.obs[groupby]).value_counts().head(top_groups).index.astype(str)
     topk = topk[topk[groupby].isin(top_group_names)]
 
     # compute fractions (rank-1 metaprogram composition)
@@ -1562,7 +1563,7 @@ def metaprogram_rank1_composition_stackedbar(
 
     # order groups (largest first, based on full obs)
     order = (
-        adata.obs[groupby].astype(str)
+        _group_labels(adata.obs[groupby])
             .value_counts()
             .loc[list(top_group_names)]
             .sort_values(ascending=False)
@@ -2098,7 +2099,7 @@ def km_2x2_interaction(
             from bullkpy.tl.cox import surv_1d_bins
             surv_1d_bins(
                 adata,
-                z_key=z_obs_key,
+                x_key=z_obs_key,
                 time_key=time_key,
                 event_key=event_key,
                 groupby=groupby_for_binning,
@@ -2112,8 +2113,8 @@ def km_2x2_interaction(
             z_low, z_high = "low", "high"
 
         # Combine into 2x2 group labels (canonical)
-        xb = adata.obs[x_bin_col].astype(str)
-        zb = adata.obs[z_bin_col].astype(str)
+        xb = _group_labels(adata.obs[x_bin_col])
+        zb = _group_labels(adata.obs[z_bin_col])
 
         out = pd.Series(pd.NA, index=adata.obs_names, dtype="object")
         # only define groups where both bins are present

@@ -17,6 +17,7 @@ except Exception:  # pragma: no cover
 
 import anndata as ad
 from .._genes import gene_indexer as _gene_indexer
+from .._compat import group_labels as _group_labels
 
 
 
@@ -89,7 +90,7 @@ def corr_heatmap(
         if groupby not in adata.obs.columns:
             raise KeyError(f"groupby='{groupby}' not found in adata.obs")
 
-        g = adata.obs[groupby].astype(str)
+        g = _group_labels(adata.obs[groupby])
 
         mask = np.ones(adata.n_obs, dtype=bool)
         if groups is not None:
@@ -101,7 +102,7 @@ def corr_heatmap(
         names = adata.obs_names[mask].astype(str).tolist()
 
         if groups is None:
-            cat_order = sorted(pd.unique(g))
+            cat_order = sorted(pd.unique(g.dropna()))
         else:
             cat_order = [x for x in groups if x in set(g)]
 

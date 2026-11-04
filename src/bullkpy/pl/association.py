@@ -10,11 +10,7 @@ import anndata as ad
 
 
 from ._style import set_style, _savefig
-
-# FIX: update this import to your new TL module location:
-from ..tl.associations import categorical_association
-# If instead you kept tl/categorical_association.py, use:
-# from ..tl.categorical_association import categorical_association
+from .._compat import group_labels as _group_labels
 
 
 def association_heatmap(
@@ -117,7 +113,7 @@ def boxplot_with_stats(
         raise KeyError(f"'{groupby}' not in adata.obs")
 
     s = pd.to_numeric(adata.obs[y], errors="coerce")
-    g = adata.obs[groupby].astype(str)
+    g = _group_labels(adata.obs[groupby])
     df = pd.DataFrame({"y": s, "g": g}).dropna()
 
     cats = list(pd.Categorical(df["g"]).categories)
@@ -167,71 +163,3 @@ def boxplot_with_stats(
     return fig, ax
 
 
-def categorical_confusion(
-    adata: ad.AnnData,
-    *,
-    key1: str,
-    key2: str,
-    normalize: Literal["none", "row", "col", "all"] = "row",
-    cmap: str = "Blues",
-    figsize: tuple[float, float] | None = None,
-    title: str | None = None,
-    save: str | Path | None = None,
-    show: bool = True,
-):
-    """
-    Confusion-style heatmap for two categorical obs columns + association metrics.
-
-    Metrics (from categorical_association):
-      - chi2
-      - cramers_v
-      - ari
-      - nmi
-    """
-    #set_style()
-
-
-    res = categorical_association(adata, key1=key1, key2=key2, ) 
-    #metrics=("chi2", "cramers_v", "ari", "nmi")
-    tab: pd.DataFrame = res["table"].copy()
-
-    mat = tab.to_numpy(dtype=float)
-
-    if normalize == "row":
-        mat = mat / np.maximum(mat.sum(axis=1, keepdims=True), 1.0)
-    elif normalize == "col":
-        mat = mat / np.maximum(mat.sum(axis=0, keepdims=True), 1.0)
-    elif normalize == "all":
-        mat = mat / np.maximum(mat.sum(), 1.0)
-
-    if figsize is None:
-        figsize = (max(6, 0.25 * tab.shape[1] + 3), max(4, 0.25 * tab.shape[0] + 2))
-
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
-    im = ax.imshow(mat, aspect="auto", cmap=cmap, vmin=0, vmax=1 if normalize != "none" else None)
-
-    ax.set_xticks(np.arange(tab.shape[1]))
-    ax.set_xticklabels(tab.columns.tolist(), rotation=90)
-    ax.set_yticks(np.arange(tab.shape[0]))
-    ax.set_yticklabels(tab.index.tolist())
-
-    crv = res.get("cramers_v", np.nan)
-    ari = res.get("ari", np.nan)
-    nmi = res.get("nmi", np.nan)
-
-    ttl = title or f"{key1} vs {key2}"
-    ttl += f" | Cramér’s V={crv:.3f}"
-    if np.isfinite(ari):
-        ttl += f" | ARI={ari:.3f}"
-    if np.isfinite(nmi):
-        ttl += f" | NMI={nmi:.3f}"
-    ax.set_title(ttl)
-
-    cbar = fig.colorbar(im, ax=ax, pad=0.01)
-    cbar.set_label("fraction" if normalize != "none" else "count")
-
-    if save is not None:
-        _savefig(fig, save)
-    if show:
-        plt.show()
-    return fig, ax

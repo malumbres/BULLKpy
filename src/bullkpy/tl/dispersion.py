@@ -4,6 +4,7 @@ from typing import Optional, Sequence
 import numpy as np
 import pandas as pd
 from anndata import AnnData
+from .._compat import ensure_actual as _ensure_actual
 
 
 def _mad(x: np.ndarray, axis: int = 0) -> np.ndarray:
@@ -52,7 +53,7 @@ def sample_dispersion(
         if X.shape[1] < min_genes:
             raise ValueError(f"Too few genes ({X.shape[1]}) for robust dispersion.")
 
-    obs = ad.obs
+    obs = _ensure_actual(ad).obs
     if groupby is not None and groupby not in obs:
         raise KeyError(f"{groupby!r} not found in adata.obs")
 

@@ -15,6 +15,8 @@ from ..logging import warn
 from ._style import set_style, _savefig
 from ..tl.posthoc import pairwise_posthoc
 from .._genes import gene_loc as _gene_loc
+from .._stats import bh_fdr as _bh_fdr
+from .._compat import group_labels as _group_labels
 
 
 def _get_gene_vector(adata: ad.AnnData, gene: str, *, layer: str | None = "log1p_cpm") -> np.ndarray:
@@ -119,7 +121,7 @@ def gene_association(
         raise KeyError(f"groupby='{groupby}' not in adata.obs")
 
     genes = [gene] if isinstance(gene, str) else [str(g) for g in gene]
-    grp = adata.obs[groupby].astype(str)
+    grp = _group_labels(adata.obs[groupby])
 
     if order is None:
         cats = list(pd.Categorical(grp).categories)
@@ -176,25 +178,6 @@ def gene_association(
         plt.show()
     return fig, np.array(axes, dtype=object)
 
-def _bh_fdr(pvals: np.ndarray) -> np.ndarray:
-    p = np.asarray(pvals, dtype=float)
-    out = np.full_like(p, np.nan, dtype=float)
-    ok = np.isfinite(p)
-    if ok.sum() == 0:
-        return out
-    p0 = p[ok]
-    n = p0.size
-    order = np.argsort(p0)
-    ranked = p0[order]
-    q = ranked * n / (np.arange(1, n + 1))
-    q = np.minimum.accumulate(q[::-1])[::-1]
-    q = np.clip(q, 0, 1)
-    out_ok = np.empty_like(p0)
-    out_ok[order] = q
-    out[ok] = out_ok
-    return out
-
-
 def gene_association_volcano(
     adata: ad.AnnData,
     *,
@@ -223,7 +206,7 @@ def gene_association_volcano(
     if groupby not in adata.obs.columns:
         raise KeyError(f"groupby='{groupby}' not in adata.obs")
 
-    grp = adata.obs[groupby].astype(str)
+    grp = _group_labels(adata.obs[groupby])
     m1 = grp.eq(str(group)).to_numpy()
     if reference is None:
         m2 = ~m1

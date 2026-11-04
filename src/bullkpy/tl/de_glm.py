@@ -10,6 +10,7 @@ import warnings
 from .._compat import is_categorical_like
 from ..logging import info
 from ._nb_utils import deseq2_size_factors, estimate_dispersion_mom, shrink_dispersion_to_trend
+from .._stats import bh_fdr as _bh_fdr
 
 
 def de_glm(
@@ -76,7 +77,7 @@ def de_glm(
     beta = np.zeros((n_genes, X.shape[1]), dtype=float)
     se_c = np.full(n_genes, np.nan, dtype=float)
     wald = np.full(n_genes, np.nan, dtype=float)
-    pval = np.ones(n_genes, dtype=float)
+    pval = np.full(n_genes, np.nan, dtype=float)
 
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", message="Negative binomial dispersion parameter alpha not set.*")
@@ -224,13 +225,3 @@ def _contrast_vector(coef_names: list[str], var: str, level_a: str, level_b: str
     return c
 
 
-def _bh_fdr(p: np.ndarray) -> np.ndarray:
-    p = np.asarray(p, dtype=float)
-    n = p.size
-    order = np.argsort(p)
-    ranked = p[order]
-    q = ranked * n / (np.arange(n) + 1)
-    q = np.minimum.accumulate(q[::-1])[::-1]
-    out = np.empty_like(q)
-    out[order] = np.clip(q, 0, 1)
-    return out
