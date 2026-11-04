@@ -1009,6 +1009,17 @@ def _set_xscale_and_limits(
     xmin_use = min(xmin_use, 1.0)
     xmax_use = max(xmax_use, 1.0)
 
+    # --- breathing room so points and CI caps never touch the frame ---
+    if xlim is None:
+        if xscale == "log":
+            span = max(np.log(xmax_use) - np.log(max(xmin_use, eps)), 0.2)
+            xmin_use = max(eps, xmin_use) * np.exp(-0.06 * span)
+            xmax_use = xmax_use * np.exp(0.06 * span)
+        else:
+            span = max(xmax_use - xmin_use, 1e-6)
+            xmin_use -= 0.06 * span
+            xmax_use += 0.06 * span
+
     if xscale == "log":
         ax.set_xscale("log")
 
@@ -1030,6 +1041,50 @@ def _set_xscale_and_limits(
     return x_text
 
 
+def _draw_forest(*, labels, HR, lo, hi, ptxt, title, xscale, xlim, figsize, ax, save, show):
+    """Forest plot of hazard ratios: points with 95% CI, p-values in a column right of the frame."""
+    import textwrap
+
+    import matplotlib.pyplot as plt
+
+    n = len(labels)
+    y = np.arange(n)[::-1]
+    own = ax is None
+    if own:
+        if figsize is None:
+            # rows + padding + x label + title
+            figsize = (6.8, max(2.4, 0.42 * (n + 1.4) + 1.3))
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
+
+    xerr = np.clip(np.vstack([HR - lo, hi - HR]), 0.0, None)
+    ax.errorbar(HR, y, xerr=xerr, fmt="o", capsize=2.5)
+    ax.axvline(1.0, linestyle="--", color="0.4", lw=1)
+
+    ax.set_yticks(y)
+    ax.set_yticklabels(labels)
+    ax.set_ylim(-0.7, n - 1 + 0.7)  # empty space above and below the first and last rows
+    ax.set_xlabel("Hazard ratio (95% CI)")
+    _set_xscale_and_limits(ax, xmin=np.nanmin(lo), xmax=np.nanmax(hi), xscale=xscale, xlim=xlim)
+
+    # p-values sit outside the frame, in axes-fraction x and data y
+    for yi, t in zip(y, ptxt):
+        ax.text(1.02, yi, t, transform=ax.get_yaxis_transform(), va="center", ha="left", fontsize=9, clip_on=False)
+
+    if title:
+        if own:
+            fig.suptitle(textwrap.fill(str(title), width=max(30, int(figsize[0] * 9))), fontsize=11)
+        else:
+            ax.set_title(title)
+
+    if save:
+        _savefig(fig, save)
+    if show:
+        plt.show()
+    return ax
+
+
 @renamed_kwargs(uns_key="key")
 def cox_forest_from_uns(
     adata,
@@ -1045,6 +1100,7 @@ def cox_forest_from_uns(
     figsize: tuple[float, float] | None = None,  
     show: bool = True,
     save: Optional[str] = None,
+    ax: Optional[plt.Axes] = None,
 ):
     """
     Forest plot for Cox results stored in `adata.uns[key]` OR passed via `uns=`.
@@ -1057,11 +1113,14 @@ def cox_forest_from_uns(
     2) Single-model summary produced by `bk.tl.cox_interaction()` (lifelines style)
        -> payload["summary"] is a DataFrame indexed by covariate
 
+    Points and confidence bars have empty space around them and the p-values sit in a column
+    to the right of the frame; the figure height follows the number of rows and the title is wrapped.
+    Pass ``ax=`` to draw into an existing axes (the title then goes on that axes).
+
     Returns matplotlib Axes.
     """
     import numpy as np
     import pandas as pd
-    import matplotlib.pyplot as plt
 
     # -----------------------
     # get payload
@@ -1098,21 +1157,6 @@ def cox_forest_from_uns(
         if p < 1e-3:
             return "p<1e-3"
         return f"p={p:.3g}"
-
-    def _apply_scale_and_limits(ax, lo, hi):
-        lo = np.asarray(lo, float)
-        hi = np.asarray(hi, float)
-
-        # robust xmin/xmax
-        x_text = _set_xscale_and_limits(
-            ax,
-            xmin=np.nanmin(lo),
-            xmax=np.nanmax(hi),
-            xscale=xscale,
-            xlim=xlim,
-        )
-
-        return x_text
 
     # -----------------------
     # Case A: multi-x tidy table
@@ -1154,42 +1198,17 @@ def cox_forest_from_uns(
         hi = df["HR_upper_95"].to_numpy(float)
         ptxt = [_fmt_p(p) for p in df["p"].to_numpy(float)]
 
-        y = np.arange(len(df))[::-1]
-
-        # figsize
-        if figsize is None:
-            fig_h = max(2.2, 0.45 * len(df) + 1.0)
-            figsize = (6.8, fig_h)
-
-        fig, ax = plt.subplots(figsize=figsize)
-        xerr = np.vstack([HR - lo, hi - HR])
-        ax.errorbar(HR, y, xerr=xerr, fmt="o")
-        ax.axvline(1.0, linestyle="--")
-
-        ax.set_yticks(y)
-        ax.set_yticklabels(labels)
-        ax.set_xlabel("Hazard ratio (95% CI)")
-
         params = payload.get("params", {})
         if title is None:
-            time_key = params.get("time_key", "")
+            time_key = params.get("time_col") or params.get("time_key", "")
             strata = params.get("strata")
             title = f"Cox univariate comparison ({time_key})" if time_key else "Cox univariate comparison"
             if strata:
                 title += f" | stratified by {strata}"
-        ax.set_title(title)
-
-        x_text = _apply_scale_and_limits(ax, lo, hi)
-        if x_text is not None:
-            for yi, t in zip(y, ptxt):
-                ax.text(x_text, yi, t, va="center", fontsize=9)
-
-        plt.tight_layout()
-        if save:
-            _savefig(fig, save)
-        if show:
-            plt.show()
-        return ax
+        return _draw_forest(
+            labels=labels, HR=HR, lo=lo, hi=hi, ptxt=ptxt, title=title,
+            xscale=xscale, xlim=xlim, figsize=figsize, ax=ax, save=save, show=show,
+        )
 
     # -----------------------
     # Case B: single-model (lifelines-like) summary table
@@ -1226,32 +1245,10 @@ def cox_forest_from_uns(
     lo = df["HR_lower_95"].to_numpy(float)
     hi = df["HR_upper_95"].to_numpy(float)
     ptxt = [_fmt_p(p) for p in df["p"].to_numpy(float)]
-    y = np.arange(len(df))[::-1]
-
-    if figsize is None:
-        fig_h = max(2.2, 0.45 * len(df) + 1.0)
-        figsize = (6.8, fig_h)
-
-    fig, ax = plt.subplots(figsize=figsize)
-    xerr = np.vstack([HR - lo, hi - HR])
-    ax.errorbar(HR, y, xerr=xerr, fmt="o")
-    ax.axvline(1.0, linestyle="--")
-    ax.set_yticks(y)
-    ax.set_yticklabels(labels)
-    ax.set_xlabel("Hazard ratio (95% CI)")
-    ax.set_title(title or "Cox model")
-
-    x_text = _apply_scale_and_limits(ax, lo, hi)
-    if x_text is not None:
-        for yi, t in zip(y, ptxt):
-            ax.text(x_text, yi, t, va="center", fontsize=9)
-
-    plt.tight_layout()
-    if save:
-        _savefig(fig, save)
-    if show:
-        plt.show()
-    return ax
+    return _draw_forest(
+        labels=labels, HR=HR, lo=lo, hi=hi, ptxt=ptxt, title=title or "Cox model",
+        xscale=xscale, xlim=xlim, figsize=figsize, ax=ax, save=save, show=show,
+    )
 
 
 @renamed_kwargs(out_key="key_added")

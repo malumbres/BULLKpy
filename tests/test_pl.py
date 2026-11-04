@@ -597,3 +597,60 @@ def test_volcano_label_placement_can_be_switched_off():
                             avoid_label_overlap=False, show=False)
     assert len(ax.texts) == 6 and not ax.lines[0:0]
     plt.close("all")
+
+
+# --------------------------------------------------------------- cox forest layout
+def _forest_payload(multi=True):
+    import pandas as pd
+
+    if multi:
+        summ = pd.DataFrame({
+            "x_key": ["a_long_predictor_name", "b", "c", "d"],
+            "HR": [1.6, 40.0, 0.93, 1.05],
+            "HR_lower_95": [1.08, 0.05, 0.85, 0.96],
+            "HR_upper_95": [2.4, 3000.0, 1.02, 1.15],
+            "p": [0.0199, 0.121, 0.153, 0.832],
+        })
+    else:
+        summ = pd.DataFrame(
+            {"HR": [1.6, 0.8], "HR_lower_95": [1.1, 0.5], "HR_upper_95": [2.3, 1.2], "p": [0.01, 0.4]},
+            index=pd.Index(["x", "z"], name="covariate"),
+        )
+    return {"summary": summ, "params": {"time_key": "OS.time", "strata": "Project_ID"}}
+
+
+@pytest.mark.parametrize("multi", [True, False])
+def test_cox_forest_from_uns_leaves_room_and_keeps_pvalues_outside(multi):
+    ax = bk.pl.cox_forest_from_uns(None, uns=_forest_payload(multi), show=False)
+    fig = ax.figure
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    axbox = ax.get_window_extent(renderer)
+    ptexts = [t for t in ax.texts if t.get_text().startswith("p")]
+    assert len(ptexts) == (4 if multi else 2)
+    assert all(t.get_window_extent(renderer).x0 >= axbox.x1 for t in ptexts), "p-values must be outside the frame"
+    n = 4 if multi else 2
+    y0, y1 = ax.get_ylim()
+    assert min(y0, y1) < -0.5 and max(y0, y1) > n - 1 + 0.5, "first and last rows need empty space"
+    x0, x1 = ax.get_xlim()
+    assert x0 < 0.05 * (0.05 if multi else 1) + 1.0 and x1 > (3000.0 if multi else 2.3), "CI bars need room"
+    assert _inside_figure(fig)
+    plt.close("all")
+
+
+def test_cox_forest_from_uns_height_follows_rows_and_accepts_ax():
+    import pandas as pd
+
+    heights = []
+    for n in (2, 6, 14):
+        summ = pd.DataFrame({
+            "x_key": [f"pred{i}" for i in range(n)], "HR": 1.2, "HR_lower_95": 0.9, "HR_upper_95": 1.5, "p": 0.2,
+        })
+        ax = bk.pl.cox_forest_from_uns(None, uns={"summary": summ, "params": {}}, show=False)
+        heights.append(ax.figure.get_size_inches()[1])
+        plt.close("all")
+    assert heights[0] < heights[1] < heights[2]
+    fig, ax = plt.subplots(figsize=(5, 3))
+    out = bk.pl.cox_forest_from_uns(None, uns=_forest_payload(), ax=ax, title="mine", show=False)
+    assert out is ax and ax.get_title() == "mine"
+    plt.close("all")

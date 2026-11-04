@@ -29,6 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   A `figsize=` too small for the labels and legends is enlarged, with a warning, instead of squashed.
   The size legend now follows `dot_max` and no longer shows the faint grid behind the dots.
 
+- `pl.cox_forest_from_uns()` leaves empty space around the points and confidence bars (the first and last
+  rows no longer touch the frame, and the x range extends past the CIs), puts the p-values in a column
+  outside the frame, sizes the figure from the number of rows, wraps and centres the title above the plot,
+  and accepts `ax=`. The two near-identical drawing blocks (tidy table and single model) are now one helper.
 - `pl.volcano()` puts the legend to the right of the plot (`legend_outside=True`) instead of over the
   points, adds headroom so labels at the extremes stay inside the frame, and moves gene labels apart so
   none overlaps another or leaves the axes (`avoid_label_overlap=True`); a thin line joins a moved label
