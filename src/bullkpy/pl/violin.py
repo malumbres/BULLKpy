@@ -9,6 +9,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import anndata as ad
 
+from ._colors import displayed_categories, positional_palette
 from ._style import set_style, _savefig
 from .._genes import gene_loc as _gene_loc
 from .._matrix import as_list as _as_list_impl
@@ -132,28 +133,36 @@ def violin(
     )
     axes = axes.ravel()
 
+    # seaborn maps palettes to hue levels correctly only for string x with explicit order/hue_order
+    shown = [str(c) for c in displayed_categories(df[groupby], order)]
+    df_plot = df.assign(**{groupby: df[groupby].astype(str)})
+
     # plotting
     for ax, k in zip(axes, keys):
         sns.violinplot(
-            data=df,
+            data=df_plot,
             x=groupby,
             y=k,
+            hue=groupby,
+            hue_order=shown,
+            dodge=False,
+            legend=False,
             ax=ax,
             inner=inner,
             cut=cut,
-            palette=palette,
-            order=order,
+            palette=positional_palette(palette, shown),
+            order=shown,
         )
         if show_points:
             sns.stripplot(
-                data=df,
+                data=df_plot,
                 x=groupby,
                 y=k,
                 ax=ax,
                 color="k",
                 size=float(point_size),
                 alpha=float(point_alpha),
-                order=order,
+                order=shown,
             )
         ax.set_title(k)
         ax.tick_params(axis="x", rotation=float(rotate_xticks))

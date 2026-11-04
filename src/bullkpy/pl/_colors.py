@@ -123,3 +123,27 @@ def categorical_palette(categories: Sequence[str], palette: str = "Set1") -> dic
         warn(f"Unknown palette {palette!r}; using 'tab20'.")
         cmap = mpl.colormaps["tab20"]
     return {cats[i]: to_hex(cmap(i / max(n - 1, 1))) for i in range(n)}
+
+
+def displayed_categories(values: pd.Series, order: Sequence[str] | None = None) -> list:
+    """Categories in the order seaborn draws them: ``order`` if given, else category order
+    for a categorical column, else order of appearance."""
+    if order is not None:
+        return list(order)
+    if isinstance(values.dtype, pd.CategoricalDtype):
+        return list(values.cat.categories)
+    return list(pd.unique(values.dropna()))
+
+
+def positional_palette(palette, categories: Sequence) -> dict | None:
+    """Explicit {category: colour} map giving the i-th displayed category the i-th palette colour.
+
+    seaborn assigns a named palette to hue levels alphabetically; this keeps colours tied to the
+    drawing order instead. Non-string palettes (dict, list) are returned unchanged.
+    """
+    if palette is None:
+        return None
+    if not isinstance(palette, str):
+        return palette
+    cols = sns.color_palette(palette, n_colors=len(categories))
+    return {c: cols[i] for i, c in enumerate(categories)}

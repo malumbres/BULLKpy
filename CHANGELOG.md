@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   they could also form a group called `"nan"` in tests and plots.
 
 ### Fixed
+- `tl.gene_gene_correlations(batch_mode="meta")` crashed on NumPy 2 (`np.math` was removed).
+- `pl.violin()` and `pl.gene_association()` no longer trigger seaborn's "palette without hue"
+  FutureWarning; colours are unchanged. `pl.metaprogram_heatmap()` no longer uses a deprecated AnnData call.
+- `io.add_metadata()` returns an unfragmented `.obs`, so adding QC metrics or group columns to a wide
+  metadata table no longer prints a long "DataFrame is highly fragmented" warning.
 - `pl.gene_plot()` and other functions no longer fail on pandas 3 when the grouping
   column has missing values.
 - Replaced `boxplot(labels=)`, removed in matplotlib 3.11, in the dispersion and

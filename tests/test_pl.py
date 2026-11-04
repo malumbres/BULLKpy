@@ -306,3 +306,42 @@ def test_clustered_heatmaps_refuse_an_external_axes(adata, genes):
     with pytest.raises(ValueError, match="ax="):
         bk.pl.corr_heatmap(adata, use="samples", dendrogram=True, ax=ax, show=False)
     plt.close("all")
+
+
+def _violin_colour_by_position(ax):
+    from matplotlib.collections import PolyCollection
+    from matplotlib.colors import to_hex
+
+    found = {}
+    for coll in ax.collections:
+        if isinstance(coll, PolyCollection):
+            for path in coll.get_paths():
+                if len(path.vertices) > 10:
+                    found[round(float(path.vertices[:, 0].mean()))] = to_hex(coll.get_facecolor()[0])
+    return [found[i] for i in sorted(found)]
+
+
+def test_violin_colours_follow_the_drawing_order(adata):
+    # Palette colours go to categories in the order they are drawn (first drawn = first colour),
+    # for default order, an explicit order and a categorical column with its own category order.
+    import seaborn as sns
+    from matplotlib.colors import to_hex
+
+    adata.obs["Subtype"] = adata.obs["Subtype"].astype("category").cat.reorder_categories(["Luminal", "Basal"])
+    first, second = (to_hex(sns.desaturate(c, 0.75)) for c in sns.color_palette("Set2", 2))
+    fig, axes = bk.pl.violin(adata, keys=["purity"], groupby="Subtype", show=False)
+    assert _violin_colour_by_position(axes[0]) == [first, second]
+    fig, axes = bk.pl.violin(adata, keys=["purity"], groupby="Subtype", order=["Basal", "Luminal"], show=False)
+    assert _violin_colour_by_position(axes[0]) == [first, second]
+    plt.close("all")
+
+
+def test_seaborn_plots_do_not_use_the_deprecated_palette_without_hue(adata, genes):
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", FutureWarning)
+        bk.pl.violin(adata, keys=["purity"], groupby="Subtype", show=False)
+        bk.pl.gene_association(adata, gene=[genes[0]], groupby="Subtype", layer="log1p_cpm", show=False)
+        bk.pl.gene_association(adata, gene=[genes[0]], groupby="Subtype", layer="log1p_cpm", kind="box", show=False)
+    plt.close("all")

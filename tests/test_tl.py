@@ -390,3 +390,11 @@ def test_store_rank_genes_groups_fast_writes_uns(adata):
         layer=LAYER, subkey="Subtype:Basal_vs_rest",
     )
     assert "rank_genes_groups_fast" in adata.uns
+
+
+def test_gene_gene_correlation_meta_analysis_runs_on_numpy2(adata, genes):
+    # np.math.erf was removed in NumPy 2; the meta-analysis p-value used it.
+    df = bk.tl.gene_gene_correlations(
+        adata, gene=genes[0], genes=genes, layer=LAYER, batch_key="Batch", batch_mode="meta"
+    )
+    assert df["pval"].between(0, 1).all()

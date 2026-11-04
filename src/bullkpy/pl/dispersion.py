@@ -290,7 +290,7 @@ def metaprogram_heatmap(
             raise ImportError(f"metaprogram_heatmap: scipy is required for clustering/dendrograms. ({e})")
 
     # ---------- pull MP matrix ----------
-    if obsm_key not in adata.obsm_keys():
+    if obsm_key not in adata.obsm:
         raise KeyError(f"obsm_key='{obsm_key}' not found in adata.obsm")
 
     X = np.asarray(adata.obsm[obsm_key])
