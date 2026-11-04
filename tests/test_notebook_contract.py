@@ -19,7 +19,7 @@ import bullkpy as bk
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 NOTEBOOKS = sorted((ROOT / "notebooks").glob("*.ipynb"))
 
-SUBMODULES = {"pp", "tl", "pl", "get", "io"}
+SUBMODULES = {"pp", "tl", "pl", "get", "io", "datasets"}
 
 
 def _code_cells(path: pathlib.Path):

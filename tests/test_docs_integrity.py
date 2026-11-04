@@ -8,9 +8,9 @@ import bullkpy as bk
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
-SUBMODULES = ["pp", "tl", "pl", "get", "io"]
+SUBMODULES = ["pp", "tl", "pl", "get", "io", "datasets"]
 
-_API_REF = re.compile(r"\bbk\.(pp|tl|pl|get|io)\.([A-Za-z_][A-Za-z0-9_]*)")
+_API_REF = re.compile(r"\bbk\.(pp|tl|pl|get|io|datasets)\.([A-Za-z_][A-Za-z0-9_]*)")
 _IMG_REF = re.compile(r"_static/([A-Za-z0-9_.\-]+)")
 
 
@@ -51,7 +51,7 @@ def test_no_private_helpers_in_doc_examples():
     """Examples must show the public API, not underscore-prefixed internals."""
     offenders = []
     for md in _markdown_files():
-        for m in re.finditer(r"\bbk\.(?:pp|tl|pl|get|io)\._[A-Za-z0-9_]*", md.read_text()):
+        for m in re.finditer(r"\bbk\.(?:pp|tl|pl|get|io|datasets)\._[A-Za-z0-9_]*", md.read_text()):
             offenders.append(f"{md.relative_to(ROOT)}: {m.group(0)}")
     assert not offenders, "docs use private helpers:\n" + "\n".join(sorted(set(offenders)))
 

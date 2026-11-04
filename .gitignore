@@ -72,3 +72,6 @@ chrome_profile_notebooklm/
 
 # Local assistant notes, not part of the published package
 CLAUDE.md
+
+# retired pan-cancer tutorial (kept locally)
+notebooks/BULLKpy_TCGA_example_notebook.ipynb

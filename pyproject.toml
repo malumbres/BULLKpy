@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bullkpy"
-version = "0.2.0"
+version = "0.3.0"
 description = "Scanpy-like pipeline for bulk RNA-seq in Python"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -13,7 +13,7 @@ authors = [{ name = "Marcos Malumbres", email = "mmalumbres@vhio.net" }]
 keywords = ["bulk-rnaseq", "tcga", "anndata", "scanpy", "bioinformatics"]
 
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 4 - Beta",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.10",
@@ -28,26 +28,33 @@ classifiers = [
 
 dependencies = [
   "numpy",
-  "pandas",
+  "pandas>=2.0",
   "scipy",
   "matplotlib>=3.9",
   "anndata",
-  "seaborn",
+  "seaborn>=0.13",
   "scikit-learn",
   "statsmodels",
   "gseapy",
   "lifelines",
   "openpyxl",
   "lxml",                         # gseapy MSigDB utilities
+  "umap-learn>=0.5.7",            # bk.tl.umap
+  "numba>=0.60",
+  "igraph",                       # bk.tl.cluster(method="leiden")
+  "leidenalg",
+  "networkx",                     # GSEA leading-edge / enrichment-map networks
 ]
 
 [project.optional-dependencies]
-umap = ["umap-learn>=0.5.7", "numba>=0.60"]
-leiden = ["igraph", "leidenalg"]
+# umap, leiden and network are installed by default since 0.3.0; the names stay so that
+# `pip install "bullkpy[umap,leiden]"` from older instructions keeps working.
+umap = []
+leiden = []
+network = []
 survival-ml = ["scikit-survival"]   # pl.time_dependent_roc
-network = ["networkx"]          # GSEA leading-edge network layouts
-notebook = ["ipykernel", "jupyterlab", "networkx"]
-dev = ["pytest", "ruff", "black", "build", "twine"]
+notebook = ["ipykernel", "jupyterlab"]
+dev = ["pytest", "ruff", "black", "build", "twine", "nbformat", "nbclient", "ipykernel"]
 docs = [
   "sphinx>=7,<8",
   "pydata-sphinx-theme>=0.15",

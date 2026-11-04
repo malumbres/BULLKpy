@@ -8,15 +8,20 @@ samples, so the tutorials can start from true counts with ``bk.io.read_counts``.
 Outputs in ``--outdir``:
     TCGA_lung_counts.tsv.gz    integer counts, genes x samples, Ensembl IDs
     TCGA_lung_genes.tsv        Ensembl ID -> gene name, gene type, chromosome
-    TCGA_lung_metadata.tsv     sample metadata; columns empty in lung are dropped
+    TCGA_lung_metadata.tsv     sample metadata, restricted to the columns in --columns
+    TCGA_lung_half_integer_samples.txt   barcodes of samples whose values were half-integers
     TCGA_lung_MANIFEST.tsv     sizes and SHA-256 checksums
 
 The script stops if back-transformed values are not whole or half-integers within
 ``--max-residual``, because that would mean the input is not log2(count + 1).
 
-A few samples hold exact half-integers throughout, as expected if Xena averaged two
-sequencing runs. They are rounded half-to-even, which avoids a directional bias, and
-flagged in the metadata column ``counts_half_integer`` so they can be excluded.
+A few samples hold exact half-integers throughout (possibly two sequencing files averaged by
+Xena; not verified). They are rounded half-to-even, which avoids a directional bias, and
+listed in ``TCGA_lung_half_integer_samples.txt`` so they can be excluded.
+
+The source metadata file also holds analysis results saved by an earlier pipeline (clusters,
+scores, cell-cycle phase) and constant columns. ``--columns`` names the ones that are kept; with
+``--manifest-only`` only the checksum manifest of an existing output folder is rewritten.
 """
 from __future__ import annotations
 
@@ -45,8 +50,13 @@ def main() -> None:
     parser.add_argument("--biomart", type=Path, default=Path("data/external/251224_biomart_human.tsv"))
     parser.add_argument("--outdir", type=Path, default=Path("data/external/lung"))
     parser.add_argument("--max-residual", type=float, default=0.01)
+    parser.add_argument("--columns", type=Path, default=Path("scripts/tcga_lung_metadata_columns.txt"))
+    parser.add_argument("--manifest-only", action="store_true", help="only rewrite the manifest of --outdir")
     args = parser.parse_args()
     args.outdir.mkdir(parents=True, exist_ok=True)
+    if args.manifest_only:
+        _write_manifest(args.outdir)
+        return
 
     meta = pd.read_csv(args.metadata, sep="\t", low_memory=False)
     meta = meta[meta["Project_ID"].isin(PROJECTS)]
@@ -106,18 +116,37 @@ def main() -> None:
 
     meta = meta[meta["sample"].isin(samples)].dropna(axis=1, how="all")
     meta = meta.set_index("sample").loc[samples].reset_index()
-    meta["counts_half_integer"] = meta["sample"].isin(half_samples)
+    if args.columns.exists():
+        wanted = [
+            line.strip() for line in args.columns.read_text().splitlines() if line.strip() and not line.startswith("#")
+        ]
+        absent = [c for c in wanted if c not in meta.columns]
+        if absent:
+            print(f"WARNING: {len(absent)} columns in {args.columns} are not in the metadata: {absent[:5]}")
+        meta = meta[["sample", *[c for c in wanted if c in meta.columns]]]
+    (args.outdir / "TCGA_lung_half_integer_samples.txt").write_text("\n".join(half_samples) + "\n")
     print(f"metadata: {meta.shape[0]} samples, {meta.shape[1]} columns")
     print(meta["Project_ID"].value_counts().to_dict())
     meta_path = args.outdir / "TCGA_lung_metadata.tsv"
     meta.to_csv(meta_path, sep="\t", index=False)
 
+    _write_manifest(args.outdir)
+
+
+def _write_manifest(outdir: Path) -> None:
+    names = [
+        "TCGA_lung_counts.tsv.gz",
+        "TCGA_lung_genes.tsv",
+        "TCGA_lung_metadata.tsv",
+        "TCGA_lung_half_integer_samples.txt",
+    ]
     rows = [
-        {"file": p.name, "bytes": p.stat().st_size, "sha256": sha256(p)}
-        for p in (counts_path, genes_path, meta_path)
+        {"file": n, "bytes": (outdir / n).stat().st_size, "sha256": sha256(outdir / n)}
+        for n in names
+        if (outdir / n).exists()
     ]
     manifest = pd.DataFrame(rows)
-    manifest.to_csv(args.outdir / "TCGA_lung_MANIFEST.tsv", sep="\t", index=False)
+    manifest.to_csv(outdir / "TCGA_lung_MANIFEST.tsv", sep="\t", index=False)
     print(manifest.to_string(index=False))
 
 

@@ -7,7 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [Unreleased]
+## [0.3.0] - 2026-11-05
+
+### Highlights
+- Three tutorial notebooks on public TCGA lung data (LUAD + LUSC) replace the single pan-cancer notebook:
+  1. build the AnnData object, QC and 2-D embedding; 2. clustering, signatures and statistics;
+  3. differential expression, pathway enrichment and survival.
+- `bk.datasets.tcga_lung()` downloads the tutorial data (integer counts, gene annotation, clinical
+  metadata) from Zenodo, verifies checksums and builds the AnnData object.
+- A plain `pip install bullkpy` now installs everything the tutorials need (UMAP, Leiden, networkx);
+  the old `umap`, `leiden` and `network` extras remain as no-ops. Requires matplotlib >= 3.9,
+  seaborn >= 0.13, pandas >= 2.
+- Parameter names are consistent across the package and several functions moved to the namespace that
+  matches what they do. Every old name keeps working with a `DeprecationWarning`; see `docs/migration.md`.
+- Plot layouts that clipped or overlapped (dotplot, dotplot_association, gene_panel_correlation_heatmap,
+  volcano, cox_forest_from_uns) were rebuilt, and 43 plotting functions accept `ax=`.
+- Tests and CI run on Linux, macOS and Windows.
 
 ### Results may change
 - `tl.de()` reported `log2FC` as a difference of natural logs, about 1.44 times too

@@ -12,7 +12,7 @@ import pytest
 
 import bullkpy as bk
 
-SUBMODULES = ["pp", "tl", "pl", "get", "io"]
+SUBMODULES = ["pp", "tl", "pl", "get", "io", "datasets"]
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SRC = ROOT / "src" / "bullkpy"
 DOCS_API = ROOT / "docs" / "api"
