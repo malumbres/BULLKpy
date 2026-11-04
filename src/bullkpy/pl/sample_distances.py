@@ -5,7 +5,6 @@ from typing import Sequence, Literal
 
 import numpy as np
 import pandas as pd
-import scipy.sparse as sp
 
 import anndata as ad
 import matplotlib.pyplot as plt
@@ -13,6 +12,7 @@ from ._colors import categorical_colors_array, get_categorical_colors
 
 
 from ._style import set_style, _savefig
+from .._matrix import get_matrix as _get_matrix
 
 try:
     import seaborn as sns
@@ -26,26 +26,6 @@ except Exception:  # pragma: no cover
     pdist = None
     squareform = None
     linkage = None
-
-
-def _get_matrix(
-    adata: ad.AnnData,
-    *,
-    layer: str | None = "log1p_cpm",
-    use: Literal["samples", "genes"] = "samples",
-) -> np.ndarray:
-    """
-    Returns dense matrix for distance computation.
-    - use="samples": rows=samples, cols=genes  (default; typical)
-    - use="genes":   rows=genes, cols=samples  (gene-gene distances)
-    """
-    X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    if sp.issparse(X):
-        X = X.toarray()
-    X = np.asarray(X, dtype=float)
-    if use == "genes":
-        X = X.T
-    return X
 
 
 def _metadata_colors(adata, *, columns, palette="tab20"):

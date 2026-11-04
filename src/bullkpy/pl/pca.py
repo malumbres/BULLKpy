@@ -15,6 +15,7 @@ from ..logging import warn
 from ..pl._style import set_style, _savefig
 from .._compat import is_categorical_like
 from .._genes import gene_loc as _gene_loc
+from .._matrix import as_list as _as_list
 
 try:
     import seaborn as sns
@@ -22,14 +23,6 @@ except Exception:  # pragma: no cover
     sns = None
 
 
-
-
-def _as_list(x):
-    if x is None:
-        return None
-    if isinstance(x, (list, tuple, set)):
-        return list(x)
-    return [x]
 
 
 def _pc_label(adata: ad.AnnData, pc_index_0: int, *, key: str = "pca") -> str:

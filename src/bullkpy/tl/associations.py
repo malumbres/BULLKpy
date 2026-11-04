@@ -18,22 +18,20 @@ from ..logging import info
 from .._genes import gene_loc as _gene_loc, gene_indexer as _gene_indexer
 from .._stats import bh_fdr as _bh_fdr
 from .._compat import group_labels as _group_labels
+from functools import partial
+from .._matrix import get_matrix as _get_matrix_impl
 
 
 
 # -----------------------------
 # Utilities
 # -----------------------------
+_get_matrix = partial(_get_matrix_impl, dense=False)  # sparse stays sparse
+
+
 def _require_scipy() -> None:
     if stats is None:
         raise ImportError("associations requires scipy. Please install scipy.")
-
-
-def _get_matrix(adata: ad.AnnData, layer: str | None = None) -> Any:
-    """Return X/layer as (n_obs x n_vars), sparse or dense."""
-    if layer is not None and layer in adata.layers:
-        return adata.layers[layer]
-    return adata.X
 
 
 def _get_gene_vector(adata: ad.AnnData, gene: str, layer: str | None = None) -> np.ndarray:

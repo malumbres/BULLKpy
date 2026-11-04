@@ -16,19 +16,12 @@ from ..logging import warn
 from ._style import set_style, _savefig
 from .._compat import is_categorical_like
 from .._genes import gene_loc as _gene_loc
+from .._matrix import as_list as _as_list
 
 try:
     import seaborn as sns
 except Exception:  # pragma: no cover
     sns = None
-
-
-def _as_list(x):
-    if x is None:
-        return None
-    if isinstance(x, (list, tuple, set)):
-        return list(x)
-    return [x]
 
 
 def _categorical_palette(categories: Sequence[str], palette: str = "Set1") -> dict[str, str]:

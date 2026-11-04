@@ -5,13 +5,13 @@ from typing import Literal
 
 import numpy as np
 import pandas as pd
-import scipy.sparse as sp
 from scipy import stats
 import anndata as ad
 
 from ..logging import info
 from .._stats import bh_fdr as _bh_fdr
 from .._compat import group_labels as _group_labels
+from .._matrix import get_matrix as _get_matrix
 
 
 def de(
@@ -84,18 +84,6 @@ def de(
 
     else:
         raise ValueError("method must be 'welch_ttest' or 'nb_glm'")
-
-
-def _get_matrix(adata: ad.AnnData, layer: str) -> np.ndarray:
-    if layer is None:
-        X = adata.X
-    else:
-        if layer not in adata.layers:
-            raise KeyError(f"layer='{layer}' not found in adata.layers")
-        X = adata.layers[layer]
-    if sp.issparse(X):
-        X = X.toarray()
-    return np.asarray(X, dtype=float)
 
 
 def _de_welch_ttest(

@@ -16,12 +16,13 @@ from ..logging import info, warn
 from .._genes import gene_indexer as _gene_indexer
 from .._stats import bh_fdr as _bh_fdr
 from .._compat import ensure_actual as _ensure_actual
+from functools import partial
+from .._matrix import get_matrix as _get_matrix_impl
 
 
 
-def _get_matrix(adata, layer, use="samples"):
-    X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    return X
+_get_matrix = partial(_get_matrix_impl, dense=False)  # sparse stays sparse
+
 
 def _get_expr_matrix(
     adata: ad.AnnData,
@@ -464,14 +465,6 @@ def _require_lifelines():
             f"Original error: {e}"
         )
     return CoxPHFitter, concordance_index
-
-
-def _as_list(x):
-    if x is None:
-        return None
-    if isinstance(x, (list, tuple, np.ndarray, pd.Index)):
-        return list(x)
-    return [x]
 
 
 def _prepare_cox_df(

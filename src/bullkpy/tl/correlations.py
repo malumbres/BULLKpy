@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Sequence
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -19,6 +19,7 @@ except Exception:  # pragma: no cover
 import matplotlib.pyplot as plt
 from .._genes import gene_loc as _gene_loc
 from .._stats import bh_fdr as _bh_fdr
+from .._matrix import as_list as _as_list_impl
 
 
 
@@ -30,12 +31,8 @@ BatchMode = Literal["none", "residualize", "within_batch", "meta"]
 # Core helpers
 # ---------------------------
 
-def _as_list(x: str | Sequence[str] | None) -> list[str]:
-    if x is None:
-        return []
-    if isinstance(x, str):
-        return [x]
-    return list(x)
+def _as_list(x):
+    return _as_list_impl(x, empty_if_none=True)
 
 
 def _get_layer_matrix(adata: ad.AnnData, layer: str | None) -> np.ndarray:

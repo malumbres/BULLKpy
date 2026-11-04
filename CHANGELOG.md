@@ -40,6 +40,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `lxml` is now installed, as gseapy's MSigDB utilities need it; `scikit-survival` is
   available through the `survival-ml` extra.
 
+### Changed
+- Functions that read an expression layer now raise `KeyError` when the named layer does
+  not exist. Several used to fall back to `adata.X` silently, which analysed a different
+  quantity (for example raw counts instead of log-CPM) without any message.
+- Seven copies of the matrix getter and five of `_as_list` are now one implementation each
+  (`bullkpy._matrix`).
+
 ### Removed
 - `settings.figdir`, `autoshow` and `autosave`, which no code ever read.
 

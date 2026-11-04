@@ -5,7 +5,6 @@ from typing import Literal, Sequence
 
 import numpy as np
 import pandas as pd
-import scipy.sparse as sp
 import matplotlib.pyplot as plt
 
 from ._style import set_style, _savefig, _apply_clustergrid_style
@@ -18,14 +17,8 @@ except Exception:  # pragma: no cover
 import anndata as ad
 from .._genes import gene_indexer as _gene_indexer
 from .._compat import group_labels as _group_labels
+from .._matrix import get_matrix as _get_matrix
 
-
-
-def _get_matrix(adata: ad.AnnData, layer: str | None) -> np.ndarray:
-    X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    if sp.issparse(X):
-        X = X.toarray()
-    return np.asarray(X, dtype=float)
 
 
 def corr_heatmap(

@@ -23,17 +23,18 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from .._compat import is_categorical_like
 from .._genes import gene_loc as _gene_loc, gene_indexer as _gene_indexer
+from functools import partial
+from .._matrix import get_matrix as _get_matrix_impl
 
 
 ############################################
 ## HELPERS
 ############################################
 
-def _get_matrix(adata, layer, use="samples"):
-    X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    return X
-
 # Extract expression matrix for genes (train only)
+_get_matrix = partial(_get_matrix_impl, dense=False)  # sparse stays sparse
+
+
 def get_expr_matrix(adata, genes, *, layer="log1p_cpm"):
     genes = [g for g in genes if g in adata.var_names]
     X = adata.layers[layer] if (layer is not None and layer in getattr(adata, "layers", {})) else adata.X

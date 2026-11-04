@@ -11,6 +11,11 @@ import anndata as ad
 
 from ._style import set_style, _savefig
 from .._genes import gene_loc as _gene_loc
+from .._matrix import as_list as _as_list_impl
+
+
+def _as_list(x):
+    return _as_list_impl(x, empty_if_none=True)
 
 
 def _get_matrix_for_layer(adata: ad.AnnData, layer: str | None):
@@ -19,14 +24,6 @@ def _get_matrix_for_layer(adata: ad.AnnData, layer: str | None):
     if layer not in adata.layers:
         raise KeyError(f"layer='{layer}' not found in adata.layers. Available: {list(adata.layers.keys())}")
     return adata.layers[layer]
-
-
-def _as_list(x) -> list:
-    if x is None:
-        return []
-    if isinstance(x, (list, tuple)):
-        return list(x)
-    return [x]
 
 
 def violin(
