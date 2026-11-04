@@ -11,6 +11,7 @@ from anndata import AnnData
 
 from sklearn.metrics import precision_recall_curve, average_precision_score
 from ._style import _savefig
+from .._deprecated import renamed_kwargs
 
 
 
@@ -778,30 +779,31 @@ def plot_pub_template_pr(
 
 
 
+@renamed_kwargs(uns_key="key")
 def signature_dispersion_heatmap(
     adata: AnnData,
     *,
-    uns_key: str = "signature_dispersion",
+    key: str = "signature_dispersion",
     title: Optional[str] = None,
     show: bool = True,
     save: Optional[str] = None,
 ):
     """
     Heatmap of signature dispersion across groups.
-    Expects `adata.uns[uns_key]` to be a DataFrame with columns:
+    Expects `adata.uns[key]` to be a DataFrame with columns:
       group, signature, dispersion
     (as returned by `bk.tl.signature_dispersion_by_group`).
     """
-    if uns_key not in adata.uns:
-        raise KeyError(f"{uns_key!r} not found in adata.uns")
+    if key not in adata.uns:
+        raise KeyError(f"{key!r} not found in adata.uns")
 
-    df = adata.uns[uns_key]
+    df = adata.uns[key]
     if not isinstance(df, pd.DataFrame):
         df = pd.DataFrame(df)
 
     req = {"group", "signature", "dispersion"}
     if not req.issubset(df.columns):
-        raise ValueError(f"{uns_key} must contain columns {req}")
+        raise ValueError(f"{key} must contain columns {req}")
 
     mat = df.pivot(index="signature", columns="group", values="dispersion")
     arr = mat.to_numpy(dtype=float)

@@ -153,7 +153,7 @@ def test_km_2x2_interaction_with_two_quantile_binned_scores(adata):
     adata.obs["score_x"] = rng.normal(size=adata.n_obs)
     adata.obs["score_z"] = rng.normal(size=adata.n_obs)
     bk.pl.km_2x2_interaction(
-        adata, x_key="score_x", z_key="score_z", time_key="OS_time", event_key="OS_event",
+        adata, x_key="score_x", z_key="score_z", time_col="OS_time", event_col="OS_event",
         q=(0.5, 0.5), min_n=1, show=False,
     )
 
@@ -164,11 +164,11 @@ def test_survival_binning_works_on_an_anndata_view(adata):
     adata.obs["score_z"] = rng.normal(size=adata.n_obs)
     view = adata[adata.obs["Subtype"] == adata.obs["Subtype"].iloc[0]]
     assert view.is_view
-    bk.tl.surv_1d_bins(view, x_key="score_x", time_key="OS_time", event_key="OS_event")
+    bk.tl.surv_1d_bins(view, x_key="score_x", time_col="OS_time", event_col="OS_event")
     assert "surv_group_1d" in view.obs.columns
     view = adata[adata.obs["Subtype"] == adata.obs["Subtype"].iloc[0]]
     bk.pl.km_2x2_interaction(
-        view, x_key="score_x", z_key="score_z", time_key="OS_time", event_key="OS_event",
+        view, x_key="score_x", z_key="score_z", time_col="OS_time", event_col="OS_event",
         q=(0.5, 0.5), min_n=1, force_rebin=True, show=False,
     )
 

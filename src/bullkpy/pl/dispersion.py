@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from anndata import AnnData
 from ._style import _savefig
+from .._deprecated import renamed_kwargs
 
 # Optional scipy for clustering/dendrogram ordering
 try:
@@ -510,10 +511,11 @@ def metaprogram_heatmap(
 ##########################
 
 
+@renamed_kwargs(uns_key="key")
 def metaprogram_dispersion_heatmap(
     adata: AnnData,
     *,
-    uns_key: str = "metaprogram_dispersion",
+    key: str = "metaprogram_dispersion",
     sort_groups_by: str = "median",   # "median" | "name"
     sort_programs_by: str = "median", # "median" | "name"
     title: str = "Metaprogram dispersion by tumor type",
@@ -525,17 +527,17 @@ def metaprogram_dispersion_heatmap(
     """
     Heatmap of per-group dispersion (rows: metaprograms, cols: groups).
 
-    Requires adata.uns[uns_key] with columns: group, metaprogram, dispersion.
+    Requires adata.uns[key] with columns: group, metaprogram, dispersion.
     """
-    if uns_key not in adata.uns:
-        raise KeyError(f"{uns_key!r} not found in adata.uns")
-    df = adata.uns[uns_key]
+    if key not in adata.uns:
+        raise KeyError(f"{key!r} not found in adata.uns")
+    df = adata.uns[key]
     if not isinstance(df, pd.DataFrame):
         df = pd.DataFrame(df)
 
     req = {"group", "metaprogram", "dispersion"}
     if not req.issubset(df.columns):
-        raise ValueError(f"{uns_key} must contain columns {req}")
+        raise ValueError(f"{key} must contain columns {req}")
 
     mat = df.pivot(index="metaprogram", columns="group", values="dispersion")
 

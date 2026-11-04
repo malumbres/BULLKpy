@@ -9,6 +9,7 @@ import scipy.sparse as sp
 import anndata as ad
 
 from ..logging import info, warn
+from .._deprecated import renamed_kwargs
 
 def pca(
     adata: ad.AnnData,
@@ -155,6 +156,7 @@ def pca(
     info(f"PCA stored in adata.obsm['X_pca'], adata.varm['PCs'], adata.uns['{key_added}']")
 
 
+@renamed_kwargs(store_key="key_added")
 def pca_loadings(
     adata: ad.AnnData,
     *,
@@ -166,7 +168,7 @@ def pca_loadings(
     include_negative: bool = True,
     dropna: bool = True,
     gene_col: str = "gene",
-    store_key: str = "pca_loadings",
+    key_added: str = "pca_loadings",
     export: str | Path | None = None,
     export_sep: Literal["\t", ","] = "\t",
     export_gmt: str | Path | None = None,
@@ -203,7 +205,7 @@ def pca_loadings(
     Returns
     -------
     dict mapping keys like "PC1_pos", "PC1_neg", "PC1_abs" -> DataFrame.
-    Also stores results in adata.uns[store_key].
+    Also stores results in adata.uns[key_added].
     """
     if loadings_key not in adata.varm:
         raise KeyError(f"adata.varm['{loadings_key}'] not found. Run bk.tl.pca first.")
@@ -277,13 +279,13 @@ def pca_loadings(
 
     if len(out) == 0:
         warn("pca_loadings: no genes returned (all NaN or filtered out).")
-        adata.uns[store_key] = {"params": {"pcs": pcs, "n_top": n_top}, "results": {}}
+        adata.uns[key_added] = {"params": {"pcs": pcs, "n_top": n_top}, "results": {}}
         return out
 
     # ---- store in AnnData ----
     long_df = pd.concat(long_rows, axis=0, ignore_index=True)
 
-    adata.uns[store_key] = {
+    adata.uns[key_added] = {
         "params": {
             "key": key,
             "loadings_key": loadings_key,

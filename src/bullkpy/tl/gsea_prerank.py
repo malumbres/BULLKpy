@@ -9,6 +9,7 @@ import pandas as pd
 import anndata as ad
 
 from ..logging import info, warn
+from .._deprecated import renamed_kwargs
 
 try:
     import gseapy as gp
@@ -103,13 +104,14 @@ def _gseapy_result_to_table(pre_res: Any) -> pd.DataFrame:
     return df
 
 
+@renamed_kwargs(store_key="key_added")
 def gsea_preranked(
     adata: ad.AnnData | None = None,
     *,
     res: pd.DataFrame,
     gene_sets: str | Sequence[str] | Mapping[str, Sequence[str]] = "MSigDB_Hallmark_2020",
     comparison: str | None = None,
-    store_key: str = "gsea",
+    key_added: str = "gsea",
     results_key: str = "results",
     gene_col: str = "gene",
     score_col: str = "t",
@@ -213,12 +215,12 @@ def gsea_preranked(
 
     # store table in adata.uns (serializable)
     if adata is not None:
-        adata.uns.setdefault(store_key, {})
-        adata.uns[store_key].setdefault(str(comparison), {})
-        adata.uns[store_key][str(comparison)][results_key] = df
+        adata.uns.setdefault(key_added, {})
+        adata.uns[key_added].setdefault(str(comparison), {})
+        adata.uns[key_added][str(comparison)][results_key] = df
 
         # helpful provenance
-        adata.uns[store_key][str(comparison)]["params"] = {
+        adata.uns[key_added][str(comparison)]["params"] = {
             "gene_sets": gs,
             "gene_col": gene_col,
             "score_col": score_col,

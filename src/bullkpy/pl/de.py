@@ -10,6 +10,7 @@ import anndata as ad
 
 from ._style import set_style, _savefig
 from ._de_utils import get_de_table
+from .._deprecated import renamed_kwargs
 
 
 def _get_de_table(
@@ -31,13 +32,14 @@ def _get_de_table(
 
 
 
+@renamed_kwargs(q_col="qval_col", p_col="pval_col")
 def volcano(
     res: pd.DataFrame,
     *,
     gene_col: str = "gene",
     fc_col: str = "log2FC",
-    p_col: str = "pval",
-    q_col: str = "qval",
+    pval_col: str = "pval",
+    qval_col: str = "qval",
     use_qval: bool = True,
     p_cutoff: float = 0.05,
     fc_cutoff: float = 0.0,  # optional, set >0 to require |log2FC| >= fc_cutoff
@@ -76,15 +78,15 @@ def volcano(
     set_style()
 
     df = res.copy()
-    for c in (gene_col, fc_col, p_col):
+    for c in (gene_col, fc_col, pval_col):
         if c not in df.columns:
             raise KeyError(f"'{c}' column not found in results.")
-    if use_qval and (q_col not in df.columns):
-        raise KeyError(f"use_qval=True but '{q_col}' column not found in results.")
+    if use_qval and (qval_col not in df.columns):
+        raise KeyError(f"use_qval=True but '{qval_col}' column not found in results.")
 
     # numeric coercion
     df[fc_col] = pd.to_numeric(df[fc_col], errors="coerce")
-    p_used_col = q_col if use_qval else p_col
+    p_used_col = qval_col if use_qval else pval_col
     df[p_used_col] = pd.to_numeric(df[p_used_col], errors="coerce")
 
     # drop NA for plotting
@@ -203,11 +205,12 @@ def volcano(
 
 
 
+@renamed_kwargs(uns_key="key")
 def rankplot(
     adata: ad.AnnData | None = None,
     *,
     res: pd.DataFrame | None = None,
-    uns_key: str | None = None,
+    key: str | None = None,
     contrast: str | None = None,
     n_genes: int = 20,
     sort_by: str = "qval",           # "qval" | "pval" | "log2FC"
@@ -227,7 +230,7 @@ def rankplot(
     - For direction="both": top shows strongest upregulated; bottom shows strongest downregulated (last).
     """
     set_style()
-    df = _get_de_table(adata, res=res, uns_key=uns_key, contrast=contrast).copy()
+    df = _get_de_table(adata, res=res, uns_key=key, contrast=contrast).copy()
 
     gene_col = "gene" if "gene" in df.columns else df.columns[0]
 

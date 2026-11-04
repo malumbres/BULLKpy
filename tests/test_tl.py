@@ -262,8 +262,8 @@ def test_cox_multivariate(adata, genes):
 def test_cox_univariate(adata):
     out = bk.tl.cox_univariate(
         adata,
-        time_key="OS_time",
-        event_key="OS_event",
+        time_col="OS_time",
+        event_col="OS_event",
         x_keys=["age", "purity"],
         groupby=None,
         strata=None,
@@ -272,13 +272,13 @@ def test_cox_univariate(adata):
 
 
 def test_surv_1d_bins_adds_group_column(adata):
-    bk.tl.surv_1d_bins(adata, x_key="purity", time_key="OS_time", event_key="OS_event")
+    bk.tl.surv_1d_bins(adata, x_key="purity", time_col="OS_time", event_col="OS_event")
     assert "surv_group_1d" in adata.obs.columns
 
 
 def test_surv_2x2_bins_adds_group_column(adata):
     bk.tl.surv_2x2_bins(
-        adata, x_key="purity", z_key="age", time_key="OS_time", event_key="OS_event"
+        adata, x_key="purity", z_key="age", time_col="OS_time", event_col="OS_event"
     )
     assert "surv_group_2x2" in adata.obs.columns
 

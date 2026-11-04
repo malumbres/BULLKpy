@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Optional, Sequence, Tuple
 import pandas as pd
 from anndata import AnnData
+from .._deprecated import renamed_kwargs
 
 
 def standardize_tcga_obs(
@@ -64,12 +65,13 @@ def standardize_tcga_obs(
     return ad if copy else None
 
 
+@renamed_kwargs(out_key="key_added")
 def obs_map_categories(
     adata: AnnData,
     *,
     key: str,
     mapping: dict,
-    out_key: Optional[str] = None,
+    key_added: Optional[str] = None,
     inplace: bool = True,
 ) -> Optional[pd.Series]:
     """
@@ -83,8 +85,8 @@ def obs_map_categories(
         Column in `.obs` to map.
     mapping
         Dict mapping old values -> new values.
-    out_key
-        If provided, writes to `.obs[out_key]` instead of overwriting `key`.
+    key_added
+        If provided, writes to `.obs[key_added]` instead of overwriting `key`.
     inplace
         If True, store in `.obs`; otherwise return mapped Series.
 
@@ -99,6 +101,6 @@ def obs_map_categories(
     if not inplace:
         return s
 
-    target = out_key or key
+    target = key_added or key
     adata.obs[target] = pd.Categorical(s)
     return None

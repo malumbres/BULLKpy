@@ -21,6 +21,7 @@ from .._compat import group_labels as _group_labels
 from functools import partial
 from .._matrix import get_matrix as _get_matrix_impl
 from .._matrix import get_gene_vector as _get_gene_vector
+from .._deprecated import renamed_kwargs
 
 
 
@@ -735,6 +736,7 @@ def posthoc_per_gene(
 
 
 
+@renamed_kwargs(out_key="key_added")
 def gene_metadata_association_scan(
     adata: AnnData,
     *,
@@ -744,7 +746,7 @@ def gene_metadata_association_scan(
     groupby: Optional[str] = None,   # optional: run separately per tumor type
     method: str = "spearman",        # "spearman" (v1)
     adjust: str = "fdr_bh",
-    out_key: str = "gene_meta_assoc",
+    key_added: str = "gene_meta_assoc",
 ) -> pd.DataFrame:
     """
     Scan gene–metadata associations (v1: Spearman correlation for continuous metadata).
@@ -752,7 +754,7 @@ def gene_metadata_association_scan(
     Returns a tidy DataFrame with columns:
       group (if groupby), gene, n, rho, pval, qval
 
-    Stores in `adata.uns[out_key]`.
+    Stores in `adata.uns[key_added]`.
     """
     if metadata_key not in adata.obs:
         raise KeyError(f"{metadata_key!r} not found in adata.obs")
@@ -806,13 +808,14 @@ def gene_metadata_association_scan(
             out_parts.append(run_block(y_all[idx], X[idx, :], var_names, group_label=str(grp)))
         out = pd.concat(out_parts, ignore_index=True)
 
-    adata.uns[out_key] = out
+    adata.uns[key_added] = out
     return out
 
 
 
 
 
+@renamed_kwargs(out_key="key_added")
 def signature_axis(
     adata: AnnData,
     *,
@@ -820,13 +823,13 @@ def signature_axis(
     neg_key: str,
     standardize: str = "global",  # "global" | "groupby"
     groupby: Optional[str] = None,
-    out_key: str = "signature_axis",
+    key_added: str = "signature_axis",
 ) -> None:
     """
     Create a two-sided axis from two signature score columns:
         axis = z(pos) - z(neg)
 
-    Stores in `adata.obs[out_key]`.
+    Stores in `adata.obs[key_added]`.
     """
     obs = adata.obs
     if pos_key not in obs or neg_key not in obs:
@@ -860,21 +863,22 @@ def signature_axis(
     else:
         raise ValueError("standardize must be 'global' or 'groupby'")
 
-    adata.obs[out_key] = axis
+    adata.obs[key_added] = axis
 
 
+@renamed_kwargs(out_key="key_added")
 def quantile_groups(
     adata: AnnData,
     *,
     key: str,
     q: Tuple[float, float] = (0.25, 0.75),
     labels: Tuple[str, str, str] = ("low", "mid", "high"),
-    out_key: Optional[str] = None,
+    key_added: Optional[str] = None,
 ) -> None:
     """
     Assign samples into low/mid/high based on quantiles of a continuous `.obs[key]`.
 
-    Stores categorical groups in `.obs[out_key or f'{key}_qgrp']`.
+    Stores categorical groups in `.obs[key_added or f'{key}_qgrp']`.
     """
     if key not in adata.obs:
         raise KeyError(f"{key!r} not found in adata.obs")
@@ -887,5 +891,5 @@ def quantile_groups(
     grp[np.isfinite(x) & (x >= hi)] = labels[2]
     grp[~np.isfinite(x)] = pd.NA
 
-    target = out_key or f"{key}_qgrp"
+    target = key_added or f"{key}_qgrp"
     adata.obs[target] = pd.Categorical(grp, categories=list(labels), ordered=True)

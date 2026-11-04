@@ -9,17 +9,19 @@ import matplotlib.pyplot as plt
 import anndata as ad
 
 from ._style import set_style, _savefig
+from .._deprecated import renamed_kwargs
 
 
 
 Metric = Literal["ARI", "NMI", "cramers_v"]
 
 
+@renamed_kwargs(store_key="key")
 def ari_resolution_heatmap(
     adata: ad.AnnData,
     *,
     df: pd.DataFrame | None = None,
-    store_key: str = "leiden_scan",
+    key: str = "leiden_scan",
     metric: Metric = "ARI",
     show_n_clusters: bool = True,
     cmap: str = "viridis",
@@ -46,12 +48,12 @@ def ari_resolution_heatmap(
     set_style()
 
     if df is None:
-        if store_key not in adata.uns:
+        if key not in adata.uns:
             raise KeyError(
-                f"adata.uns['{store_key}'] not found. Run bk.tl.leiden_resolution_scan(...) first "
+                f"adata.uns['{key}'] not found. Run bk.tl.leiden_resolution_scan(...) first "
                 f"or pass df=..."
             )
-        df = adata.uns[store_key]
+        df = adata.uns[key]
         if not isinstance(df, pd.DataFrame):
             df = pd.DataFrame(df)
 

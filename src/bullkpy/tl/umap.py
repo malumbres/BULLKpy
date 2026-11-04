@@ -5,8 +5,10 @@ import scipy.sparse as sp
 import anndata as ad
 
 from ..logging import info
+from .._deprecated import renamed_kwargs
 
 
+@renamed_kwargs(random_state="seed")
 def umap(
     adata: ad.AnnData,
     *,
@@ -17,7 +19,7 @@ def umap(
     spread: float = 1.0,
     n_components: int = 2,
     metric: str = "euclidean",
-    random_state: int = 0,
+    seed: int = 0,
     init: str = "spectral",
 ) -> None:
     """
@@ -58,7 +60,7 @@ def umap(
         min_dist=float(min_dist),
         spread=float(spread),
         metric=metric,
-        random_state=int(random_state),
+        random_state=int(seed),
         init=init,
     )
 
@@ -74,12 +76,13 @@ def umap(
             "spread": float(spread),
             "n_components": int(n_components),
             "metric": metric,
-            "random_state": int(random_state),
+            "random_state": int(seed),
             "init": init,
         }
     }
 
 
+@renamed_kwargs(random_state="seed")
 def umap_graph(
     adata: ad.AnnData,
     *,
@@ -89,7 +92,7 @@ def umap_graph(
     min_dist: float = 0.5,
     spread: float = 1.0,
     n_components: int = 2,
-    random_state: int = 0,
+    seed: int = 0,
     init: str = "spectral",  # "spectral" or "random"
     negative_sample_rate: int = 5,
     n_epochs: int | None = None,
@@ -146,7 +149,7 @@ def umap_graph(
         min_dist=float(min_dist),
         spread=float(spread),
         metric="euclidean",
-        random_state=int(random_state),
+        random_state=int(seed),
         init=init,
         negative_sample_rate=int(negative_sample_rate),
         n_epochs=n_epochs,
@@ -178,7 +181,7 @@ def umap_graph(
             n_epochs_eff = 500  # safe default for small cohorts
 
 
-        rs = np.random.RandomState(int(random_state))
+        rs = np.random.RandomState(int(seed))
         emb = reducer._fit_embed_data(X, int(n_epochs_eff), init_emb, rs)
 
     if isinstance(emb, tuple):
@@ -201,7 +204,7 @@ def umap_graph(
             "min_dist": float(min_dist),
             "spread": float(spread),
             "n_components": int(n_components),
-            "random_state": int(random_state),
+            "random_state": int(seed),
             "init": init,
             "negative_sample_rate": int(negative_sample_rate),
             "n_epochs": n_epochs,

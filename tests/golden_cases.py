@@ -40,7 +40,7 @@ def compute(adata, genes: list[str]) -> dict:
     out["pca_abs_scores_pc1"] = _vec(np.abs(adata.obsm["X_pca"][:, 0]), 20)
 
     bk.tl.neighbors(adata, n_neighbors=8)
-    bk.tl.cluster(adata, method="kmeans", n_clusters=3, use_rep="X_pca", n_pcs=5, random_state=0)
+    bk.tl.cluster(adata, method="kmeans", n_clusters=3, use_rep="X_pca", n_pcs=5, seed=0)
     labels = adata.obs["clusters"].astype(str).to_numpy()
     out["kmeans_partition_sizes"] = sorted(int((labels == u).sum()) for u in np.unique(labels))
 

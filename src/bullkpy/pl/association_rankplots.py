@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 
 from ._style import set_style, _savefig
+from .._deprecated import renamed_kwargs
 
 
 def rankplot_association(
@@ -121,13 +122,14 @@ def rankplot_association(
 
     return fig, ax
 
+@renamed_kwargs(q_col="qval_col")
 def dotplot_association(
     df: pd.DataFrame,
     *,
     feature_col: str,            # "gene" or "obs"
     groupby_col: str = "groupby",
     effect_col: str = "effect",
-    q_col: str = "qval",
+    qval_col: str = "qval",
     top_n: int = 50,
     figsize: tuple[float, float] | None = None,
     cmap: str = "RdBu_r",
@@ -148,14 +150,14 @@ def dotplot_association(
     set_style()
 
     d = df.copy()
-    d = d.replace([np.inf, -np.inf], np.nan).dropna(subset=[feature_col, groupby_col, effect_col, q_col])
+    d = d.replace([np.inf, -np.inf], np.nan).dropna(subset=[feature_col, groupby_col, effect_col, qval_col])
 
     # take top_n per groupby_col
-    d = d.sort_values([groupby_col, q_col], ascending=[True, True])
+    d = d.sort_values([groupby_col, qval_col], ascending=[True, True])
     d = d.groupby(groupby_col, group_keys=False).head(int(top_n))
 
     piv_eff = d.pivot_table(index=feature_col, columns=groupby_col, values=effect_col, aggfunc="first")
-    piv_q = d.pivot_table(index=feature_col, columns=groupby_col, values=q_col, aggfunc="first")
+    piv_q = d.pivot_table(index=feature_col, columns=groupby_col, values=qval_col, aggfunc="first")
 
     eff = piv_eff.to_numpy(dtype=float)
     qq = piv_q.to_numpy(dtype=float)
@@ -204,7 +206,7 @@ def dotplot_association(
     cbar = fig.colorbar(sm, ax=ax, pad=0.01)
     cbar.set_label(effect_col)
 
-    ax.set_title(title or f"Association dotplot: color={effect_col}, size=-log10({q_col})")
+    ax.set_title(title or f"Association dotplot: color={effect_col}, size=-log10({qval_col})")
 
     if save is not None:
         _savefig(fig, save)

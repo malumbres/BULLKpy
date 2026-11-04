@@ -19,14 +19,16 @@ import anndata as ad
 from .._genes import gene_loc as _gene_loc
 from .._compat import group_labels as _group_labels
 from .._matrix import get_matrix as _get_matrix
+from .._deprecated import renamed_kwargs
 
 
 
+@renamed_kwargs(de_key="key")
 def heatmap_de(
     adata: ad.AnnData,
     *,
     contrast: str,
-    de_key: str = "de",
+    key: str = "de",
     results_key: str = "results",
     layer: str | None = "log1p_cpm",
     groupby: str | None = None,
@@ -49,7 +51,7 @@ def heatmap_de(
 ):
     """
     Heatmap of top DE genes using results stored at:
-        adata.uns[de_key][contrast][results_key]
+        adata.uns[key][contrast][results_key]
 
     Expected DE columns:
         ['gene', 'log2FC', 't', 'pval', 'qval', 'mean_group', 'mean_ref']
@@ -64,17 +66,17 @@ def heatmap_de(
 
     # --- fetch DE results ---
     try:
-        res = adata.uns[de_key][contrast][results_key]
+        res = adata.uns[key][contrast][results_key]
     except KeyError as e:
-        available = list(adata.uns[de_key]) if de_key in adata.uns else []
+        available = list(adata.uns[key]) if key in adata.uns else []
         hint = (
-            f" Available contrasts in adata.uns['{de_key}']: {available}."
+            f" Available contrasts in adata.uns['{key}']: {available}."
             if available
-            else f" adata.uns has no '{de_key}' entry; run bk.tl.de first"
-            f" (or pass de_key='de_glm' after bk.tl.de_glm)."
+            else f" adata.uns has no '{key}' entry; run bk.tl.de first"
+            f" (or pass key='de_glm' after bk.tl.de_glm)."
         )
         raise KeyError(
-            f"Could not find DE results at adata.uns['{de_key}']['{contrast}']['{results_key}'].{hint}"
+            f"Could not find DE results at adata.uns['{key}']['{contrast}']['{results_key}'].{hint}"
         ) from e
 
     if not isinstance(res, pd.DataFrame):
@@ -175,11 +177,11 @@ def heatmap_de(
             col_colors = [col_colors]
 
         ann_colors = {}
-        for key in col_colors:
-            if key not in adata.obs.columns:
-                raise KeyError(f"col_colors obs key '{key}' not found")
+        for col_key in col_colors:
+            if col_key not in adata.obs.columns:
+                raise KeyError(f"col_colors obs key '{col_key}' not found")
 
-            vals = adata.obs.loc[df.columns, key]
+            vals = adata.obs.loc[df.columns, col_key]
 
             # categorical/stringify for stable mapping
             vals_str = vals.astype(str)
@@ -189,7 +191,7 @@ def heatmap_de(
             palette = sns.color_palette("tab20", n_colors=len(cats))
             lut = {cat: to_hex(palette[i]) for i, cat in enumerate(cats)}
 
-            ann_colors[key] = vals_str.map(lut)
+            ann_colors[col_key] = vals_str.map(lut)
 
         col_colors_df = pd.DataFrame(ann_colors, index=df.columns)
 

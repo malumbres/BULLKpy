@@ -115,7 +115,7 @@ def test_sanitize_metadata_takes_a_dataframe(adata):
 
 def test_obs_map_categories(adata):
     a = adata.copy()
-    bk.pp.obs_map_categories(a, key="Subtype", mapping={"Basal": "B"}, out_key="Subtype2")
+    bk.pp.obs_map_categories(a, key="Subtype", mapping={"Basal": "B"}, key_added="Subtype2")
     assert "B" in set(a.obs["Subtype2"].astype(str))
 
 

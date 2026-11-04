@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from anndata import AnnData
 from .._matrix import get_matrix as _get_matrix_impl
+from .._deprecated import renamed_kwargs
 
 
 # -----------------------------
@@ -223,12 +224,13 @@ def metaprogram_sample_metrics(
     return ad if copy else None
 
 
+@renamed_kwargs(out_key="key_added")
 def metaprogram_dispersion_by_group(
     adata: AnnData,
     *,
     groupby: str,
     method: str = "mad",             # "mad" | "iqr" | "std"
-    out_key: str = "metaprogram_dispersion",
+    key_added: str = "metaprogram_dispersion",
 ) -> pd.DataFrame:
     """
     Compute per-group dispersion across samples for each metaprogram.
@@ -236,7 +238,7 @@ def metaprogram_dispersion_by_group(
     Output table columns:
       group, metaprogram, dispersion, n
 
-    Stores result in adata.uns[out_key] and returns it.
+    Stores result in adata.uns[key_added] and returns it.
     """
     if groupby not in adata.obs:
         raise KeyError(f"{groupby!r} not found in adata.obs")
@@ -273,17 +275,18 @@ def metaprogram_dispersion_by_group(
             rows.append({"group": str(grp), "metaprogram": str(mp), "dispersion": d, "n": n})
 
     out = pd.DataFrame(rows)
-    adata.uns[out_key] = out
+    adata.uns[key_added] = out
     return out
 
 
+@renamed_kwargs(out_key="key_added")
 def metaprogram_ne_enrichment(
     adata: AnnData,
     *,
     ne_signature_key: str,
     mp_score_threshold: float = 0.0,
     method: str = "spearman",
-    out_key: str = "mp_ne_association",
+    key_added: str = "mp_ne_association",
 ) -> pd.DataFrame:
     """
     Associate metaprogram activities with a neuroendocrine (NE) signature score.
@@ -300,7 +303,7 @@ def metaprogram_ne_enrichment(
     Returns
     -------
     DataFrame with columns: metaprogram, rho, pval, qval, n
-    Stored in adata.uns[out_key].
+    Stored in adata.uns[key_added].
     """
     from scipy.stats import spearmanr
     from statsmodels.stats.multitest import multipletests
@@ -337,15 +340,16 @@ def metaprogram_ne_enrichment(
     out["qval"] = q
     out = out.sort_values(["qval", "pval"], na_position="last").reset_index(drop=True)
 
-    adata.uns[out_key] = out
+    adata.uns[key_added] = out
     return out
 
 
+@renamed_kwargs(out_key="key_added")
 def metaprogram_topk_contribution(
     adata: AnnData,
     *,
     k: int = 3,
-    out_key: str = "mp_topk",
+    key_added: str = "mp_topk",
 ) -> pd.DataFrame:
     """
     Compute, per sample, the top-k metaprograms and their weights (softmax).
@@ -353,7 +357,7 @@ def metaprogram_topk_contribution(
     Returns a tidy DataFrame with columns:
       sample, rank, metaprogram, weight, score
 
-    Stores result in adata.uns[out_key].
+    Stores result in adata.uns[key_added].
     """
     df = metaprogram_scores_get(adata, return_df=True)
     X = df.to_numpy(dtype=float)
@@ -371,7 +375,7 @@ def metaprogram_topk_contribution(
                 "score": float(X[i, j]),
             })
     out = pd.DataFrame(rows)
-    adata.uns[out_key] = out
+    adata.uns[key_added] = out
     return out
 
 
@@ -419,6 +423,7 @@ def _dense(M):
 
 
 
+@renamed_kwargs(uns_key="key_added")
 def score_metaprograms(
     adata,
     mp_dict: dict[str, list[str]],
@@ -430,7 +435,7 @@ def score_metaprograms(
     min_genes_found: int = 5,
     prefix: str = "MP_",
     obsm_key: str = "X_mp",
-    uns_key: str = "metaprograms",
+    key_added: str = "metaprograms",
     add_obs: bool = True,   # also write each MP to adata.obs[prefix+mp_short]
 ):
     """
@@ -438,7 +443,7 @@ def score_metaprograms(
 
     Stores:
       - adata.obsm[obsm_key] = (n_samples, n_MPs) array
-      - adata.uns[uns_key]   = metadata table about MPs (n_found, genes_found, ...)
+      - adata.uns[key_added]   = metadata table about MPs (n_found, genes_found, ...)
       - optionally adata.obs[prefix+...] for each MP score
     Returns (df_scores, df_mp_info)
     """
@@ -505,7 +510,7 @@ def score_metaprograms(
 
     # store
     adata.obsm[obsm_key] = S
-    adata.uns[uns_key] = {
+    adata.uns[key_added] = {
         "mp_names": mp_names,
         "params": {
             "layer": layer,
@@ -716,7 +721,8 @@ def metaprogram_heterogeneity(
 
 
 
-def summarize_by_group(adata, group_col, cols=("MP_dispersion_entropy_norm",)):
+@renamed_kwargs(group_col="groupby")
+def summarize_by_group(adata, groupby, cols=("MP_dispersion_entropy_norm",)):
     """
     Mean and standard deviation of numeric ``.obs`` columns per group.
 
@@ -727,7 +733,7 @@ def summarize_by_group(adata, group_col, cols=("MP_dispersion_entropy_norm",)):
     ----------
     adata
         Annotated data matrix.
-    group_col
+    groupby
         Column in ``adata.obs`` to group by.
     cols
         Numeric ``.obs`` columns to summarise. Non-numeric values are coerced to
@@ -740,7 +746,7 @@ def summarize_by_group(adata, group_col, cols=("MP_dispersion_entropy_norm",)):
         sorted by decreasing group size.
     """
     out = []
-    for g, d in adata.obs.groupby(group_col):
+    for g, d in adata.obs.groupby(groupby):
         row = {"group": g, "n": int(d.shape[0])}
         for c in cols:
             x = pd.to_numeric(d[c], errors="coerce")

@@ -12,6 +12,7 @@ from ._style import set_style, _savefig
 from .._genes import gene_loc as _gene_loc
 from .._compat import group_labels as _group_labels
 from ..logging import info, warn
+from .._deprecated import renamed_kwargs
 
 
 
@@ -1008,10 +1009,11 @@ def _set_xscale_and_limits(
     return x_text
 
 
+@renamed_kwargs(uns_key="key")
 def cox_forest_from_uns(
     adata,
     *,
-    uns_key: str = "cox",
+    key: str = "cox",
     uns: dict | None = None,                 # : accept payload directly
     title: Optional[str] = None,
     x_keys: Optional[Sequence[str]] = None,
@@ -1024,7 +1026,7 @@ def cox_forest_from_uns(
     save: Optional[str] = None,
 ):
     """
-    Forest plot for Cox results stored in `adata.uns[uns_key]` OR passed via `uns=`.
+    Forest plot for Cox results stored in `adata.uns[key]` OR passed via `uns=`.
 
     Supports two formats:
     1) Multi-x tidy table produced by `bk.tl.cox_univariate(..., x_keys=[...])`
@@ -1046,9 +1048,9 @@ def cox_forest_from_uns(
     if uns is None:
         if adata is None:
             raise ValueError("Provide either `adata` (with adata.uns[uns_key]) or `uns=...`.")
-        if uns_key not in adata.uns:
-            raise KeyError(f"{uns_key!r} not found in adata.uns")
-        payload = adata.uns[uns_key]
+        if key not in adata.uns:
+            raise KeyError(f"{key!r} not found in adata.uns")
+        payload = adata.uns[key]
     else:
         payload = uns
 
@@ -1231,14 +1233,15 @@ def cox_forest_from_uns(
     return ax
 
 
+@renamed_kwargs(time_key="time_col", event_key="event_col", group_col="groupby")
 def run_cox_per_group(
     adata,
     *,
-    group_col: str,
+    groupby: str,
     min_n: int = 30,
     dropna_group: bool = True,
-    time_key: str,
-    event_key: str,
+    time_col: str,
+    event_col: str,
     x_keys,
     x_mode: str = "continuous",
     strata: str | None = None,
@@ -1247,7 +1250,7 @@ def run_cox_per_group(
     **cox_kwargs,
 ):
     """
-    Run tl.cox_univariate() separately within each level of `group_col`.
+    Run tl.cox_univariate() separately within each level of `groupby`.
 
     Returns dict:
       {group_value: payload_dict}  where payload_dict is the same object stored in adata.uns[out_key].
@@ -1257,10 +1260,10 @@ def run_cox_per_group(
     # Adjust the relative import to your actual module layout:
     from ..tl.cox import cox_univariate
 
-    if group_col not in adata.obs.columns:
-        raise KeyError(f"group_col='{group_col}' not found in adata.obs")
+    if groupby not in adata.obs.columns:
+        raise KeyError(f"group_col='{groupby}' not found in adata.obs")
 
-    g = adata.obs[group_col]
+    g = adata.obs[groupby]
     if dropna_group:
         g = g.dropna()
 
@@ -1279,7 +1282,7 @@ def run_cox_per_group(
         ad = adata[idx].copy()
 
         # survival columns present?
-        missing_cols = [k for k in (time_key, event_key) if k not in ad.obs.columns]
+        missing_cols = [k for k in (time_col, event_col) if k not in ad.obs.columns]
         if missing_cols:
             if verbose:
                 warn(f"{grp}: missing {missing_cols} -> skipped")
@@ -1287,7 +1290,7 @@ def run_cox_per_group(
 
         # within-group: strata cannot be the same as group_col
         strata_eff = strata
-        if strata_eff is not None and str(strata_eff) == str(group_col):
+        if strata_eff is not None and str(strata_eff) == str(groupby):
             if verbose:
                 warn(f"{grp}: strata==group_col inside subset -> setting strata=None")
             strata_eff = None
@@ -1297,12 +1300,12 @@ def run_cox_per_group(
         try:
             cox_univariate(
                 ad,
-                time_key=time_key,
-                event_key=event_key,
+                time_col=time_col,
+                event_col=event_col,
                 x_keys=list(x_keys),
                 x_mode=x_mode,
                 strata=strata_eff,
-                out_key=out_key,
+                key_added=out_key,
                 **cox_kwargs,
             )
 
@@ -1324,6 +1327,7 @@ def run_cox_per_group(
 
 
 
+@renamed_kwargs(out_key="key_added")
 def metaprogram_rank1_composition_stackedbar(
     adata: AnnData,
     *,
@@ -1341,14 +1345,14 @@ def metaprogram_rank1_composition_stackedbar(
     ylabel: str = "Fraction of samples where MP is rank-1",
     show: bool = True,
     save: Optional[str] = None,
-    out_key: Optional[str] = "mp_rank1_composition",
+    key_added: Optional[str] = "mp_rank1_composition",
 ):
     """
     Stacked barplot showing, for each tumor type (groupby), the fraction of samples
     whose rank-1 metaprogram is each MP.
 
     Uses `adata.uns[topk_key]` with at least columns: 'sample', 'rank', 'metaprogram'.
-    Stores the plotted matrix in `adata.uns[out_key]` if provided.
+    Stores the plotted matrix in `adata.uns[key_added]` if provided.
     """
     if topk_key not in adata.uns:
         raise KeyError(f"{topk_key!r} not found in adata.uns")
@@ -1404,8 +1408,8 @@ def metaprogram_rank1_composition_stackedbar(
     if show:
         plt.show()
 
-    if out_key:
-        adata.uns[out_key] = {
+    if key_added:
+        adata.uns[key_added] = {
             "params": dict(
                 topk_key=topk_key,
                 groupby=groupby,
@@ -1423,14 +1427,15 @@ def metaprogram_rank1_composition_stackedbar(
 ### Kaplan-Meier curves
 ###########################################################
 
+@renamed_kwargs(time_key="time_col", event_key="event_col", out_key="key_added")
 def km_univariate(
     adata: AnnData,
     *,
     x_key: str,
     x_source: Literal["auto", "obs", "gene"] = "auto",
     layer: str | None = None,
-    time_key: str,
-    event_key: str,
+    time_col: str,
+    event_col: str,
     group_col: str | None = "surv_group_1d",
     groupby_for_binning: Optional[str] = None,
     binning: str = "global",
@@ -1445,7 +1450,7 @@ def km_univariate(
     annotate_p: bool = True,
     show: bool = True,
     save: Optional[str] = None,
-    out_key: Optional[str] = "km_1d",
+    key_added: Optional[str] = "km_1d",
     force_rebin: bool = False,
     cleanup_tmp_cols: bool = True,
 
@@ -1550,8 +1555,8 @@ def km_univariate(
     )
 
     # also rebin if prior params mismatch
-    if (not need_rebin) and out_key and (out_key in adata.uns) and isinstance(adata.uns[out_key], dict):
-        prev = adata.uns[out_key].get("params", {})
+    if (not need_rebin) and key_added and (key_added in adata.uns) and isinstance(adata.uns[key_added], dict):
+        prev = adata.uns[key_added].get("params", {})
         # if previously binary vs quantile mode differs, rebin
         if prev.get("binary_direct") != bool(binary_direct):
             need_rebin = True
@@ -1591,8 +1596,8 @@ def km_univariate(
             surv_1d_bins(
                 adata,
                 x_key=x_obs_key,
-                time_key=time_key,
-                event_key=event_key,
+                time_col=time_col,
+                event_col=event_col,
                 groupby=groupby_for_binning,
                 binning=binning,
                 q=q,
@@ -1604,14 +1609,14 @@ def km_univariate(
 
     # Build plotting df
     obs = adata.obs
-    for k in [time_key, event_key, group_col]:
+    for k in [time_col, event_col, group_col]:
         if k not in obs:
             raise KeyError(f"{k!r} not found in adata.obs")
 
-    df = obs[[time_key, event_key, group_col]].copy()
-    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[time_key, event_key, group_col])
-    df = df[df[time_key].astype(float) > 0]
-    df[event_key] = df[event_key].astype(float).astype(int)
+    df = obs[[time_col, event_col, group_col]].copy()
+    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[time_col, event_col, group_col])
+    df = df[df[time_col].astype(float) > 0]
+    df[event_col] = df[event_col].astype(float).astype(int)
 
     # filter small groups
     sizes = df[group_col].value_counts()
@@ -1639,7 +1644,7 @@ def km_univariate(
         sub = df[df[group_col].astype(str) == str(g)]
         color = _pick_color(str(g), i, default=None)
         label = f"{g} (n={sub.shape[0]})"
-        kmf.fit(durations=sub[time_key], event_observed=sub[event_key], label=label)
+        kmf.fit(durations=sub[time_col], event_observed=sub[event_col], label=label)
         kmf.plot(ax=ax, ci_show=False, color=color)
 
     ax.set_xlabel("Time (days)")
@@ -1659,10 +1664,10 @@ def km_univariate(
             d1 = df[df[group_col].astype(str) == str(g1)]
             d2 = df[df[group_col].astype(str) == str(g2)]
             logrank_res = logrank_test(
-                d1[time_key],
-                d2[time_key],
-                event_observed_A=d1[event_key],
-                event_observed_B=d2[event_key],
+                d1[time_col],
+                d2[time_col],
+                event_observed_A=d1[event_col],
+                event_observed_B=d2[event_col],
             )
             if annotate_p:
                 p = float(logrank_res.p_value)
@@ -1677,14 +1682,14 @@ def km_univariate(
     if show:
         plt.show()
 
-    if out_key:
-        adata.uns[out_key] = {
+    if key_added:
+        adata.uns[key_added] = {
             "params": dict(
                 x_key=x_key,
                 x_source=x_src,
                 layer=layer,
-                time_key=time_key,
-                event_key=event_key,
+                time_key=time_col,
+                event_key=event_col,
                 group_col=group_col,
                 groupby_for_binning=groupby_for_binning,
                 binning=binning,
@@ -1711,6 +1716,7 @@ def km_univariate(
     return ax
 
 
+@renamed_kwargs(time_key="time_col", event_key="event_col", out_key="key_added")
 def km_2x2_interaction(
     adata,
     *,
@@ -1719,8 +1725,8 @@ def km_2x2_interaction(
     x_source: Literal["auto", "obs", "gene"] = "auto",
     z_source: Literal["auto", "obs", "gene"] = "auto",
     layer: str | None = None,
-    time_key: str,
-    event_key: str,
+    time_col: str,
+    event_col: str,
     group_col: str | None = "surv_group_2x2",
     groupby_for_binning: Optional[str] = None,
     binning: str = "global",  # "global" | "within_group"
@@ -1734,7 +1740,7 @@ def km_2x2_interaction(
     annotate_p: bool = True,
     show: bool = True,
     save: Optional[str] = None,
-    out_key: Optional[str] = "km_2x2",
+    key_added: Optional[str] = "km_2x2",
     force_rebin: bool = False,
     cleanup_tmp_cols: bool = True,
 
@@ -1836,8 +1842,8 @@ def km_2x2_interaction(
     )
 
     # Also rebin if prior params mismatch
-    if (not need_rebin) and out_key and (out_key in adata.uns) and isinstance(adata.uns[out_key], dict):
-        prev = adata.uns[out_key].get("params", {})
+    if (not need_rebin) and key_added and (key_added in adata.uns) and isinstance(adata.uns[key_added], dict):
+        prev = adata.uns[key_added].get("params", {})
         if (
             prev.get("x_key") != x_key
             or prev.get("z_key") != z_key
@@ -1894,8 +1900,8 @@ def km_2x2_interaction(
             surv_1d_bins(
                 adata,
                 x_key=x_obs_key,
-                time_key=time_key,
-                event_key=event_key,
+                time_col=time_col,
+                event_col=event_col,
                 groupby=groupby_for_binning,
                 binning=binning,
                 q=q,
@@ -1914,8 +1920,8 @@ def km_2x2_interaction(
             surv_1d_bins(
                 adata,
                 x_key=z_obs_key,
-                time_key=time_key,
-                event_key=event_key,
+                time_col=time_col,
+                event_col=event_col,
                 groupby=groupby_for_binning,
                 binning=binning,
                 q=q,
@@ -1942,14 +1948,14 @@ def km_2x2_interaction(
 
     # Build plotting df
     obs = adata.obs
-    for k in [time_key, event_key, group_col]:
+    for k in [time_col, event_col, group_col]:
         if k not in obs:
             raise KeyError(f"{k!r} not found in adata.obs")
 
-    df = obs[[time_key, event_key, group_col]].copy()
-    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[time_key, event_key, group_col])
-    df = df[df[time_key].astype(float) > 0]
-    df[event_key] = df[event_key].astype(float).astype(int)
+    df = obs[[time_col, event_col, group_col]].copy()
+    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[time_col, event_col, group_col])
+    df = df[df[time_col].astype(float) > 0]
+    df[event_col] = df[event_col].astype(float).astype(int)
 
     # filter small groups
     sizes = df[group_col].value_counts()
@@ -1969,7 +1975,7 @@ def km_2x2_interaction(
         sub = df[df[group_col].astype(str) == str(g)]
         color = _pick_color(str(g), i)
         label = f"{g} (n={sub.shape[0]})"
-        kmf.fit(durations=sub[time_key], event_observed=sub[event_key], label=label)
+        kmf.fit(durations=sub[time_col], event_observed=sub[event_col], label=label)
         kmf.plot(ax=ax, ci_show=False, color=color)
 
     ax.set_xlabel("Time (days)")
@@ -1986,9 +1992,9 @@ def km_2x2_interaction(
         try:
             from lifelines.statistics import multivariate_logrank_test
             res = multivariate_logrank_test(
-                df[time_key].astype(float),
+                df[time_col].astype(float),
                 df[group_col].astype(str),
-                df[event_key].astype(int),
+                df[event_col].astype(int),
             )
             logrank_p = float(res.p_value)
             if annotate_p:
@@ -2003,16 +2009,16 @@ def km_2x2_interaction(
     if show:
         plt.show()
 
-    if out_key:
-        adata.uns[out_key] = {
+    if key_added:
+        adata.uns[key_added] = {
             "params": dict(
                 x_key=x_key,
                 z_key=z_key,
                 x_source=x_src,
                 z_source=z_src,
                 layer=layer,
-                time_key=time_key,
-                event_key=event_key,
+                time_key=time_col,
+                event_key=event_col,
                 group_col=group_col,
                 groupby_for_binning=groupby_for_binning,
                 binning=binning,
