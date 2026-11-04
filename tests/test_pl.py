@@ -119,7 +119,7 @@ def test_no_removed_matplotlib_get_cmap():
     bad = [
         str(p.relative_to(root))
         for p in root.rglob("*.py")
-        if re.search(r"(?:mpl|matplotlib)\.cm\.get_cmap\(", p.read_text())
+        if re.search(r"(?:mpl|matplotlib)\.cm\.get_cmap\(", p.read_text(encoding="utf-8"))
     ]
     assert not bad, f"removed API mpl.cm.get_cmap still used in: {bad}"
 
@@ -236,7 +236,7 @@ def test_no_removed_boxplot_labels_argument():
     bad = [
         str(p.relative_to(root))
         for p in root.rglob("*.py")
-        if re.search(r"\.boxplot\([^\n]*\blabels=", p.read_text().replace("tick_labels=", ""))
+        if re.search(r"\.boxplot\([^\n]*\blabels=", p.read_text(encoding="utf-8").replace("tick_labels=", ""))
     ]
     assert not bad, f"removed boxplot(labels=) still used in: {bad}"
 
@@ -250,7 +250,7 @@ def test_every_figure_is_saved_through_the_shared_helper():
     bad = [
         str(p.relative_to(root))
         for p in root.rglob("*.py")
-        if p.name != "_style.py" and re.search(r"\.savefig\(", p.read_text())
+        if p.name != "_style.py" and re.search(r"\.savefig\(", p.read_text(encoding="utf-8"))
     ]
     assert not bad, f"call _savefig from pl._style instead of savefig in: {bad}"
 
@@ -263,7 +263,7 @@ def test_library_code_does_not_print():
     bad = [
         str(p.relative_to(root))
         for p in root.rglob("*.py")
-        if re.search(r"^\s+print\(", p.read_text(), flags=re.M)
+        if re.search(r"^\s+print\(", p.read_text(encoding="utf-8"), flags=re.M)
     ]
     assert not bad, f"use bullkpy.logging (info/warn) instead of print in: {bad}"
 

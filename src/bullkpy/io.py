@@ -245,7 +245,7 @@ def save_signature_bank(sig_bank: dict, outdir: str):
             "weights_tsv": w_path.name,
         }
 
-    with open(outdir / "sig_bank.json", "w") as f:
+    with open(outdir / "sig_bank.json", "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
 
     info(f"Saved {len(sig_bank)} signatures to: {outdir}")
@@ -265,7 +265,7 @@ def load_signature_bank(indir: str):
         :func:`evaluate_signatures_store` or :func:`benchmark_signatures_pr_auc`.
     """
     indir = Path(indir)
-    with open(indir / "sig_bank.json", "r") as f:
+    with open(indir / "sig_bank.json", "r", encoding="utf-8") as f:
         meta = json.load(f)
 
     sig_bank = {}

@@ -30,7 +30,7 @@ def test_docs_reference_only_existing_functions():
     api = _public_api()
     offenders = []
     for md in _markdown_files():
-        for m in _API_REF.finditer(md.read_text()):
+        for m in _API_REF.finditer(md.read_text(encoding="utf-8")):
             ref = f"{m.group(1)}.{m.group(2)}"
             if ref not in api:
                 offenders.append(f"{md.relative_to(ROOT)}: bk.{ref}")
@@ -41,7 +41,7 @@ def test_docs_reference_only_existing_images():
     available = {p.name for p in (DOCS / "_static").glob("*")}
     offenders = []
     for md in _markdown_files():
-        for m in _IMG_REF.finditer(md.read_text()):
+        for m in _IMG_REF.finditer(md.read_text(encoding="utf-8")):
             if m.group(1) not in available:
                 offenders.append(f"{md.relative_to(ROOT)}: _static/{m.group(1)}")
     assert not offenders, "docs reference missing images:\n" + "\n".join(sorted(set(offenders)))
@@ -51,14 +51,14 @@ def test_no_private_helpers_in_doc_examples():
     """Examples must show the public API, not underscore-prefixed internals."""
     offenders = []
     for md in _markdown_files():
-        for m in re.finditer(r"\bbk\.(?:pp|tl|pl|get|io|datasets)\._[A-Za-z0-9_]*", md.read_text()):
+        for m in re.finditer(r"\bbk\.(?:pp|tl|pl|get|io|datasets)\._[A-Za-z0-9_]*", md.read_text(encoding="utf-8")):
             offenders.append(f"{md.relative_to(ROOT)}: {m.group(0)}")
     assert not offenders, "docs use private helpers:\n" + "\n".join(sorted(set(offenders)))
 
 
 def _readme_python_blocks():
     import re
-    txt = (ROOT / "README.md").read_text()
+    txt = (ROOT / "README.md").read_text(encoding="utf-8")
     return re.findall(r"```python\n(.*?)```", txt, re.S)
 
 

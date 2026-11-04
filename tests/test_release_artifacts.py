@@ -22,7 +22,7 @@ MAX_PNG_WIDTH = 1400
 
 
 def _git(*args: str) -> str:
-    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, check=True, text=True).stdout
+    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, check=True, encoding="utf-8").stdout
 
 
 def _committed_notebooks() -> list[str]:
@@ -73,18 +73,16 @@ def test_committed_notebook_is_small_clean_and_fully_run(path):
 
 @needs_git
 def test_docs_tutorial_index_lists_exactly_the_committed_notebooks():
-    index = (ROOT / "docs" / "notebooks" / "index.md").read_text()
+    index = (ROOT / "docs" / "notebooks" / "index.md").read_text(encoding="utf-8")
     block = index.split("```{toctree}", 1)[1].split("```", 1)[0]
     listed = {line.strip().split("<")[-1].rstrip(">").strip() for line in block.splitlines() if line.strip() and not line.startswith(":")}
     assert listed == {pathlib.Path(p).stem for p in COMMITTED}
 
 
 def test_version_is_the_same_in_pyproject_citation_and_changelog():
-    import tomllib
-
-    version = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["version"]
-    cff = re.search(r"^version:\s*(\S+)", (ROOT / "CITATION.cff").read_text(), re.M).group(1)
-    first_release = re.search(r"^## \[(\d[^\]]*)\]", (ROOT / "CHANGELOG.md").read_text(), re.M).group(1)
+    version = re.search(r'^version = "([^"]+)"', (ROOT / "pyproject.toml").read_text(encoding="utf-8"), re.M).group(1)
+    cff = re.search(r"^version:\s*(\S+)", (ROOT / "CITATION.cff").read_text(encoding="utf-8"), re.M).group(1)
+    first_release = re.search(r"^## \[(\d[^\]]*)\]", (ROOT / "CHANGELOG.md").read_text(encoding="utf-8"), re.M).group(1)
     assert version == cff == first_release, (version, cff, first_release)
 
 
@@ -94,14 +92,12 @@ def test_dataset_checksums_match_the_local_manifest_when_there_is_one():
         pytest.skip("no local copy of the tutorial data")
     from bullkpy import datasets
 
-    rows = dict(line.split("\t")[::2] for line in manifest.read_text().splitlines()[1:] if line)
+    rows = dict(line.split("\t")[::2] for line in manifest.read_text(encoding="utf-8").splitlines()[1:] if line)
     for name, digest in datasets._FILES.items():
         assert rows.get(name) == digest, f"{name}: update bullkpy.datasets._FILES from the manifest"
 
 
 def test_extras_kept_for_backwards_compatibility_exist():
-    import tomllib
-
-    extras = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["optional-dependencies"]
-    assert {"umap", "leiden", "network"} <= set(extras)
-    assert not extras["umap"] and not extras["leiden"] and not extras["network"], "these extras should install nothing"
+    text = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    for name in ("umap", "leiden", "network"):
+        assert re.search(rf"^{name} = \[\]", text, re.M), f"extra {name!r} should exist and install nothing"

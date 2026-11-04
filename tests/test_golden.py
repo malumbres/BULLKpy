@@ -24,4 +24,4 @@ def _compare(actual, expected, path=""):
 
 
 def test_numeric_results_are_unchanged(adata, genes):
-    _compare(compute(adata, genes), json.loads(GOLDEN.read_text()))
+    _compare(compute(adata, genes), json.loads(GOLDEN.read_text(encoding="utf-8")))
