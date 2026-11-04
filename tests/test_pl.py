@@ -363,6 +363,7 @@ def _dot_adata(n_groups, n_genes, n=240, seed=0):
 
 
 def _inside_figure(fig, tol=0.03):
+    fig.canvas.draw()  # let constrained layout settle after the last artists were added
     bb = fig.get_tightbbox(fig.canvas.get_renderer())
     w, h = fig.get_size_inches()
     return bb.x0 >= -tol and bb.y0 >= -tol and bb.x1 <= w + tol and bb.y1 <= h + tol
@@ -496,4 +497,50 @@ def test_widening_for_the_colorbar_keeps_every_axes_the_same_size_in_inches():
     assert g.fig.get_size_inches()[0] > before_w, "long labels must widen the figure"
     heat = g.fig.axes.index(g.ax_heatmap)
     assert after[heat] == pytest.approx(before[heat], abs=1e-6), "the heatmap must not shrink when the figure widens"
+    plt.close("all")
+
+
+# ------------------------------------------------------- dotplot_association layout
+def _assoc_df(genes, groups, seed=0):
+    import numpy as np
+    import pandas as pd
+
+    r = np.random.default_rng(seed)
+    rows = [(g, k, r.normal(0, 0.3), 10 ** -r.uniform(0.5, 12)) for g in genes for k in groups]
+    return pd.DataFrame(rows, columns=["gene", "groupby", "effect", "qval"])
+
+
+@pytest.mark.parametrize("n_genes,n_groups", [(2, 2), (8, 4), (30, 6), (1, 3)])
+def test_dotplot_association_leaves_room_around_the_dots(n_genes, n_groups):
+    d = _assoc_df([f"G{i}" for i in range(n_genes)], [f"c{j}" for j in range(n_groups)])
+    fig, ax = bk.pl.dotplot_association(d, feature_col="gene", show=False)
+    x0, x1 = ax.get_xlim()
+    y_top, y_bot = ax.get_ylim()[1], ax.get_ylim()[0]
+    assert x0 < -0.3 and x1 > n_groups - 1 + 0.3, "no empty margin left/right of the outermost dots"
+    assert min(y_top, y_bot) < -0.3 and max(y_top, y_bot) > n_genes - 1 + 0.3, "no margin above/below the dots"
+    # every dot fits inside its cell, so none is clipped by the frame
+    fig.canvas.draw()
+    box = ax.get_window_extent()
+    cell_pt = min(box.width / (n_groups - 1 + 1.4), box.height / (n_genes - 1 + 1.4)) * 72 / fig.dpi
+    largest = max(float(s_.max()) for coll in ax.collections if len(s_ := coll.get_sizes()))
+    assert largest ** 0.5 <= cell_pt + 0.5
+    # legend and colour bar are present and the whole figure is inside the canvas
+    assert fig.legends and fig.legends[0].get_title().get_text().startswith("-log10")
+    assert _inside_figure(fig)
+    plt.close("all")
+
+
+def test_dotplot_association_too_small_figsize_grows():
+    d = _assoc_df(["DLL3", "SOX2"], ["Gender", "Project_ID"])
+    fig, ax = bk.pl.dotplot_association(d, feature_col="gene", figsize=(2, 2), show=False)
+    w, h = fig.get_size_inches()
+    assert w > 2.0 and h > 2.0 and _inside_figure(fig)
+    plt.close("all")
+
+
+def test_dotplot_association_into_a_given_axes_and_missing_cells():
+    d = _assoc_df(["A", "B", "C"], ["x", "y"]).drop(index=[1])
+    fig, ax = plt.subplots(figsize=(4, 3))
+    out_fig, out_ax = bk.pl.dotplot_association(d, feature_col="gene", ax=ax, show=False)
+    assert out_ax is ax and ax.has_data()
     plt.close("all")

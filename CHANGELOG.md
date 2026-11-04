@@ -29,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   A `figsize=` too small for the labels and legends is enlarged, with a warning, instead of squashed.
   The size legend now follows `dot_max` and no longer shows the faint grid behind the dots.
 
+- `pl.dotplot_association()` leaves empty space around the outermost dots (`pad=`, default 0.7 cells),
+  caps dots to the size of their cell so none is clipped or overlaps, adds a size legend for
+  -log10(q) (it had none), keeps the colour bar to a sensible length, skips missing cells, and drops
+  the long default title. A `figsize` too small for the labels, colour bar and legend is enlarged with
+  a warning.
 - `pl.gene_panel_correlation_heatmap(cluster=True)` places the colour bar to the right of the row
   labels (measured after drawing, widening the figure if needed) instead of at a fixed position that
   long gene names ran under, and it now passes `vmin`/`vmax` to the clustermap. `cbar_pos=` is `None`
