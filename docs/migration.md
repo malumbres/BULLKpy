@@ -68,7 +68,7 @@ These were on the list and were left alone because changing them cannot be done 
 | Item | Why it was left as it is |
 |---|---|
 | One storage layout and key format for DE results (`uns["de"]["Project_ID_LUAD_vs_LUSC"]` vs `uns["de_glm"]["Subtype:LumB_vs_LumA"]`) | Code and notebooks index `adata.uns` directly, so a new key format cannot be aliased and would break them silently. Use `bk.get.de()`, which accepts both. |
-| One return type for plotting functions (now a mix of `(fig, ax)`, `fig`, `ax`, `ClusterGrid`, tuples with a table) | `fig, ax = bk.pl.x(...)` unpacking in user code would break with no way to warn. |
+| One return type for plotting functions (now a mix of `(fig, ax)`, `fig`, `ax`, `ClusterGrid`, tuples with a table) | `fig, ax = ...` unpacking of a plot call in user code would break with no way to warn. |
 | Merging the four PR-curve functions, `stability_barplot`/`stability_freq_bar`, `rankplot`/`rankplot_association`, `association_heatmap`/`heatmap_association`, the three redundancy filters, `cox_forest`/`cox_forest_from_uns` | They take different inputs or implement different algorithms, so merging changes behaviour. |
 | `make_obs_h5ad_safe_strict`, `make_var_h5ad_safe_strict`, `find_bad_*` vs `make_h5ad_safe` | The strict variants coerce more aggressively and return a report; `make_h5ad_safe` is the recommended default. |
 | `layer_expr` vs `layer_counts` in `tl.de`, `copy` vs `inplace` | Each pair means two different things. |
