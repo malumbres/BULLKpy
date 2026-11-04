@@ -504,14 +504,6 @@ def metaprogram_heatmap(
 
 
 
-# Backward-compatible names for your requested API
-def metaprogram_heatmap_plot(*args, **kwargs):
-    return metaprogram_heatmap(*args, **kwargs)
-
-def metaprogram_corr_plot(*args, **kwargs):
-    return metaprogram_corr(*args, **kwargs)
-
-
 ##########################
 ### NEW METAPROGRAMS
 ##########################

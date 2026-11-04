@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import anndata as ad
 
 from ._style import set_style, _savefig
+from ._de_utils import get_de_table
 
 
 def _get_de_table(
@@ -26,7 +27,7 @@ def _get_de_table(
         uns_key = "de"
     if contrast is None:
         raise ValueError("When using `adata`, you must provide `contrast=`.")
-    return adata.uns[uns_key][contrast]["results"]
+    return get_de_table(adata, uns_key=uns_key, contrast=contrast)
 
 
 
