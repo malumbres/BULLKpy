@@ -458,3 +458,42 @@ def test_dotplot_small_figsize_grows_and_titles_can_be_omitted(caplog):
     assert not any("Mean expression" in t.get_text() for t in fig.texts)
     assert not ax.xaxis.get_gridlines()[0].get_visible()
     plt.close("all")
+
+
+def test_clustered_gene_panel_colorbar_clears_long_row_labels(adata):
+    names = [f"A_VERY_LONG_GENE_NAME_{i:03d}" for i in range(adata.n_vars)]
+    adata.var_names = names
+    dfC, fig, g = bk.pl.gene_panel_correlation_heatmap(adata, genes=names[:8], cluster=True, show=False)
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    heat = g.ax_heatmap.get_tightbbox(renderer)  # includes the row labels on the right
+    bar = g.cax.get_window_extent(renderer)
+    assert bar.x0 >= heat.x1 - 1, "the colour bar overlaps the row labels"
+    assert fig.get_tightbbox(renderer).x1 <= fig.get_size_inches()[0] + 0.03, "colour bar falls outside the figure"
+    assert g.cax.get_ylim() == (-1.0, 1.0), "vmin/vmax must reach the clustermap"
+    plt.close("all")
+
+
+def test_widening_for_the_colorbar_keeps_every_axes_the_same_size_in_inches():
+    import numpy as np
+    import pandas as pd
+    import seaborn as sns
+
+    from bullkpy.pl.corr_heatmap import _place_clustermap_colorbar
+
+    names = [f"A_VERY_LONG_GENE_NAME_{i:03d}" for i in range(8)]
+    C = pd.DataFrame(np.corrcoef(np.random.default_rng(0).normal(size=(40, 8)), rowvar=False), index=names, columns=names)
+    g = sns.clustermap(C, figsize=(3, 3), cbar_pos=(0.02, 0.8, 0.05, 0.18))
+
+    def sizes():
+        w, h = g.fig.get_size_inches()
+        return [(a.get_position().width * w, a.get_position().height * h) for a in g.fig.axes]
+
+    before_w = g.fig.get_size_inches()[0]
+    before = sizes()
+    _place_clustermap_colorbar(g)
+    after = sizes()
+    assert g.fig.get_size_inches()[0] > before_w, "long labels must widen the figure"
+    heat = g.fig.axes.index(g.ax_heatmap)
+    assert after[heat] == pytest.approx(before[heat], abs=1e-6), "the heatmap must not shrink when the figure widens"
+    plt.close("all")

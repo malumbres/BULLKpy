@@ -29,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   A `figsize=` too small for the labels and legends is enlarged, with a warning, instead of squashed.
   The size legend now follows `dot_max` and no longer shows the faint grid behind the dots.
 
+- `pl.gene_panel_correlation_heatmap(cluster=True)` places the colour bar to the right of the row
+  labels (measured after drawing, widening the figure if needed) instead of at a fixed position that
+  long gene names ran under, and it now passes `vmin`/`vmax` to the clustermap. `cbar_pos=` is `None`
+  by default (automatic); a tuple still sets it by hand. The title sits above the dendrogram.
+
 ### Fixed
 - `tl.gene_gene_correlations(batch_mode="meta")` crashed on NumPy 2 (`np.math` was removed).
 - `pl.violin()` and `pl.gene_association()` no longer trigger seaborn's "palette without hue"
