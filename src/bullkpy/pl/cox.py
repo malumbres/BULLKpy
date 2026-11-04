@@ -11,6 +11,7 @@ from anndata import AnnData
 from ._style import set_style, _savefig
 from .._genes import gene_loc as _gene_loc
 from .._compat import group_labels as _group_labels
+from ..logging import info, warn
 
 
 
@@ -945,7 +946,7 @@ def stability_freq_bar(
 
     fig.tight_layout()
     if save is not None:
-        fig.savefig(save, bbox_inches="tight", dpi=300)
+        _savefig(fig, save, dpi=300)
     if show:
         plt.show()
 
@@ -1162,7 +1163,7 @@ def cox_forest_from_uns(
 
         plt.tight_layout()
         if save:
-            fig.savefig(save, bbox_inches="tight")
+            _savefig(fig, save)
         if show:
             plt.show()
         return ax
@@ -1224,7 +1225,7 @@ def cox_forest_from_uns(
 
     plt.tight_layout()
     if save:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return ax
@@ -1272,7 +1273,7 @@ def run_cox_per_group(
         idx = list(idx)
         if len(idx) < int(min_n):
             if verbose:
-                print(f"[SKIP] {grp}: n={len(idx)} < min_n={min_n}")
+                info(f"{grp}: n={len(idx)} < min_n={min_n}")
             continue
 
         ad = adata[idx].copy()
@@ -1281,14 +1282,14 @@ def run_cox_per_group(
         missing_cols = [k for k in (time_key, event_key) if k not in ad.obs.columns]
         if missing_cols:
             if verbose:
-                print(f"[WARN] {grp}: missing {missing_cols} -> skipped")
+                warn(f"{grp}: missing {missing_cols} -> skipped")
             continue
 
         # within-group: strata cannot be the same as group_col
         strata_eff = strata
         if strata_eff is not None and str(strata_eff) == str(group_col):
             if verbose:
-                print(f"[WARN] {grp}: strata==group_col inside subset -> setting strata=None")
+                warn(f"{grp}: strata==group_col inside subset -> setting strata=None")
             strata_eff = None
 
         out_key = f"{out_key_prefix}{grp}"
@@ -1308,16 +1309,16 @@ def run_cox_per_group(
             payload = ad.uns.get(out_key, None)
             if payload is None:
                 if verbose:
-                    print(f"[WARN] {grp}: no payload found at ad.uns[{out_key!r}]")
+                    warn(f"{grp}: no payload found at ad.uns[{out_key!r}]")
                 continue
 
             results[grp] = payload
             if verbose:
-                print(f"[OK] {grp}: n={len(idx)} stored '{out_key}'")
+                info(f"{grp}: n={len(idx)} stored '{out_key}'")
 
         except Exception as e:
             if verbose:
-                print(f"[WARN] {grp}: {type(e).__name__}: {e}")
+                warn(f"{grp}: {type(e).__name__}: {e}")
 
     return results
 
@@ -1399,7 +1400,7 @@ def metaprogram_rank1_composition_stackedbar(
     plt.tight_layout()
 
     if save:
-        plt.savefig(save, bbox_inches="tight")
+        _savefig(plt.gcf(), save)
     if show:
         plt.show()
 
@@ -1619,7 +1620,7 @@ def km_univariate(
 
     if len(keep_groups) < 2:
         # warn early; still plot what exists
-        print(f"[WARN] km_univariate: only {len(keep_groups)} group(s) remain after min_n={min_n}. sizes={sizes.to_dict()}")
+        warn(f"km_univariate: only {len(keep_groups)} group(s) remain after min_n={min_n}. sizes={sizes.to_dict()}")
 
     # Order + colors
     if binary_direct:
@@ -1672,7 +1673,7 @@ def km_univariate(
 
     plt.tight_layout()
     if save:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
 
@@ -1956,7 +1957,7 @@ def km_2x2_interaction(
     df = df[df[group_col].isin(keep_groups)].copy()
 
     if len(keep_groups) < 2:
-        print(f"[WARN] km_2x2_interaction: only {len(keep_groups)} group(s) remain after min_n={min_n}. sizes={sizes.to_dict()}")
+        warn(f"km_2x2_interaction: only {len(keep_groups)} group(s) remain after min_n={min_n}. sizes={sizes.to_dict()}")
 
     canonical = ["X_low & Z_low", "X_low & Z_high", "X_high & Z_low", "X_high & Z_high"]
     order = [g for g in canonical if g in keep_groups] + [g for g in keep_groups if g not in canonical]
@@ -1998,7 +1999,7 @@ def km_2x2_interaction(
 
     plt.tight_layout()
     if save:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
 

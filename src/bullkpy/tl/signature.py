@@ -100,7 +100,7 @@ def filter_genes_var(
     if top_var is not None and df.shape[0] > int(top_var):
         df = df.head(int(top_var)).copy()
 
-    print(f"Basic filter: kept {df.shape[0]} genes (min_var={min_var}, top_var={top_var})")
+    info(f"Basic filter: kept {df.shape[0]} genes (min_var={min_var}, top_var={top_var})")
 
     return df
 
@@ -280,7 +280,7 @@ def gene_corr_redundancy(
     df_audit["keep"] = df_audit["gene"].astype(str).isin(kept_set)
 
     # Add a quick summary
-    print(f"Redundancy filter (audit): {len(genes_ranked)} -> {len(kept)} genes (thr={corr_threshold})")
+    info(f"Redundancy filter (audit): {len(genes_ranked)} -> {len(kept)} genes (thr={corr_threshold})")
 
     return df_audit, kept
 
@@ -2898,7 +2898,7 @@ def build_signature_bank_from_genes(
             if on_missing == "raise":
                 raise ValueError(msg)
             else:
-                print("WARNING:", msg)
+                warn(msg)
                 continue
 
         # IMPORTANT: pass genes_in_train (not genes_req) to avoid _build_Xy crashing
@@ -2997,7 +2997,7 @@ def save_signature_bank(sig_bank: dict, outdir: str):
     with open(outdir / "sig_bank.json", "w") as f:
         json.dump(meta, f, indent=2)
 
-    print(f"Saved {len(sig_bank)} signatures to: {outdir}")
+    info(f"Saved {len(sig_bank)} signatures to: {outdir}")
 
 
 def load_signature_bank(indir: str):

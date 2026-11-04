@@ -89,19 +89,14 @@ def set_style(figsize: tuple[float, float] | None = None) -> None:
     sns.set_palette(settings.plot_palette)
 
 
-def _savefig(fig: plt.Figure, path: str | Path) -> None:
+def _savefig(fig: plt.Figure, path: str | Path, *, dpi: int | None = None) -> None:
     """
-    Save figure at ``bk.settings.plot_dpi``, creating parent folders.
+    Save a figure, creating parent folders. Uses ``bk.settings.plot_dpi`` unless ``dpi``
+    is given. Every plotting function saves through here.
     """
     path = Path(path)
-    if not path.parent.exists():
-        path.parent.mkdir(parents=True, exist_ok=True)
-
-    fig.savefig(
-        path,
-        dpi=settings.plot_dpi,
-        bbox_inches="tight",
-    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(path, dpi=settings.plot_dpi if dpi is None else dpi, bbox_inches="tight")
 
 def get_palette(n: int | None = None, palette: str | None = None):
     """

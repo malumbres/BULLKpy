@@ -44,6 +44,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Functions that read an expression layer now raise `KeyError` when the named layer does
   not exist. Several used to fall back to `adata.X` silently, which analysed a different
   quantity (for example raw counts instead of log-CPM) without any message.
+- All plotting functions save through one helper, so `bk.settings.plot_dpi` applies
+  everywhere (several used the matplotlib default, a few a fixed 300 dpi). Library code
+  logs through `bullkpy.logging` instead of `print`.
+- Removed dead modules (`tl/cluster_metrics.py`, `plotting/`, the shadowed `_settings.py`)
+  and duplicate definitions that were never exported.
 - Seven copies of the matrix getter and five of `_as_list` are now one implementation each
   (`bullkpy._matrix`).
 

@@ -240,3 +240,36 @@ def test_no_removed_boxplot_labels_argument():
         if re.search(r"\.boxplot\([^\n]*\blabels=", p.read_text().replace("tick_labels=", ""))
     ]
     assert not bad, f"removed boxplot(labels=) still used in: {bad}"
+
+
+def test_every_figure_is_saved_through_the_shared_helper():
+    # One save path means one dpi rule (bk.settings.plot_dpi) and one place to fix bugs.
+    import pathlib
+    import re
+
+    root = pathlib.Path(bk.__file__).parent
+    bad = [
+        str(p.relative_to(root))
+        for p in root.rglob("*.py")
+        if p.name != "_style.py" and re.search(r"\.savefig\(", p.read_text())
+    ]
+    assert not bad, f"call _savefig from pl._style instead of savefig in: {bad}"
+
+
+def test_library_code_does_not_print():
+    import pathlib
+    import re
+
+    root = pathlib.Path(bk.__file__).parent
+    bad = [
+        str(p.relative_to(root))
+        for p in root.rglob("*.py")
+        if re.search(r"^\s+print\(", p.read_text(), flags=re.M)
+    ]
+    assert not bad, f"use bullkpy.logging (info/warn) instead of print in: {bad}"
+
+
+def test_plot_save_writes_a_file(adata_pca, tmp_path):
+    out = tmp_path / "sub" / "pca.png"
+    bk.pl.pca_scatter(adata_pca, color="Subtype", save=out, show=False)
+    assert out.exists() and out.stat().st_size > 0

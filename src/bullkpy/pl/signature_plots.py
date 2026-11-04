@@ -10,6 +10,7 @@ from anndata import AnnData
 
 
 from sklearn.metrics import precision_recall_curve, average_precision_score
+from ._style import _savefig
 
 
 
@@ -63,7 +64,7 @@ def auc_cv_heatmap(
 
     fig.tight_layout()
     if save is not None:
-        fig.savefig(save, bbox_inches="tight", dpi=300)
+        _savefig(fig, save, dpi=300)
     if show:
         plt.show()
     return fig, ax, piv
@@ -815,7 +816,7 @@ def signature_dispersion_heatmap(
     fig.colorbar(im, ax=ax, fraction=0.03, pad=0.02)
 
     if save is not None:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return ax

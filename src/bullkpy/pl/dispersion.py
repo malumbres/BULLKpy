@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from anndata import AnnData
+from ._style import _savefig
 
 # Optional scipy for clustering/dendrogram ordering
 try:
@@ -55,7 +56,7 @@ def axis_vs_dispersion(
     ax.set_title(title or f"{axis_key} vs {dispersion_key}")
 
     if save is not None:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return ax
@@ -90,7 +91,7 @@ def dispersion_summary(
     ax.tick_params(axis="x", labelrotation=90)
 
     if save is not None:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return ax
@@ -561,7 +562,7 @@ def metaprogram_dispersion_heatmap(
     cbar.set_label("Dispersion (MAD)", fontsize=8)
 
     if save:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return ax
@@ -613,7 +614,7 @@ def metaprogram_metrics_summary(
     plt.tight_layout()
 
     if save:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return axes
@@ -661,7 +662,7 @@ def metaprogram_ne_scatter(
     ax.set_title(title or f"{ne_key} vs {x_key}")
 
     if save:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return ax
@@ -766,7 +767,7 @@ def metaprogram_dominance_ridgeplot_like(
 
     plt.tight_layout()
     if save:
-        plt.savefig(save, bbox_inches="tight")
+        _savefig(plt.gcf(), save)
     if show:
         plt.show()
 

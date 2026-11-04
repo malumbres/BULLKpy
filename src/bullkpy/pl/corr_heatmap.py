@@ -389,7 +389,7 @@ def gene_panel_correlation_heatmap(
         if save is not None:
             # NOTE: bbox_inches="tight" can override manual axis positions.
             # Use bbox_inches=None to preserve exact cbar_pos.
-            g.fig.savefig(save, dpi=300)  # <-- no bbox_inches="tight"
+            _savefig(g.fig, save, dpi=300)
         if show:
             plt.show()
 
@@ -420,7 +420,7 @@ def gene_panel_correlation_heatmap(
     fig.tight_layout()
 
     if save is not None:
-        fig.savefig(save, bbox_inches="tight", dpi=300)
+        _savefig(fig, save, dpi=300)
     if show:
         plt.show()
 
