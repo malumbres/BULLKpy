@@ -171,3 +171,13 @@ def test_survival_binning_works_on_an_anndata_view(adata):
         view, x_key="score_x", z_key="score_z", time_key="OS_time", event_key="OS_event",
         q=(0.5, 0.5), min_n=1, force_rebin=True, show=False,
     )
+
+
+def test_unknown_palette_warns_and_falls_back(caplog):
+    import logging
+
+    from bullkpy.pl._colors import categorical_palette
+
+    with caplog.at_level(logging.WARNING):
+        cols = categorical_palette(["a", "b"], "Set20")
+    assert set(cols) == {"a", "b"} and all(c.startswith("#") for c in cols.values())

@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Sequence
 
 import numpy as np
 import pandas as pd
 import scipy.sparse as sp
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-from matplotlib.colors import to_hex
 import anndata as ad
 
 from ..logging import warn
@@ -16,6 +13,7 @@ from ..pl._style import set_style, _savefig
 from .._compat import is_categorical_like
 from .._genes import gene_loc as _gene_loc
 from .._matrix import as_list as _as_list
+from ._colors import categorical_palette as _categorical_palette
 
 try:
     import seaborn as sns
@@ -34,23 +32,6 @@ def _pc_label(adata: ad.AnnData, pc_index_0: int, *, key: str = "pca") -> str:
     except Exception:
         pass
     return f"PC{pc}"
-
-
-def _categorical_palette(categories: Sequence[str], palette: str = "Set1") -> dict[str, str]:
-    cats = [str(c) for c in categories]
-    n = len(cats)
-
-    # seaborn palettes are usually nicer and can go > 20 colors (e.g., husl)
-    if sns is not None:
-        try:
-            cols = sns.color_palette(palette, n_colors=n)
-            return {cats[i]: to_hex(cols[i]) for i in range(n)}
-        except Exception:
-            pass
-
-    # fallback to matplotlib colormap
-    cmap = mpl.colormaps.get_cmap(palette) if palette in plt.colormaps() else mpl.colormaps.get_cmap("tab20")
-    return {cats[i]: to_hex(cmap(i / max(n - 1, 1))) for i in range(n)}
 
 
 def _get_gene_vector(adata: ad.AnnData, gene: str, *, layer: str | None) -> np.ndarray:

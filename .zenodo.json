@@ -1,0 +1,40 @@
+{
+  "title": "BULLKpy: an AnnData-based framework for bulk transcriptomic analysis",
+  "upload_type": "software",
+  "description": "BULLKpy is a Scanpy-style Python framework for bulk RNA-seq and other bulk omics data. A cohort is kept in one AnnData object (samples x genes, with clinical metadata in .obs) and analysed with preprocessing, tools, plotting and accessor modules: quality control, normalisation, PCA/UMAP, clustering, differential expression, preranked GSEA, gene-signature scoring, metaprogram heterogeneity, association screens and Cox survival models.",
+  "creators": [
+    {
+      "name": "Malumbres, Marcos",
+      "affiliation": "Vall d'Hebron Institute of Oncology (VHIO)",
+      "orcid": "0000-0002-0829-6315"
+    }
+  ],
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "bulk RNA-seq",
+    "transcriptomics",
+    "AnnData",
+    "Scanpy",
+    "TCGA",
+    "survival analysis",
+    "gene set enrichment"
+  ],
+  "access_right": "open",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/malumbres/BULLKpy",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://bullkpy.readthedocs.io/en/latest/",
+      "relation": "isDocumentedBy",
+      "scheme": "url"
+    },
+    {
+      "identifier": "10.64898/2026.01.26.701768",
+      "relation": "isDescribedBy",
+      "scheme": "doi"
+    }
+  ]
+}

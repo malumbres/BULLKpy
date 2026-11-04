@@ -49,6 +49,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   logs through `bullkpy.logging` instead of `print`.
 - Removed dead modules (`tl/cluster_metrics.py`, `plotting/`, the shadowed `_settings.py`)
   and duplicate definitions that were never exported.
+- Importing `bullkpy` in Jupyter no longer runs `%matplotlib inline` or changes the inline
+  backend's settings. An unknown palette name now logs a warning before falling back.
+- Added `.zenodo.json` and the author ORCID, so the Zenodo archive gets the right metadata.
 - Seven copies of the matrix getter and five of `_as_list` are now one implementation each
   (`bullkpy._matrix`).
 
