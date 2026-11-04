@@ -15,11 +15,12 @@ except Exception:  # pragma: no cover
     stats = None
 
 from ..logging import info
-from .._genes import gene_loc as _gene_loc, gene_indexer as _gene_indexer
+from .._genes import gene_indexer as _gene_indexer
 from .._stats import bh_fdr as _bh_fdr
 from .._compat import group_labels as _group_labels
 from functools import partial
 from .._matrix import get_matrix as _get_matrix_impl
+from .._matrix import get_gene_vector as _get_gene_vector
 
 
 
@@ -32,17 +33,6 @@ _get_matrix = partial(_get_matrix_impl, dense=False)  # sparse stays sparse
 def _require_scipy() -> None:
     if stats is None:
         raise ImportError("associations requires scipy. Please install scipy.")
-
-
-def _get_gene_vector(adata: ad.AnnData, gene: str, layer: str | None = None) -> np.ndarray:
-    """Return expression vector for one gene (n_obs,)."""
-    if gene not in adata.var_names:
-        raise KeyError(f"Gene '{gene}' not in adata.var_names.")
-    X = _get_matrix(adata, layer=layer)
-    j = int(_gene_loc(adata, gene))
-    if sp.issparse(X):
-        return np.asarray(X[:, j].toarray()).ravel().astype(float)
-    return np.asarray(X[:, j], dtype=float).ravel()
 
 
 def _as_categorical(s: pd.Series) -> pd.Categorical:

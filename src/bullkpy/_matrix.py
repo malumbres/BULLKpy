@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import scipy.sparse as sp
 
-__all__ = ["get_matrix", "as_list"]
+__all__ = ["get_matrix", "get_gene_vector", "as_list"]
 
 
 def get_matrix(
@@ -53,3 +53,15 @@ def as_list(x, *, empty_if_none: bool = False) -> list | None:
     if isinstance(x, (list, tuple, set, np.ndarray, pd.Index)):
         return list(x)
     return [x]
+
+
+def get_gene_vector(adata, gene: str, layer: str | None = None) -> np.ndarray:
+    """Expression of one gene across samples as a float vector (n_obs,)."""
+    from ._genes import gene_loc
+
+    if gene not in adata.var_names:
+        raise KeyError(f"Gene {gene!r} not in adata.var_names")
+    X = get_matrix(adata, layer, dense=False)
+    v = X[:, gene_loc(adata, gene)]
+    v = v.toarray() if sp.issparse(v) else v
+    return np.asarray(v, dtype=float).ravel()

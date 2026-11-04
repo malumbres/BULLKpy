@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 from .._genes import gene_loc as _gene_loc
 from .._stats import bh_fdr as _bh_fdr
 from .._matrix import as_list as _as_list_impl
+from .._matrix import get_gene_vector as _get_gene_vector
 
 
 
@@ -40,14 +41,6 @@ def _get_layer_matrix(adata: ad.AnnData, layer: str | None) -> np.ndarray:
     if sp.issparse(X):
         X = X.toarray()
     return np.asarray(X, dtype=float)
-
-
-def _get_gene_vector(adata: ad.AnnData, gene: str, *, layer: str | None) -> np.ndarray:
-    if gene not in adata.var_names:
-        raise KeyError(f"Gene '{gene}' not in adata.var_names")
-    X = _get_layer_matrix(adata, layer)
-    j = _gene_loc(adata, gene)
-    return np.asarray(X[:, j], dtype=float).ravel()
 
 
 def _numeric_obs_df(adata: ad.AnnData, *, obs_keys: list[str] | None = None) -> pd.DataFrame:

@@ -7,14 +7,11 @@ import scipy.sparse as sp
 import anndata as ad
 
 from ..logging import info, warn
+from functools import partial
+from .._matrix import get_matrix as _get_matrix_impl
 
 
-def _get_X(adata: ad.AnnData, layer: str | None) -> sp.spmatrix | np.ndarray:
-    if layer is None:
-        return adata.X
-    if layer in adata.layers:
-        return adata.layers[layer]
-    raise KeyError(f"layer='{layer}' not found in adata.layers")
+_get_X = partial(_get_matrix_impl, dense=False)
 
 
 def _as_1d(a) -> np.ndarray:

@@ -5,11 +5,16 @@ import re
 import numpy as np
 import pandas as pd
 from anndata import AnnData
+from .._matrix import get_matrix as _get_matrix_impl
 
 
 # -----------------------------
 # Internal helpers
 # -----------------------------
+def _get_X(adata, layer="log1p_cpm"):
+    return _get_matrix_impl(adata, layer, dense=False)
+
+
 def _to_dense(X) -> np.ndarray:
     if hasattr(X, "toarray"):
         return X.toarray()
@@ -408,10 +413,6 @@ def read_metaprograms_xlsx(
     return mp
 
 
-
-def _get_X(adata, layer="log1p_cpm"):
-    X = adata.layers[layer] if (layer is not None and layer in getattr(adata, "layers", {})) else adata.X
-    return X
 
 def _dense(M):
     return M.toarray() if hasattr(M, "toarray") else np.asarray(M, float)

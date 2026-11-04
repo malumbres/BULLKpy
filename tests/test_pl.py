@@ -100,11 +100,10 @@ def test_umap_plot(adata_pca):
 def test_categorical_palette_unknown_name_falls_back():
     # An unrecognised palette name takes the matplotlib fallback branch, which
     # called mpl.cm.get_cmap -- removed in matplotlib 3.9.
-    import importlib
+    from bullkpy.pl._colors import categorical_palette
 
-    for mod in ("bullkpy.pl.umap", "bullkpy.pl.pca"):
-        cols = importlib.import_module(mod)._categorical_palette(["a", "b", "c"], "NotAPalette")
-        assert set(cols) == {"a", "b", "c"}
+    cols = categorical_palette(["a", "b", "c"], "NotAPalette")
+    assert set(cols) == {"a", "b", "c"}
 
 
 def test_pca_scatter_unknown_palette_falls_back(adata_pca):
