@@ -191,6 +191,9 @@ def add_metadata(
         right_index=True,
         how=how,
     )
+    # A wide table arrives with one internal block per column; later inserts into it
+    # (QC metrics, group labels) would each warn about fragmentation. One copy fixes it.
+    adata.obs = adata.obs.copy()
 
     return adata
 

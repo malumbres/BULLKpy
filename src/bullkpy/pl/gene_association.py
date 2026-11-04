@@ -12,6 +12,7 @@ import anndata as ad
 from scipy import stats
 
 from ..logging import warn
+from ._colors import positional_palette
 from ._style import set_style, _savefig
 from ..tl.posthoc import pairwise_posthoc
 from .._genes import gene_loc as _gene_loc
@@ -129,11 +130,13 @@ def gene_association(
         y = _get_gene_vector(adata, g, layer=layer)
         df = pd.DataFrame({"y": y, "grp": grp.values})
         df["grp"] = pd.Categorical(df["grp"], categories=cats, ordered=True)
+        df_plot = df.assign(grp=df["grp"].astype(str))   # string x + explicit order: correct palette mapping
+        shown = [str(c) for c in cats]
 
         if kind == "violin":
-            sns.violinplot(data=df, x="grp", y="y", ax=ax, cut=0, inner="quartile", palette=palette)
+            sns.violinplot(data=df_plot, x="grp", y="y", hue="grp", order=shown, hue_order=shown, dodge=False, legend=False, ax=ax, cut=0, inner="quartile", palette=positional_palette(palette, shown))
         else:
-            sns.boxplot(data=df, x="grp", y="y", ax=ax, palette=palette)
+            sns.boxplot(data=df_plot, x="grp", y="y", hue="grp", order=shown, hue_order=shown, dodge=False, legend=False, ax=ax, palette=positional_palette(palette, shown))
 
         if show_points:
             sns.stripplot(

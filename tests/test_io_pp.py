@@ -322,3 +322,22 @@ def test_make_h5ad_safe_can_skip_dtype_repair(adata):
     a.obs["mixed"] = ["x"] * (a.n_obs - 1) + [np.nan]
     rep = bk.pp.make_h5ad_safe(a, dtypes=False, verbose=False)
     assert "dtypes" not in rep
+
+
+def test_add_metadata_does_not_leave_the_obs_table_fragmented(counts_file, tmp_path):
+    import warnings
+
+    import numpy as np
+    import pandas as pd
+
+    import bullkpy as bk
+
+    a = bk.io.read_counts(counts_file, orientation="genes_by_samples")
+    wide = pd.DataFrame({f"c{i}": np.arange(a.n_obs, dtype=float) for i in range(300)}, index=a.obs_names)
+    p = tmp_path / "wide.tsv"
+    wide.to_csv(p, sep="\t", index_label="sample")
+    bk.io.add_metadata(a, p, index_col="sample")
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", pd.errors.PerformanceWarning)
+        for i in range(5):
+            a.obs[f"added{i}"] = 1.0
