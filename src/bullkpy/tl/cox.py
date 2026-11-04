@@ -2006,3 +2006,95 @@ def surv_2x2_bins(
 
     return ad if copy else None
 
+
+@renamed_kwargs(time_key="time_col", event_key="event_col", group_col="groupby")
+def run_cox_per_group(
+    adata,
+    *,
+    groupby: str,
+    min_n: int = 30,
+    dropna_group: bool = True,
+    time_col: str,
+    event_col: str,
+    x_keys,
+    x_mode: str = "continuous",
+    strata: str | None = None,
+    out_key_prefix: str = "cox_",
+    verbose: bool = True,
+    **cox_kwargs,
+):
+    """
+    Run tl.cox_univariate() separately within each level of `groupby`.
+
+    Returns dict:
+      {group_value: payload_dict}  where payload_dict is the same object stored in adata.uns[out_key].
+    """
+
+    # IMPORTANT: import the function directly (no 'bk' global)
+    # Adjust the relative import to your actual module layout:
+    from ..tl.cox import cox_univariate
+
+    if groupby not in adata.obs.columns:
+        raise KeyError(f"group_col='{groupby}' not found in adata.obs")
+
+    g = adata.obs[groupby]
+    if dropna_group:
+        g = g.dropna()
+
+    results = {}
+
+    # group -> list of obs_names
+    groups = g.astype(str).groupby(g.astype(str)).groups
+
+    for grp, idx in groups.items():
+        idx = list(idx)
+        if len(idx) < int(min_n):
+            if verbose:
+                info(f"{grp}: n={len(idx)} < min_n={min_n}")
+            continue
+
+        ad = adata[idx].copy()
+
+        # survival columns present?
+        missing_cols = [k for k in (time_col, event_col) if k not in ad.obs.columns]
+        if missing_cols:
+            if verbose:
+                warn(f"{grp}: missing {missing_cols} -> skipped")
+            continue
+
+        # within-group: strata cannot be the same as group_col
+        strata_eff = strata
+        if strata_eff is not None and str(strata_eff) == str(groupby):
+            if verbose:
+                warn(f"{grp}: strata==group_col inside subset -> setting strata=None")
+            strata_eff = None
+
+        out_key = f"{out_key_prefix}{grp}"
+
+        try:
+            cox_univariate(
+                ad,
+                time_col=time_col,
+                event_col=event_col,
+                x_keys=list(x_keys),
+                x_mode=x_mode,
+                strata=strata_eff,
+                key_added=out_key,
+                **cox_kwargs,
+            )
+
+            payload = ad.uns.get(out_key, None)
+            if payload is None:
+                if verbose:
+                    warn(f"{grp}: no payload found at ad.uns[{out_key!r}]")
+                continue
+
+            results[grp] = payload
+            if verbose:
+                info(f"{grp}: n={len(idx)} stored '{out_key}'")
+
+        except Exception as e:
+            if verbose:
+                warn(f"{grp}: {type(e).__name__}: {e}")
+
+    return results

@@ -61,10 +61,52 @@ def test_random_state_is_now_seed(adata_pca):
 @pytest.mark.parametrize("old", sorted(MOVED))
 def test_moved_functions_resolve_and_warn(old):
     namespace, _, name = old.rpartition(".")
-    new_namespace, _, new_name = MOVED[old].rpartition(".")
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         via_old = getattr(getattr(bk, namespace), name)
     assert any(issubclass(w.category, DeprecationWarning) for w in caught)
-    assert via_old is getattr(getattr(bk, new_namespace), new_name)
+    assert via_old is _resolve("bullkpy." + MOVED[old])
     assert name not in getattr(getattr(bk, namespace), "__all__", [])
+
+
+def test_umap_graph_is_now_a_method_of_umap(adata_pca):
+    pytest.importorskip("umap")
+    bk.tl.umap(adata_pca, method="graph", n_epochs=20)
+    new = adata_pca.obsm["X_umap_graph"].copy()
+    assert new.shape == (adata_pca.n_obs, 2)
+    del adata_pca.obsm["X_umap_graph"]
+    with pytest.warns(DeprecationWarning, match="umap_graph"):
+        legacy = bk.tl.umap_graph
+    legacy(adata_pca, n_epochs=20)
+    np.testing.assert_allclose(adata_pca.obsm["X_umap_graph"], new)
+    with pytest.raises(ValueError, match="method"):
+        bk.tl.umap(adata_pca, method="nope")
+
+
+def test_rank_genes_groups_fast_stores_when_key_added_is_given(adata):
+    bk.tl.rank_genes_groups_fast(adata, groupby="Subtype", group="Basal", layer="log1p_cpm")
+    assert "rank_genes_groups_fast" not in adata.uns
+    res = bk.tl.rank_genes_groups_fast(
+        adata, groupby="Subtype", group="Basal", layer="log1p_cpm", key_added="rgg"
+    )
+    stored = adata.uns["rgg"]["Subtype:Basal_vs_rest"]
+    assert stored["results"] is res
+    assert stored["params"]["groupby"] == "Subtype" and "reference" not in stored["params"]
+
+
+def test_legacy_store_functions_match_key_added(adata):
+    with pytest.warns(DeprecationWarning):
+        legacy = bk.tl.store_gene_categorical_association
+    legacy(adata, groupby="Subtype", layer="log1p_cpm", genes=list(adata.var_names[:5]))
+    assert "gene~Subtype" in adata.uns["associations"]
+    assert set(adata.uns["associations"]["gene~Subtype"]) == {"results", "params"}
+
+
+def test_moved_and_renamed_functions_have_new_homes():
+    for name in ("plot_corr_scatter", "plot_corr_heatmap"):
+        assert name in bk.pl.__all__ and name not in bk.tl.__all__
+    for name in ("run_cox_per_group", "bootstrap_pr_bands", "leading_edge_pathway_clusters"):
+        assert name in bk.tl.__all__ and name not in bk.pl.__all__
+    assert {"read_metaprograms_xlsx", "save_signature_bank", "load_signature_bank"} <= set(bk.io.__all__)
+    assert "metaprogram_scores" in bk.get.__all__
+    assert "metaprogram_dispersion_metrics" in bk.tl.__all__ and "score_signature_on_ppv" in bk.tl.__all__

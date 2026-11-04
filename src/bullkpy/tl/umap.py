@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 import numpy as np
 import scipy.sparse as sp
 import anndata as ad
@@ -21,17 +23,35 @@ def umap(
     metric: str = "euclidean",
     seed: int = 0,
     init: str = "spectral",
+    method: Literal["knn", "graph"] = "knn",
+    graph_key: str = "connectivities",
+    negative_sample_rate: int = 5,
+    n_epochs: int | None = None,
 ) -> None:
     """
-    Compute UMAP embedding from a representation (default: PCA).
+    Compute a UMAP embedding.
 
-    This mirrors Scanpy practice: UMAP is computed from `X_pca` with
-    `n_neighbors`/`min_dist`, consistent with the neighbors graph settings.
+    ``method="knn"`` (default) embeds from a representation (default: PCA), mirroring
+    Scanpy practice, with ``n_neighbors``/``min_dist``.
+
+    ``method="graph"`` embeds strictly from the precomputed neighbour graph in
+    ``adata.obsp[graph_key]`` (from ``bk.tl.neighbors``); ``adata.obsm[use_rep]`` is then
+    used only to initialise the layout. ``n_neighbors`` and ``metric`` are ignored, and
+    ``negative_sample_rate`` and ``n_epochs`` apply.
 
     Stores:
-      - adata.obsm['X_umap']
-      - adata.uns['umap']
+      - ``method="knn"``: ``adata.obsm['X_umap']`` and ``adata.uns['umap']``
+      - ``method="graph"``: ``adata.obsm['X_umap_graph']`` and ``adata.uns['umap_graph']``
     """
+    if method == "graph":
+        return _umap_graph(
+            adata, graph_key=graph_key, use_rep=use_rep, n_pcs=n_pcs, min_dist=min_dist,
+            spread=spread, n_components=n_components, seed=seed, init=init,
+            negative_sample_rate=negative_sample_rate, n_epochs=n_epochs,
+        )
+    if method != "knn":
+        raise ValueError("method must be 'knn' or 'graph'")
+
     if use_rep not in adata.obsm:
         raise KeyError(f"adata.obsm['{use_rep}'] not found. Run bk.tl.pca(adata) first.")
 
@@ -82,8 +102,7 @@ def umap(
     }
 
 
-@renamed_kwargs(random_state="seed")
-def umap_graph(
+def _umap_graph(
     adata: ad.AnnData,
     *,
     graph_key: str = "connectivities",

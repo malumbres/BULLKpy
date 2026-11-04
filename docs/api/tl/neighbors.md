@@ -118,7 +118,7 @@ bk.tl.neighbors(
 
 # 3. Downstream analyses
 bk.tl.cluster(adata, method="leiden")
-bk.tl.umap_graph(adata)
+bk.tl.umap(adata, method="graph")
 ```
 
 ## Notes and caveats
@@ -130,6 +130,6 @@ bk.tl.umap_graph(adata)
 ## See also
 	•	bk.tl.pca – compute PCA representation
 	•	bk.tl.cluster – Leiden/Louvain clustering
-	•	bk.tl.umap_graph – UMAP embedding from the neighbor graph
+	•	bk.tl.umap(adata, method="graph") – UMAP embedding from the neighbor graph
 	•	bk.tl.leiden_resolution_scan – resolution benchmarking
 

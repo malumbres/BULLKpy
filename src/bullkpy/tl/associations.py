@@ -22,6 +22,7 @@ from functools import partial
 from .._matrix import get_matrix as _get_matrix_impl
 from .._matrix import get_gene_vector as _get_gene_vector
 from .._deprecated import renamed_kwargs
+from .._store import stores_result
 
 
 
@@ -75,6 +76,7 @@ def _epsilon2_from_kruskal(H: float, n: int, k: int) -> float:
 # -----------------------------
 # A) Gene ↔ categorical obs (global test across all groups)
 # -----------------------------
+@stores_result(params=("groupby","layer","test","effect_size","min_group_size","adjust"), default_subkey="gene~{groupby}", subkey_of=lambda a: f"gene~{a['groupby']}")
 def gene_categorical_association(
     adata: ad.AnnData,
     *,
@@ -345,6 +347,7 @@ def obs_categorical_association(
 # -----------------------------
 # B) Fast “rank_genes_groups”-like for one group vs reference/rest
 # -----------------------------
+@stores_result(params=("groupby","group","reference","layer","method","effect","adjust","min_n"), default_subkey="{groupby}:{group}_vs_{reference or 'rest'}", subkey_of=lambda a: f"{a['groupby']}:{a['group']}_vs_{a['reference'] if a['reference'] is not None else 'rest'}")
 def rank_genes_groups_fast(
     adata: ad.AnnData,
     *,
@@ -506,62 +509,6 @@ def categorical_association(
 # -----------------------------
 # D) Convenience: store results in adata.uns
 # -----------------------------
-def store_gene_categorical_association(
-    adata: ad.AnnData,
-    *,
-    groupby: str,
-    key: str = "associations",
-    subkey: str | None = None,
-    **kwargs,
-) -> pd.DataFrame:
-    """
-    Run `gene_categorical_association` and store results in `adata.uns[key][subkey]`.
-
-    If subkey is None, uses f"gene~{groupby}".
-    """
-    subkey = subkey or f"gene~{groupby}"
-    res = gene_categorical_association(adata, groupby=groupby, **kwargs)
-
-    adata.uns.setdefault(key, {})
-    adata.uns[key][subkey] = {
-        "results": res,
-        "params": {"groupby": groupby, **kwargs},
-    }
-    info(f"Stored gene_categorical_association results in adata.uns['{key}']['{subkey}']")
-
-    return res
-
-
-def store_rank_genes_groups_fast(
-    adata: ad.AnnData,
-    *,
-    groupby: str,
-    group: str,
-    reference: str | None = None,
-    key: str = "rank_genes_groups_fast",
-    subkey: str | None = None,
-    **kwargs,
-) -> pd.DataFrame:
-    """
-    Run `rank_genes_groups_fast` and store results in `adata.uns[key][subkey]`.
-
-    If subkey is None, uses f"{groupby}:{group}_vs_{reference or 'rest'}".
-    """
-    ref_name = reference if reference is not None else "rest"
-    subkey = subkey or f"{groupby}:{group}_vs_{ref_name}"
-
-    res = rank_genes_groups_fast(adata, groupby=groupby, group=group, reference=reference, **kwargs)
-
-    adata.uns.setdefault(key, {})
-    adata.uns[key][subkey] = {
-        "results": res,
-        "params": {"groupby": groupby, "group": group, "reference": ref_name, **kwargs},
-    }
-    info(f"Stored rank_genes_groups_fast results in adata.uns['{key}']['{subkey}']")
-
-    return res
-
-
 # -----------------------------
 # E) Very small dispatcher (optional)
 # -----------------------------

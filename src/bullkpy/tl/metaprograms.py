@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import Optional, Sequence, Tuple, Union
+from typing import Optional
 import re
 import numpy as np
 import pandas as pd
 from anndata import AnnData
 from .._matrix import get_matrix as _get_matrix_impl
 from .._deprecated import renamed_kwargs
+from ..get.metaprogram_scores import metaprogram_scores as _metaprogram_scores
 
 
 # -----------------------------
@@ -71,64 +72,6 @@ def _zscore_within_groups(X: np.ndarray, groups: pd.Series) -> np.ndarray:
 # -----------------------------
 # Public API
 # -----------------------------
-def metaprogram_scores_get(
-    adata: AnnData,
-    *,
-    obsm_key_candidates: Sequence[str] = ("X_metaprogram", "X_metaprograms", "X_mp", "X_metaprog"),
-    uns_df_key_candidates: Sequence[str] = ("metaprogram_scores", "mp_scores", "metaprograms"),
-    names_key_candidates: Sequence[str] = ("metaprogram_names", "mp_names"),
-    return_df: bool = True,
-) -> Union[pd.DataFrame, Tuple[np.ndarray, list[str]]]:
-    """
-    Retrieve metaprogram score matrix (samples x programs) from AnnData.
-
-    Supported storage:
-      - adata.obsm[<key>] -> matrix; names in adata.uns['metaprogram_names'] (or similar)
-      - adata.uns[<key>]  -> DataFrame indexed by sample, columns programs
-
-    Parameters
-    ----------
-    return_df
-        If True returns a DataFrame indexed by adata.obs_names.
-        If False returns (X, names).
-
-    Returns
-    -------
-    pd.DataFrame OR (np.ndarray, list[str])
-    """
-    # 1) Prefer obsm
-    for k in obsm_key_candidates:
-        if k in adata.obsm:
-            X = _to_dense(adata.obsm[k]).astype(float)
-            names = None
-            for nk in names_key_candidates:
-                if nk in adata.uns:
-                    names = list(adata.uns[nk])
-                    break
-            if names is None:
-                names = [f"MP{i+1}" for i in range(X.shape[1])]
-            if return_df:
-                return pd.DataFrame(X, index=adata.obs_names, columns=names)
-            return X, names
-
-    # 2) Fall back to uns dataframe
-    for k in uns_df_key_candidates:
-        if k in adata.uns:
-            df = adata.uns[k]
-            if not isinstance(df, pd.DataFrame):
-                df = pd.DataFrame(df)
-            # align to current obs order
-            df = df.loc[adata.obs_names]
-            if return_df:
-                return df
-            return df.to_numpy(dtype=float), list(df.columns)
-
-    raise KeyError(
-        "Metaprogram scores not found. Expected in adata.obsm (e.g. 'X_metaprogram') "
-        "or adata.uns (e.g. 'metaprogram_scores')."
-    )
-
-
 def metaprogram_sample_metrics(
     adata: AnnData,
     *,
@@ -163,7 +106,7 @@ def metaprogram_sample_metrics(
     if groupby not in ad.obs:
         raise KeyError(f"{groupby!r} not found in adata.obs")
 
-    df = metaprogram_scores_get(ad, return_df=True)
+    df = _metaprogram_scores(ad, return_df=True)
     X = df.to_numpy(dtype=float)
     n_samples, n_prog = X.shape
 
@@ -243,7 +186,7 @@ def metaprogram_dispersion_by_group(
     if groupby not in adata.obs:
         raise KeyError(f"{groupby!r} not found in adata.obs")
 
-    df = metaprogram_scores_get(adata, return_df=True)
+    df = _metaprogram_scores(adata, return_df=True)
 
     rows = []
     # IMPORTANT: use integer positions for indexing X, not string obs_names
@@ -311,7 +254,7 @@ def metaprogram_ne_enrichment(
     if ne_signature_key not in adata.obs:
         raise KeyError(f"{ne_signature_key!r} not found in adata.obs")
 
-    df = metaprogram_scores_get(adata, return_df=True)
+    df = _metaprogram_scores(adata, return_df=True)
     y = adata.obs[ne_signature_key].to_numpy(dtype=float)
 
     # optional filter
@@ -359,7 +302,7 @@ def metaprogram_topk_contribution(
 
     Stores result in adata.uns[key_added].
     """
-    df = metaprogram_scores_get(adata, return_df=True)
+    df = _metaprogram_scores(adata, return_df=True)
     X = df.to_numpy(dtype=float)
     W = _softmax_rows(X)
 
@@ -382,40 +325,6 @@ def metaprogram_topk_contribution(
 ########################################
 ## METAPROGRAMS
 #######################################
-
-
-def read_metaprograms_xlsx(
-    xlsx_path: str,
-    *,
-    sheet_name: str = "Malignant",
-    min_genes: int = 5,
-) -> dict[str, list[str]]:
-    """
-    Excel format expected: each column is an MP, rows are gene symbols.
-    Returns dict mp_name -> list of genes (non-empty strings).
-    """
-    df = pd.read_excel(xlsx_path, sheet_name=sheet_name)
-
-    mp = {}
-    for col in df.columns:
-        genes = (
-            df[col]
-            .dropna()
-            .astype(str)
-            .str.strip()
-            .replace({"": np.nan, "nan": np.nan, "None": np.nan})
-            .dropna()
-            .tolist()
-        )
-        genes = [g for g in genes if g and g.lower() != "nan"]
-        if len(genes) >= int(min_genes):
-            mp[str(col)] = genes
-
-    if len(mp) == 0:
-        raise ValueError(f"No metaprograms found in sheet='{sheet_name}' of {xlsx_path}")
-
-    return mp
-
 
 
 def _dense(M):
@@ -533,7 +442,7 @@ def score_metaprograms(
     return df_scores, df_info
 
 
-def mp_dispersion_metrics(
+def metaprogram_dispersion_metrics(
     adata,
     *,
     mp_key="MP_scores",
@@ -663,7 +572,7 @@ def metaprogram_heterogeneity(
 
     See Also
     --------
-    bullkpy.tl.mp_dispersion_metrics : per-sample dispersion instead of per-group.
+    bullkpy.tl.metaprogram_dispersion_metrics : per-sample dispersion instead of per-group.
     bullkpy.pl.metaprogram_dispersion_heatmap : plot the resulting matrix.
     """
     if groupby not in adata.obs.columns:

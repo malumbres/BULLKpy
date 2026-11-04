@@ -7,4 +7,5 @@ obs_df
 vector
 rank_genes_groups_df
 rank_genes_groups_df_all
+metaprogram_scores
 ```
