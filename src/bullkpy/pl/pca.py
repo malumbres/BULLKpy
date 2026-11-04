@@ -120,7 +120,7 @@ def pca_variance_ratio(
     cumulative: bool = True,
     figsize: tuple[float, float] = (6.5, 4.5),
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Scree plot of PCA variance ratio (+ optional cumulative curve).
@@ -137,7 +137,10 @@ def pca_variance_ratio(
 
     xs = np.arange(1, len(vr) + 1)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     ax.plot(xs, vr, marker="o")
     ax.set_xlabel("PC")
     ax.set_ylabel("Explained variance ratio")

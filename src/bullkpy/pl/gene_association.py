@@ -181,7 +181,7 @@ def gene_association_volcano(
     figsize: tuple[float, float] = (6.5, 5.5),
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Effect-size aware volcano for categorical association:
@@ -245,7 +245,10 @@ def gene_association_volcano(
     df["neglog10q"] = -np.log10(df["qval"].clip(lower=1e-300))
     df = df.sort_values("qval", na_position="last").reset_index(drop=True)
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
     ax.scatter(df["effect"], df["neglog10q"], s=10, alpha=0.75, edgecolors="none")
 
     # threshold line

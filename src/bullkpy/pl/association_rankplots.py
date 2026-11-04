@@ -22,7 +22,7 @@ def rankplot_association(
     figsize: tuple[float, float] = (7, 6),
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Ranked barplot for categorical association results.
@@ -105,7 +105,10 @@ def rankplot_association(
 
     colors = np.where(vals >= 0, "#D62728", "#1F77B4")  # red / blue
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
     ax.barh(labels, vals, color=colors)
     ax.axvline(0, linewidth=1)
 
@@ -139,7 +142,7 @@ def dotplot_association(
     size_max: float = 250.0,
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Scanpy-like dotplot for association results across multiple contrasts/groupby runs.
@@ -174,7 +177,10 @@ def dotplot_association(
     if figsize is None:
         figsize = (max(6, 0.45 * piv_eff.shape[1] + 2.8), max(4, 0.22 * piv_eff.shape[0] + 1.6))
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     if vmin is None:
         vmin = float(np.nanmin(eff))
@@ -227,7 +233,7 @@ def heatmap_association(
     figsize: tuple[float, float] | None = None,
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Heatmap of association values (effect by default), selecting top_n rows by best qval per column.
@@ -249,7 +255,10 @@ def heatmap_association(
     if figsize is None:
         figsize = (max(6, 0.45 * piv.shape[1] + 3), max(4, 0.22 * piv.shape[0] + 1.8))
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
     im = ax.imshow(mat, aspect="auto", cmap=cmap)
     ax.set_xticks(np.arange(piv.shape[1]))
     ax.set_xticklabels([str(c) for c in piv.columns], rotation=90)

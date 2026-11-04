@@ -272,3 +272,37 @@ def test_plot_save_writes_a_file(adata_pca, tmp_path):
     out = tmp_path / "sub" / "pca.png"
     bk.pl.pca_scatter(adata_pca, color="Subtype", save=out, show=False)
     assert out.exists() and out.stat().st_size > 0
+
+
+def _fresh_ax():
+    fig, ax = plt.subplots()
+    return fig, ax
+
+
+def test_single_axes_plots_draw_on_a_given_axes(adata, de_table, genes):
+    fig, axes = plt.subplots(1, 4, figsize=(12, 3))
+    bk.pl.volcano(de_table, ax=axes[0], show=False)
+    bk.pl.ma(de_table, ax=axes[1], show=False)
+    bk.pl.gene_plot(adata, gene=genes[0], groupby="Subtype", ax=axes[2], show=False)
+    bk.pl.library_size_vs_genes(adata, ax=axes[3], show=False)
+    for ax in axes:
+        assert ax.has_data(), "nothing was drawn on the axes that was passed in"
+    assert len(plt.get_fignums()) == 1, "a second figure was created"
+    plt.close("all")
+
+
+def test_ax_argument_is_added_to_the_single_axes_plots():
+    import inspect
+
+    for name in ("volcano", "ma", "rankplot", "gene_plot", "pca_variance_ratio", "boxplot_with_stats",
+                 "km_univariate", "cox_forest", "gsea_bubbleplot"):
+        assert "ax" in inspect.signature(getattr(bk.pl, name)).parameters, name
+
+
+def test_clustered_heatmaps_refuse_an_external_axes(adata, genes):
+    fig, ax = plt.subplots()
+    with pytest.raises(ValueError, match="ax="):
+        bk.pl.gene_panel_correlation_heatmap(adata, genes=genes[:4], cluster=True, ax=ax, show=False)
+    with pytest.raises(ValueError, match="ax="):
+        bk.pl.corr_heatmap(adata, use="samples", dendrogram=True, ax=ax, show=False)
+    plt.close("all")

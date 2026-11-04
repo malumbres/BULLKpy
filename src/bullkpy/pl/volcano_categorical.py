@@ -21,7 +21,7 @@ def volcano_categorical(
     figsize: tuple[float, float] = (6.8, 5.2),
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Volcano plot for categorical associations.
@@ -40,7 +40,10 @@ def volcano_categorical(
     df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[x, qval_col])
     df["mlog10q"] = -np.log10(np.clip(df[qval_col].to_numpy(dtype=float), 1e-300, 1.0))
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     sig = df[qval_col].to_numpy(dtype=float) <= float(q_thr)
     ax.scatter(df.loc[~sig, x], df.loc[~sig, "mlog10q"], alpha=0.35, s=12, edgecolors="none")

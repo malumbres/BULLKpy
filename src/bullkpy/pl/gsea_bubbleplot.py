@@ -50,7 +50,7 @@ def gsea_bubbleplot(
     title: str | None = None,
     # output
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Bubble plot matrix for GSEA results.
@@ -174,7 +174,10 @@ def gsea_bubbleplot(
         h = max(3.5, row_height * len(comps_final) + 2.0)   # room for labels
         figsize = (w, h)
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=False)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=False)
+    else:
+        fig = ax.figure
     fig.subplots_adjust(right=0.78)
 
     # coords

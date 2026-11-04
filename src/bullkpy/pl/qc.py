@@ -314,7 +314,7 @@ def library_size_vs_genes(
     legend: bool = True,
     legend_loc: str = "best",
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ) -> tuple[plt.Figure, plt.Axes]:
     """
     QC scatter: library size vs detected genes with optional thresholds.
@@ -356,7 +356,10 @@ def library_size_vs_genes(
             raise KeyError(f"adata.obs['{groupby}'] not found")
         df[groupby] = adata.obs.loc[df.index, groupby].astype(str)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
 
     # scatter (inliers)
     if groupby is None:
@@ -455,11 +458,14 @@ def mt_fraction_vs_counts(
     logy: bool = False,
     figsize: tuple[float, float] = (5.5, 4.5),
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """Scatter QC: total counts vs mitochondrial fraction (with thresholds)."""
     set_style()
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     ok, _ = _scatter_qc(
         adata,
         ax=ax,
@@ -498,11 +504,14 @@ def genes_vs_mt_fraction(
     logy: bool = True,
     figsize: tuple[float, float] = (5.5, 4.5),
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """Scatter QC: mt fraction vs detected genes (with thresholds)."""
     set_style()
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     ok, _ = _scatter_qc(
         adata,
         ax=ax,

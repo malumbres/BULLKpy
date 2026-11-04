@@ -18,6 +18,9 @@ from .obs_df import (
 from .metaprogram_scores import (
     metaprogram_scores,
 )
+from .de import (
+    de,
+)
 
 __all__ = [
     "rank_genes_groups_df",
@@ -25,4 +28,5 @@ __all__ = [
     "vector",
     "obs_df",
     "metaprogram_scores",
+    "de",
 ]

@@ -47,7 +47,7 @@ def corr_heatmap(
     dendrogram_gap: float = 0.004,   # smaller = closer
     right_margin: float = 0.82,      # room for legend on right
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Correlation heatmap for sample QC (or gene-gene if use="genes").
@@ -138,6 +138,9 @@ def corr_heatmap(
         col_colors_df = pd.DataFrame(ann, index=corr.index)
 
     # --- autosize ---
+    if dendrogram and ax is not None:
+        raise ValueError("ax= cannot be combined with dendrogram=True: a clustermap creates its own figure.")
+
     if figsize is None:
         n = corr.shape[0]
         w = min(max(6.0, 0.18 * n + 2.0), 18.0)
@@ -242,7 +245,10 @@ def corr_heatmap(
 
     # --- non-clustered heatmap ---
     else:
-        fig, ax = plt.subplots(figsize=figsize)
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+        else:
+            fig = ax.figure
         sns.heatmap(
             corr,
             cmap=cmap,
@@ -292,7 +298,7 @@ def gene_panel_correlation_heatmap(
     dendrogram_ratio: float = 0.12, # only for cluster=True
     cbar_pos: tuple[float, float, float, float] = (0.92, 0.15, 0.02, 0.7),
     save: str | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Pairwise correlation heatmap for a gene panel.
@@ -330,6 +336,9 @@ def gene_panel_correlation_heatmap(
             vmax = 1.0
 
     dfC = pd.DataFrame(C, index=genes, columns=genes)
+
+    if cluster and ax is not None:
+        raise ValueError("ax= cannot be combined with cluster=True: a clustermap creates its own figure.")
 
     # --- size ---
     if figsize is None:
@@ -396,7 +405,10 @@ def gene_panel_correlation_heatmap(
         return dfC_plot_order, g.fig, g
 
     # --- plain matplotlib heatmap ---
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     im = ax.imshow(dfC.to_numpy(), aspect="auto", vmin=vmin, vmax=vmax, cmap=cmap)
 
     ax.set_xticks(np.arange(len(genes)))

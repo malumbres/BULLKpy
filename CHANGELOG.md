@@ -55,6 +55,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Seven copies of the matrix getter and five of `_as_list` are now one implementation each
   (`bullkpy._matrix`).
 
+### Deprecated (still work, with a `DeprecationWarning`; see docs/migration.md)
+- Parameter names normalised across 38 functions: `time_key`/`event_key` -> `time_col`/`event_col`,
+  `out_key`/`store_key`/`uns_key` -> `key_added` (written) or `key` (read), `de_key` -> `key`,
+  `random_state` -> `seed`, `group_col` -> `groupby`, `q_col`/`fdr_col` -> `qval_col`, `p_col` -> `pval_col`.
+- Functions moved to the namespace that matches what they do: `tl.plot_corr_*` -> `pl`;
+  `pl.run_cox_per_group`, `pl.bootstrap_pr_bands`, `pl.leading_edge_pathway_clusters`,
+  `pl.leading_edge_cluster_driver_genes`, `pl.export_leading_edge_clusters_cytoscape` -> `tl`;
+  `tl.read_metaprograms_xlsx`, `tl.save_signature_bank`, `tl.load_signature_bank` -> `io`;
+  `tl.metaprogram_scores_get` -> `get.metaprogram_scores`.
+- `tl.umap_graph` -> `tl.umap(method="graph")`; `tl.store_gene_categorical_association` and
+  `tl.store_rank_genes_groups_fast` -> `key_added=` on the functions they wrapped.
+- `tl.mp_dispersion_metrics` -> `tl.metaprogram_dispersion_metrics`;
+  `tl.score_signature_on_PPV` -> `tl.score_signature_on_ppv`.
+
+### Added
+- `ax=` on 43 single-axes plotting functions. `bk.get.de()` finds DE results from `tl.de` or `tl.de_glm`.
+- `docs/migration.md`, generated from the deprecation registry.
+
 ### Removed
 - `settings.figdir`, `autoshow` and `autosave`, which no code ever read.
 

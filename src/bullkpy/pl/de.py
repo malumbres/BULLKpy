@@ -60,7 +60,7 @@ def volcano(
     # thresholds lines
     show_thresholds: bool = True,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Volcano plot for DE results.
@@ -106,7 +106,10 @@ def volcano(
     down = sig & (df[fc_col] < 0)
     ns = ~sig
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     # plot in layers: ns first, then down, then up (so sig points are on top)
     ax.scatter(
@@ -219,7 +222,7 @@ def rankplot(
     figsize: tuple[float, float] = (7, 6),
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Ranked horizontal barplot of top DE genes (up/down).
@@ -313,7 +316,10 @@ def rankplot(
 
     colors = np.where(vals >= 0, "#D62728", "#1F77B4")  # red / blue
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
     ax.barh(genes, vals, color=colors)
     ax.axvline(0, linewidth=1)
 
@@ -358,7 +364,7 @@ def ma(
     ylabel: str | None = None,
     figsize: tuple[float, float] = (8.5, 5.5),
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     MA plot for DE results.
@@ -456,7 +462,10 @@ def ma(
     nonsig = ~(up | down)
 
     # Plot
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     # non-significant (grey)
     ax.scatter(

@@ -48,6 +48,7 @@ pip install bullkpy
 :caption: Contents
 
 install
+migration
 api/index
 ```
 ---

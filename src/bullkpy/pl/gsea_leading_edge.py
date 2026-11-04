@@ -476,7 +476,7 @@ def leading_edge_cluster_bubbles(
     repel_iters: int = 200,
     repel_strength: float = 0.8,
     repel_padding: float = 0.02,
-    return_metrics: bool = False,        # NEW: optionally return embedding metrics as 8th object
+    return_metrics: bool = False, ax: plt.Axes | None = None,        # NEW: optionally return embedding metrics as 8th object
 ):
     """
     Bubble map for pathway clusters.
@@ -686,7 +686,10 @@ def leading_edge_cluster_bubbles(
     dist_corr = _dist_corr(D, Dplot)
 
     # ---- plot ----
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     ax.set_aspect("equal", adjustable="datalim")
 
     if show_edges:

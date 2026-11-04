@@ -27,7 +27,7 @@ def auc_cv_heatmap(
     annotate: bool = True,
     annot_fontsize: float = 7.0,
     save: str | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Heatmap of mean AUC across (C, l1_ratio).
@@ -41,7 +41,10 @@ def auc_cv_heatmap(
     piv = piv.sort_index(ascending=True)
     piv = piv.loc[:, sorted(piv.columns, key=float)]
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     im = ax.imshow(piv.to_numpy(), aspect="auto")
 
     ax.set_title(title, pad=10)
@@ -86,7 +89,7 @@ def pr_curve_signatures(
     alpha: float = 0.95,
     show_baseline: bool = True,
     baseline_ls: str = "--",
-    seed: int = 0,
+    seed: int = 0, ax: plt.Axes | None = None,
 ):
     """
     Plot PR curves for multiple signatures on the same cohort.
@@ -139,7 +142,10 @@ def pr_curve_signatures(
         return 1.0 / (1.0 + np.exp(-z))
 
     rows = []
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
 
     # Plot each signature
     for name, spec in sigs.items():
@@ -689,7 +695,7 @@ def signature_dispersion_heatmap(
     key: str = "signature_dispersion",
     title: Optional[str] = None,
     show: bool = True,
-    save: Optional[str] = None,
+    save: Optional[str] = None, ax: plt.Axes | None = None,
 ):
     """
     Heatmap of signature dispersion across groups.
@@ -711,7 +717,10 @@ def signature_dispersion_heatmap(
     mat = df.pivot(index="signature", columns="group", values="dispersion")
     arr = mat.to_numpy(dtype=float)
 
-    fig, ax = plt.subplots(figsize=(8, 4))
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(8, 4))
+    else:
+        fig = ax.figure
     im = ax.imshow(arr, aspect="auto")
     ax.set_yticks(range(mat.shape[0]))
     ax.set_yticklabels(mat.index.tolist(), fontsize=7)

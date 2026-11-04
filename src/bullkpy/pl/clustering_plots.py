@@ -30,7 +30,7 @@ def ari_resolution_heatmap(
     figsize: tuple[float, float] | None = None,
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Heatmap-like summary of clustering quality vs Leiden resolution.
@@ -83,7 +83,10 @@ def ari_resolution_heatmap(
         h = 2.3 if n_rows == 1 else 3.2
         figsize = (w, h)
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     # ---- draw images with explicit extents (no ax.images.pop) ----
     # We use a coordinate system where:
@@ -165,7 +168,7 @@ def categorical_confusion(
     dropna: bool = True,
     min_count: int = 1,
     show: bool = True,
-    save: str | Path | None = None,
+    save: str | Path | None = None, ax: plt.Axes | None = None,
 ):
     """
     Confusion-style heatmap for two categorical obs columns + association metrics.
@@ -194,7 +197,10 @@ def categorical_confusion(
     if figsize is None:
         figsize = (max(6, 0.28 * tab.shape[1] + 3.0), max(4, 0.28 * tab.shape[0] + 2.0))
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     vmin = 0.0
     vmax = 1.0 if normalize != "none" else None

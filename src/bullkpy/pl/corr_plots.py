@@ -30,7 +30,7 @@ def plot_corr_scatter(
     cmap: str = "viridis",
     palette: str = "tab20",
     title: str | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Scatter plot + correlation in title.
@@ -61,7 +61,10 @@ def plot_corr_scatter(
         covariates=covariates,
     )
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     if hue is None:
         ax.scatter(xv, yv, s=s, alpha=alpha, edgecolors="none")
@@ -106,12 +109,15 @@ def plot_corr_heatmap(
     annot: bool = False,
     fmt: str = ".2f",
     title: str | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Heatmap for a wide correlation matrix (e.g., from obs_obs_corr_matrix).
     """
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
     if sns is not None:
         sns.heatmap(mat, ax=ax, cmap=cmap, center=center, vmin=vmin, vmax=vmax, annot=annot, fmt=fmt)
     else:

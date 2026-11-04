@@ -27,7 +27,7 @@ def axis_vs_dispersion(
     max_groups: int = 12,
     title: Optional[str] = None,
     show: bool = True,
-    save: Optional[str] = None,
+    save: Optional[str] = None, ax: plt.Axes | None = None,
 ):
     """
     Scatter plot of signature axis vs per-sample dispersion.
@@ -39,7 +39,10 @@ def axis_vs_dispersion(
     x = adata.obs[axis_key].to_numpy(dtype=float)
     y = adata.obs[dispersion_key].to_numpy(dtype=float)
 
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.figure
     if groupby is None:
         ax.scatter(x, y, s=10, alpha=0.7)
     else:
@@ -70,7 +73,7 @@ def dispersion_summary(
     groupby: str,
     title: Optional[str] = None,
     show: bool = True,
-    save: Optional[str] = None,
+    save: Optional[str] = None, ax: plt.Axes | None = None,
 ):
     """
     Boxplot of per-sample dispersion across groups (e.g., tumor types).
@@ -84,7 +87,10 @@ def dispersion_summary(
     groups = df[groupby].astype("category")
     order = df.groupby(groupby)[dispersion_key].median().sort_values(ascending=False).index
 
-    fig, ax = plt.subplots(figsize=(8, 3))
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(8, 3))
+    else:
+        fig = ax.figure
     data = [df.loc[df[groupby] == g, dispersion_key].to_numpy() for g in order]
     ax.boxplot(data, tick_labels=[str(g) for g in order], showfliers=False)
     ax.set_ylabel(dispersion_key)
@@ -522,7 +528,7 @@ def metaprogram_dispersion_heatmap(
     cmap="viridis",
     figsize=(8, 6),
     show: bool = True,
-    save: Optional[str] = None,
+    save: Optional[str] = None, ax: plt.Axes | None = None,
 ):
     """
     Heatmap of per-group dispersion (rows: metaprograms, cols: groups).
@@ -553,7 +559,10 @@ def metaprogram_dispersion_heatmap(
 
     arr = mat.to_numpy(dtype=float)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     im = ax.imshow(arr, aspect="auto", cmap=cmap)
     ax.set_title(title)
     ax.set_yticks(range(mat.shape[0]))
@@ -632,7 +641,7 @@ def metaprogram_ne_scatter(
     title: Optional[str] = None,
     figsize=(5, 4),
     show: bool = True,
-    save: Optional[str] = None,
+    save: Optional[str] = None, ax: plt.Axes | None = None,
 ):
     """
     Scatter: NE score vs metaprogram heterogeneity (or dispersion).
@@ -646,7 +655,10 @@ def metaprogram_ne_scatter(
     x = adata.obs[x_key].to_numpy(dtype=float)
     y = adata.obs[ne_key].to_numpy(dtype=float)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     if groupby is None:
         ax.scatter(x, y, s=10, alpha=0.7)
     else:
@@ -683,7 +695,7 @@ def metaprogram_dominance_ridgeplot_like(
     label_rotation=90,
     fontsize=8,
     show=True,
-    save=None,
+    save=None, ax: plt.Axes | None = None,
 ):
     """
     Ridge/violin-style plot of dominance of the top metaprogram (rank-1 weight)
@@ -716,7 +728,10 @@ def metaprogram_dominance_ridgeplot_like(
 
     data = [df.loc[df[groupby] == g, weight_key].values for g in order]
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
 
     parts = ax.violinplot(
         data,

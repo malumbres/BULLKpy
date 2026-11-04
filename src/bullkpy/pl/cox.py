@@ -33,7 +33,7 @@ def cox_volcano(
     point_size: float = 12.0,
     point_alpha: float = 0.75,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Cox volcano plot: log(HR) vs -log10(significance).
@@ -116,7 +116,10 @@ def cox_volcano(
     if min_effect_loghr is not None:
         is_sig = is_sig & (np.abs(xvals) >= float(min_effect_loghr))
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     # base points
     ax.scatter(
@@ -197,7 +200,7 @@ def cox_forest(
     save: str | Path | None = None,
     show: bool = True,
     hr_text_x: float = 1.02,          # <- x position in axes-fraction (to the right)
-    right_margin: float = 0.78,       # <- makes room for the text column
+    right_margin: float = 0.78, ax: plt.Axes | None = None,       # <- makes room for the text column
 ):
     """
     Forest plot for Cox proportional hazards results.
@@ -262,7 +265,10 @@ def cox_forest(
         figsize = (7.6, h)  # a touch wider to accommodate the text column
 
     # IMPORTANT: use subplots_adjust to reserve space for right-side text
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=False)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=False)
+    else:
+        fig = ax.figure
     fig.subplots_adjust(right=right_margin)
 
     # CI bars
@@ -618,7 +624,7 @@ def time_dependent_roc(
     title: str | None = None,
     figsize: tuple[float, float] = (6.3, 5.0),
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Time-dependent ROC/AUC using scikit-survival (optional dependency).
@@ -655,7 +661,10 @@ def time_dependent_roc(
     # for proper estimation, pass external/test data or use CV.
     auc, mean_auc = cumulative_dynamic_auc(y, y, s, times)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     ax.plot(times, auc, marker="o")
     ax.set_xlabel("Time")
     ax.set_ylabel("AUC(t)")
@@ -680,7 +689,7 @@ def panel_size_cindex_plot(
     show_errorbar: bool = True,
     figsize: tuple[float, float] = (6.5, 4.5),
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ) -> tuple[plt.Figure, plt.Axes]:
     """
     Plot panel size vs (mean±sd) C-index curve produced by `bk.tl.panel_size_cindex`.
@@ -698,7 +707,10 @@ def panel_size_cindex_plot(
 
     df = df_curve.sort_values("size").copy()
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     x = df["size"].to_numpy(dtype=float)
     y = df["c_index_mean"].to_numpy(dtype=float)
 
@@ -743,7 +755,7 @@ def stability_barplot(
     title: str | None = "Stability selection (gene frequency)",
     figsize: tuple[float, float] | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ) -> tuple[plt.Figure, plt.Axes]:
     """
     Barplot for stability selection output from `bk.tl.cox_stability_selection`.
@@ -771,7 +783,10 @@ def stability_barplot(
         h = max(3.2, 0.22 * df.shape[0] + 1.2)
         figsize = (7.0, h)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     ax.barh(df["gene"].iloc[::-1], df["freq"].iloc[::-1])
     ax.set_xlabel("Selection frequency")
     ax.set_ylabel("")
@@ -804,7 +819,7 @@ def permutation_importance_barplot(
     show_values: bool = False,
     value_fontsize: float = 8.0,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Barplot of permutation importance for signature genes with error bars.
@@ -868,7 +883,10 @@ def permutation_importance_barplot(
     sds = df[col_sd].to_numpy(float)
     genes = df["gene"].to_numpy(str)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
 
     ax.barh(y, means, xerr=sds, capsize=3, alpha=0.9)
     ax.set_yticks(y)
@@ -918,7 +936,7 @@ def stability_freq_bar(
     show_values: bool = True,
     value_fontsize: float = 8.0,
     save: str | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Horizontal barplot of stability frequencies.
@@ -931,7 +949,10 @@ def stability_freq_bar(
     df = df[np.isfinite(df[freq_col])].sort_values(freq_col, ascending=False).head(int(top))
     df = df.iloc[::-1]  # so best is at top
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     y = np.arange(df.shape[0])
     ax.barh(y, df[freq_col].to_numpy(float))
 
@@ -1363,7 +1384,7 @@ def km_univariate(
     # NEW: binary handling + colors
     binary_mode: Literal["auto", "force", "off"] = "auto",
     binary_labels: Tuple[str, str] = ("0", "1"),   # e.g. ("WT","Mut")
-    palette: Optional[object] = None,              # tuple/list/dict; see below
+    palette: Optional[object] = None, ax: plt.Axes | None = None,              # tuple/list/dict; see below
 ):
     """
     Kaplan–Meier plot for one variable (x_key).
@@ -1543,7 +1564,10 @@ def km_univariate(
 
     order = [g for g in canonical if g in keep_groups] + [g for g in keep_groups if g not in canonical]
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     kmf = KaplanMeierFitter()
 
     for i, g in enumerate(order):
@@ -1659,7 +1683,7 @@ def km_2x2_interaction(
     # NEW: color selection
     # - dict: {group_label: color}
     # - list/tuple len>=4: mapped to canonical order
-    palette: Optional[object] = None,
+    palette: Optional[object] = None, ax: plt.Axes | None = None,
 ):
     """
     Kaplan–Meier plot for a 2x2 interaction: x low/high × z low/high
@@ -1874,7 +1898,10 @@ def km_2x2_interaction(
     canonical = ["X_low & Z_low", "X_low & Z_high", "X_high & Z_low", "X_high & Z_high"]
     order = [g for g in canonical if g in keep_groups] + [g for g in keep_groups if g not in canonical]
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     kmf = KaplanMeierFitter()
 
     for i, g in enumerate(order):
