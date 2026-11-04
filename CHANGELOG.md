@@ -21,6 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `reference="rest"` they used to be counted in the comparison group, and on pandas 2
   they could also form a group called `"nan"` in tests and plots.
 
+### Changed
+- `pl.dotplot()` lays out in inches from the number of rows/columns and the label lengths, so
+  figures stay compact and uncluttered at any size (a 2 x 3 plot no longer gets a 5.8 x 4.2 in canvas,
+  a 25 x 30 one is smaller than before). Labels sit under their legend dots, dendrograms line up with
+  the dots, and the colour bar and size legend are compact. New `cell_size=` (inches per dot cell).
+  A `figsize=` too small for the labels and legends is enlarged, with a warning, instead of squashed.
+  The size legend now follows `dot_max` and no longer shows the faint grid behind the dots.
+
 ### Fixed
 - `tl.gene_gene_correlations(batch_mode="meta")` crashed on NumPy 2 (`np.math` was removed).
 - `pl.violin()` and `pl.gene_association()` no longer trigger seaborn's "palette without hue"

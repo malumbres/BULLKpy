@@ -345,3 +345,116 @@ def test_seaborn_plots_do_not_use_the_deprecated_palette_without_hue(adata, gene
         bk.pl.gene_association(adata, gene=[genes[0]], groupby="Subtype", layer="log1p_cpm", show=False)
         bk.pl.gene_association(adata, gene=[genes[0]], groupby="Subtype", layer="log1p_cpm", kind="box", show=False)
     plt.close("all")
+
+
+# ----------------------------------------------------------------- dotplot layout
+def _dot_adata(n_groups, n_genes, n=240, seed=0):
+    import anndata as ad
+    import numpy as np
+    import pandas as pd
+
+    r = np.random.default_rng(seed)
+    X = r.gamma(2.0, 1.0, size=(n, n_genes)).astype("float32")
+    a = ad.AnnData(X, var=pd.DataFrame(index=[f"GENE{i + 1}" for i in range(n_genes)]))
+    a.obs["grp"] = pd.Categorical([f"A fairly long group name {i}" for i in r.integers(0, n_groups, n)])
+    a.layers["log1p_cpm"] = np.log1p(X)
+    a.layers["counts"] = X
+    return a
+
+
+def _inside_figure(fig, tol=0.03):
+    bb = fig.get_tightbbox(fig.canvas.get_renderer())
+    w, h = fig.get_size_inches()
+    return bb.x0 >= -tol and bb.y0 >= -tol and bb.x1 <= w + tol and bb.y1 <= h + tol
+
+
+@pytest.mark.parametrize(
+    "n_groups,n_genes,kwargs",
+    [
+        (2, 3, {}),
+        (3, 8, {"dendrogram_top": True, "dendrogram_rows": True}),
+        (10, 6, {"dendrogram_top": True, "dendrogram_rows": True}),
+        (12, 25, {}),
+        (25, 12, {"swap_axes": True, "dendrogram_top": True, "dendrogram_rows": True}),
+        (6, 6, {"dendrogram_rows": True, "row_dendrogram_position": "outer_left"}),
+        (6, 6, {"dendrogram_rows": True, "row_dendrogram_position": "left"}),
+        (6, 6, {"title": "A title", "dendrogram_top": True}),
+    ],
+)
+def test_dotplot_layout_fits_the_figure_for_any_size(n_groups, n_genes, kwargs):
+    a = _dot_adata(n_groups, n_genes)
+    fig, ax = bk.pl.dotplot(a, var_names=list(a.var_names), groupby="grp", layer="log1p_cpm", show=False, **kwargs)
+    assert _inside_figure(fig), "labels, dendrograms or legends are cut off or outside the figure"
+    # legends sit to the right of the panel and dendrograms, never on top of them
+    panel = ax.get_position()
+    others = [x for x in fig.axes if x is not ax and x.get_visible()]
+    for other in others:
+        pos = other.get_position()
+        overlap_x = min(panel.x1, pos.x1) - max(panel.x0, pos.x0)
+        overlap_y = min(panel.y1, pos.y1) - max(panel.y0, pos.y0)
+        is_overlay = pos.width > 0.99 and pos.height > 0.99  # the transparent full-figure legend canvas
+        assert is_overlay or overlap_x <= 1e-6 or overlap_y <= 1e-6, "an axes overlaps the dot panel"
+    plt.close("all")
+
+
+def test_dotplot_size_follows_the_number_of_groups_and_genes():
+    sizes = {}
+    for ng, nf in [(2, 3), (6, 10), (20, 30)]:
+        a = _dot_adata(ng, nf)
+        fig, _ = bk.pl.dotplot(a, var_names=list(a.var_names), groupby="grp", layer="log1p_cpm", show=False)
+        sizes[(ng, nf)] = tuple(fig.get_size_inches())
+        plt.close("all")
+    (w1, h1), (w2, h2), (w3, h3) = sizes[(2, 3)], sizes[(6, 10)], sizes[(20, 30)]
+    assert w1 < w2 < w3 and h1 < h2 < h3
+    assert h1 < 3.5, "a 2 x 3 dotplot should not get the old 4.2 in minimum height"
+
+
+def test_dotplot_cell_size_and_fixed_figsize():
+    a = _dot_adata(5, 6)
+    kw = dict(var_names=list(a.var_names), groupby="grp", layer="log1p_cpm", show=False)
+    fig_small, _ = bk.pl.dotplot(a, cell_size=0.25, **kw)
+    fig_big, _ = bk.pl.dotplot(a, cell_size=0.5, **kw)
+    assert fig_big.get_size_inches()[0] > fig_small.get_size_inches()[0]
+    fig_fixed, _ = bk.pl.dotplot(a, figsize=(7, 4), **kw)
+    assert tuple(fig_fixed.get_size_inches()) == (7.0, 4.0)
+    assert _inside_figure(fig_fixed)
+    plt.close("all")
+
+
+def test_dotplot_dendrogram_leaves_sit_on_the_dots():
+    a = _dot_adata(8, 7)
+    fig, ax = bk.pl.dotplot(
+        a, var_names=list(a.var_names), groupby="grp", layer="log1p_cpm",
+        dendrogram_top=True, dendrogram_rows=True, show=False,
+    )
+    tops = [x for x in fig.axes if x is not ax and x.get_xlim() == ax.get_xlim() and x.lines]
+    rows = [x for x in fig.axes if x is not ax and x.get_ylim() == ax.get_ylim() and x.lines]
+    assert tops and rows, "dendrogram axes must share the panel's limits so leaves align with dots"
+    plt.close("all")
+
+
+def test_dotplot_size_legend_is_labelled_per_dot_and_follows_dot_max():
+    a = _dot_adata(4, 5)
+    kw = dict(var_names=list(a.var_names), groupby="grp", layer="log1p_cpm", show=False)
+    fig, _ = bk.pl.dotplot(a, **kw)
+    texts = {t.get_text() for x in fig.axes for t in x.texts}
+    assert {"20", "40", "60", "80", "100"} <= texts
+    plt.close("all")
+    fig, _ = bk.pl.dotplot(a, dot_max=0.6, **kw)
+    texts = {t.get_text() for x in fig.axes for t in x.texts}
+    assert "100" not in texts and "60" in texts, "legend must not advertise sizes above dot_max"
+    plt.close("all")
+
+
+def test_dotplot_small_figsize_grows_and_titles_can_be_omitted(caplog):
+    a = _dot_adata(3, 8)
+    fig, ax = bk.pl.dotplot(
+        a, var_names=list(a.var_names), groupby="grp", layer="log1p_cpm",
+        figsize=(4, 2), colorbar_title=None, show=False,
+    )
+    w, h = fig.get_size_inches()
+    assert (w, h) != (4.0, 2.0) and w > 4.0, "a too-small figsize must be enlarged, not squashed"
+    assert _inside_figure(fig)
+    assert not any("Mean expression" in t.get_text() for t in fig.texts)
+    assert not ax.xaxis.get_gridlines()[0].get_visible()
+    plt.close("all")

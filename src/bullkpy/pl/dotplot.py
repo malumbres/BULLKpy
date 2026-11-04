@@ -8,7 +8,6 @@ import pandas as pd
 import scipy.sparse as sp
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from matplotlib.gridspec import GridSpec
 
 try:
     from scipy.cluster.hierarchy import linkage, dendrogram
@@ -18,6 +17,7 @@ except Exception:  # pragma: no cover
 
 import anndata as ad
 
+from ..logging import warn
 from ._style import set_style, _savefig
 from .._genes import gene_loc as _gene_loc
 
@@ -128,6 +128,27 @@ def _get_feature_matrix(
     return M
 
 
+def _font_pt(size) -> float:
+    """Font size in points; rcParams may hold names such as "medium"."""
+    from matplotlib.font_manager import FontProperties
+
+    return float(FontProperties(size=size).get_size_in_points())
+
+
+def _text_extent_in(texts, fontsize: float) -> float:
+    """Widest of ``texts`` in inches when drawn at ``fontsize`` (no pyplot state touched)."""
+    from matplotlib.backends.backend_agg import FigureCanvasAgg
+    from matplotlib.figure import Figure
+
+    texts = [str(t) for t in texts if str(t)]
+    if not texts:
+        return 0.0
+    fig = Figure(figsize=(1, 1))
+    renderer = FigureCanvasAgg(fig).get_renderer()
+    widths = [fig.text(0, 0, t, fontsize=fontsize).get_window_extent(renderer).width / fig.dpi for t in texts]
+    return float(max(widths))
+
+
 # -----------------------------------------------------------------------------
 # Main function
 # -----------------------------------------------------------------------------
@@ -182,6 +203,7 @@ def dotplot(
     y_padding: float = 1.0,
     # ---- figure ----
     figsize: tuple[float, float] | None = None,
+    cell_size: float = 0.32,
     invert_yaxis: bool = True,
     title: str | None = None,
     size_title: str = "Fraction of samples\nin group (%)",
@@ -200,6 +222,12 @@ def dotplot(
       - dot sizes can auto-scale to figsize/axes (scale_dots_to_fig=True)
       - optional dendrograms (top + rows)
       - optional size encoding from an obs column (size_obs_key)
+
+    Layout is computed in inches from the number of rows and columns and the label lengths:
+    ``cell_size`` is the width and height of one dot cell (default 0.32 in); the panel,
+    dendrograms and legends are sized from it and the dots scale with the cell. Pass
+    ``figsize`` to fix the total size instead; the panel then takes the space left after the
+    labels and legends.
     """
     set_style()
 
@@ -384,14 +412,6 @@ def dotplot(
     row_labels = [row_labels[i] for i in row_order]
     col_labels = [col_labels[i] for i in col_order]
 
-    # ---- autosize figure ----
-    if figsize is None:
-        n_x = len(col_labels)
-        n_y = len(row_labels)
-        w = max(5.8, 0.50 * n_x + 3.6)
-        h = max(4.2, 0.42 * n_y + 2.6)
-        figsize = (w, h)
-
     # ---- color scaling ----
     vmin_eff = vmin if vmin is not None else float(np.nanmin(plot_vals))
     vmax_eff = vmax if vmax is not None else float(np.nanmax(plot_vals))
@@ -430,184 +450,178 @@ def dotplot(
 
     u = np.clip(u, 0.0, 1.0) ** float(size_exponent)
 
-    # ---- layout ----
-    outer_left = 0.20 if (has_row_dendro and row_dendrogram_position == "outer_left") else 0.001
-    inner_left = 0.18 if (has_row_dendro and row_dendrogram_position == "left") else 0.001
-    inner_right = 0.18 if (has_row_dendro and row_dendrogram_position == "right") else 0.001
-    legends_w = 0.58
+    # ---- layout in physical units (inches) ----
+    n_rows, n_cols = plot_vals.shape
+    xpad = float(x_padding) - 0.5
+    ypad = float(y_padding) - 0.5
+    tick_fs = _font_pt(mpl.rcParams["ytick.labelsize"])
+    label_fs = _font_pt(mpl.rcParams["axes.labelsize"])
+    line_in = 1.3 * label_fs / 72.0  # height of one line of text
 
-    fig = plt.figure(figsize=figsize, constrained_layout=False)
-    gs = GridSpec(
-        nrows=2,
-        ncols=5,
-        figure=fig,
-        height_ratios=[0.22, 1.0] if has_top_dendro else [0.001, 1.0],
-        width_ratios=[outer_left, inner_left, 1.0, inner_right, legends_w],
-        hspace=0.05,
-        wspace=0.14,
-    )
+    pad = 0.08
+    dendro_w = 0.55
+    dendro_h = 0.50
+    ylab_w = _text_extent_in(row_labels, tick_fs) + 0.12
+    xlab_h = _text_extent_in(col_labels, tick_fs) + 0.12
+    size_title_lines = (str(size_title).count("\n") + 1) if size_title else 0
+    cbar_title_lines = (str(colorbar_title).count("\n") + 1) if colorbar_title else 0
 
-    ax_top = fig.add_subplot(gs[0, 2]) if has_top_dendro else None
-    ax = fig.add_subplot(gs[1, 2])
+    left_dendro = has_row_dendro and row_dendrogram_position == "left"
+    outer_dendro = has_row_dendro and row_dendrogram_position == "outer_left"
+    right_dendro = has_row_dendro and row_dendrogram_position == "right"
 
-    ax_outer_left = fig.add_subplot(gs[1, 0]) if (has_row_dendro and row_dendrogram_position == "outer_left") else None
-    ax_inner_left = fig.add_subplot(gs[1, 1]) if (has_row_dendro and row_dendrogram_position == "left") else None
-    ax_inner_right = fig.add_subplot(gs[1, 3]) if (has_row_dendro and row_dendrogram_position == "right") else None
+    left_margin = ylab_w + (dendro_w + pad if outer_dendro else 0.0) + (dendro_w + pad if left_dendro else 0.0)
+    right_of_panel = (dendro_w + pad) if right_dendro else 0.0
+    bottom_margin = xlab_h
+    title_h = (line_in + pad) if title else 0.0
+    top_extra = ((dendro_h + pad) if has_top_dendro else 0.0) + title_h
+    top_pad = 0.10
+    gap_legend = 0.30
+    row_h = float(row_spacing)
 
-    gs_leg = gs[:, 4].subgridspec(nrows=2, ncols=1, height_ratios=[0.58, 0.42], hspace=0.25)
-    ax_leg = fig.add_subplot(gs_leg[0, 0])
-    ax_cbar = fig.add_subplot(gs_leg[1, 0])
+    def _dot_diameters(cell_w_in: float, cell_h_in: float) -> tuple[float, float]:
+        if not scale_dots_to_fig:
+            return float(np.sqrt(smallest_dot)), float(np.sqrt(largest_dot))
+        base = min(cell_w_in, cell_h_in) * 72.0
+        return 0.22 * base * float(np.sqrt(dot_scale)), 0.85 * base * float(np.sqrt(dot_scale))
 
-    # ---- dot sizes (AUTO scale to figure/axes) ----
-    if scale_dots_to_fig:
-        # compute available point space for the dot grid from the axes box
-        fig.canvas.draw_idle()
-        pos = ax.get_position()
-        ax_w_pts = figsize[0] * 72.0 * pos.width
-        ax_h_pts = figsize[1] * 72.0 * pos.height
-        nx = max(1, len(col_labels))
-        ny = max(1, len(row_labels))
-        cell_w = ax_w_pts / nx
-        cell_h = ax_h_pts / ny
-        max_diam = 0.85 * min(cell_w, cell_h)
-        min_diam = 0.22 * min(cell_w, cell_h)
+    def _legend_geometry(max_diam_pt: float) -> dict:
+        d_in = max_diam_pt / 72.0
+        spacing = max(1.35 * d_in, 0.30)
+        dots_w = 4.0 * spacing + d_in
+        text_w = max(
+            _text_extent_in(str(size_title or "").split("\n"), label_fs),
+            _text_extent_in(str(colorbar_title or "").split("\n"), label_fs),
+        )
+        w = max(dots_w + 0.1, text_w, 1.30)
+        size_h = size_title_lines * line_in + (0.08 if size_title_lines else 0.0) + d_in + 0.06 + line_in
+        cbar_h = cbar_title_lines * line_in + (0.08 if cbar_title_lines else 0.0) + 0.13 + 1.1 * line_in
+        return dict(d_in=d_in, spacing=spacing, w=w, size_h=size_h, cbar_h=cbar_h, stack_h=size_h + 0.25 + cbar_h)
 
-        largest_dot_eff = (max_diam ** 2) * float(dot_scale)
-        smallest_dot_eff = (min_diam ** 2) * float(dot_scale)
-        sizes = smallest_dot_eff + (largest_dot_eff - smallest_dot_eff) * u
+    if figsize is None:
+        cell_in = float(cell_size)
+        cell_w_in, cell_h_in = cell_in, cell_in * row_h
+        panel_w = (n_cols + 2 * xpad) * cell_w_in
+        panel_h = (n_rows + 2 * ypad) * cell_h_in
+        leg = _legend_geometry(_dot_diameters(cell_w_in, cell_h_in)[1])
+        fig_w = left_margin + panel_w + right_of_panel + gap_legend + leg["w"] + 0.05
+        fig_h = max(bottom_margin + panel_h + top_extra, bottom_margin + leg["stack_h"]) + top_pad
     else:
-        smallest_dot_eff = float(smallest_dot)
-        largest_dot_eff = float(largest_dot)
-        sizes = smallest_dot_eff + (largest_dot_eff - smallest_dot_eff) * u
+        fig_w, fig_h = float(figsize[0]), float(figsize[1])
+        leg = _legend_geometry(_dot_diameters(float(cell_size), float(cell_size) * row_h)[1])
+        # figsize is a request: grow it when labels and legends cannot fit around a readable panel
+        min_cell = 0.20
+        need_w = left_margin + right_of_panel + gap_legend + leg["w"] + 0.05 + (n_cols + 2 * xpad) * min_cell
+        need_h = (
+            max(bottom_margin + top_extra + (n_rows + 2 * ypad) * min_cell * row_h, bottom_margin + leg["stack_h"])
+            + top_pad
+        )
+        if fig_w < need_w - 1e-6 or fig_h < need_h - 1e-6:
+            new_w, new_h = max(fig_w, need_w), max(fig_h, need_h)
+            warn(
+                f"dotplot: figsize=({fig_w:g}, {fig_h:g}) is too small for the labels and legends; "
+                f"using ({new_w:.1f}, {new_h:.1f}). Omit figsize to size the plot automatically."
+            )
+            fig_w, fig_h = new_w, new_h
+        for _ in range(2):  # legend width depends on dot size, which depends on the panel
+            panel_w = max(0.5, fig_w - left_margin - right_of_panel - gap_legend - leg["w"] - 0.05)
+            panel_h = max(0.5, fig_h - bottom_margin - top_extra - top_pad)
+            cell_w_in = panel_w / (n_cols + 2 * xpad)
+            cell_h_in = panel_h / (n_rows + 2 * ypad)
+            leg = _legend_geometry(_dot_diameters(cell_w_in, cell_h_in)[1])
+
+    smallest_d, largest_d = _dot_diameters(cell_w_in, cell_h_in)
+    smallest_dot_eff, largest_dot_eff = smallest_d**2, largest_d**2
+    sizes = smallest_dot_eff + (largest_dot_eff - smallest_dot_eff) * u
+
+    fig = plt.figure(figsize=(fig_w, fig_h), constrained_layout=False)
+
+    def _rect(x: float, y: float, w: float, h: float) -> list[float]:
+        return [x / fig_w, y / fig_h, w / fig_w, h / fig_h]
+
+    x0, y0 = left_margin, bottom_margin
+    ax = fig.add_axes(_rect(x0, y0, panel_w, panel_h))
+    ax_top = fig.add_axes(_rect(x0, y0 + panel_h + pad, panel_w, dendro_h)) if has_top_dendro else None
+    ax_outer_left = fig.add_axes(_rect(0.0, y0, dendro_w, panel_h)) if outer_dendro else None
+    ax_inner_left = fig.add_axes(_rect(x0 - pad - dendro_w, y0, dendro_w, panel_h)) if left_dendro else None
+    ax_inner_right = fig.add_axes(_rect(x0 + panel_w + pad, y0, dendro_w, panel_h)) if right_dendro else None
 
     # ---- main dots (Scanpy-style coordinates) ----
-    n_rows, n_cols = plot_vals.shape
     yy, xx = np.indices((n_rows, n_cols))
     x = xx.ravel().astype(float) + 0.5
     y = yy.ravel().astype(float) + 0.5
-
     s = sizes.ravel().astype(float)
     c = cmap_obj(norm(plot_vals.ravel().astype(float)))
+    ax.scatter(x, y, s=s, c=c, edgecolors="0.2", linewidths=0.35)
+    ax.grid(False)
 
-    ax.scatter(
-        x,
-        y,
-        s=s,
-        c=c,
-        edgecolors="0.2",
-        linewidths=0.35,
-    )
-
-    # ticks at centers
-    x_ticks = np.arange(n_cols, dtype=float) + 0.5
-    y_ticks = np.arange(n_rows, dtype=float) + 0.5
-    ax.set_xticks(x_ticks)
-    ax.set_yticks(y_ticks)
-
+    ax.set_xticks(np.arange(n_cols, dtype=float) + 0.5)
+    ax.set_yticks(np.arange(n_rows, dtype=float) + 0.5)
     ax.set_xticklabels([str(v) for v in col_labels], rotation=90, ha="center")
     ax.set_yticklabels([str(v) for v in row_labels])
 
-    # axis limits (Scanpy-style padding when color_on="dot")
-    xpad = float(x_padding) - 0.5
-    ypad = float(y_padding) - 0.5
     ax.set_xlim(-xpad, float(n_cols) + xpad)
-    ax.set_ylim(float(n_rows) + ypad, -ypad)  # inverted like Scanpy
-
-    if not invert_yaxis:
-        # user wants non-inverted y: flip back
+    if invert_yaxis:
+        ax.set_ylim(float(n_rows) + ypad, -ypad)  # first group on top, like Scanpy
+    else:
         ax.set_ylim(-ypad, float(n_rows) + ypad)
 
-    # reduce y tick label padding so it doesn't crash into dendrogram area
-    ax.tick_params(axis="y", pad=10 if has_row_dendro else 6)
-
-    # x tick placement: keep bottom labels by default (more typical for bulk figures)
-    ax.tick_params(axis="x", labeltop=False, labelbottom=True)
-
+    # an inner-left dendrogram sits between the labels and the panel
+    ax.tick_params(axis="y", pad=(dendro_w + pad) * 72.0 + 4.0 if left_dendro else 4.0)
+    ax.tick_params(axis="x", labeltop=False, labelbottom=True, pad=3.0)
     ax.set_xlabel("")
     ax.set_ylabel("")
     if title is not None:
-        ax.set_title(title)
+        top_y = y0 + panel_h + ((dendro_h + pad) if has_top_dendro else 0.0) + 0.04
+        fig.text((x0 + panel_w / 2) / fig_w, top_y / fig_h, title, ha="center", va="bottom", fontsize=label_fs)
 
-    # ---- dendrograms ----
+    # ---- dendrograms (limits copied from the panel so leaves sit on the dots) ----
     if ax_top is not None:
         _plot_col_dendrogram_aligned(ax_top, Z_col, n_leaves=len(col_labels))
+        ax_top.set_xlim(ax.get_xlim())
+    for dax, mirror in ((ax_outer_left, True), (ax_inner_left, True), (ax_inner_right, False)):
+        if dax is not None:
+            _plot_row_dendrogram_aligned(dax, Z_row, n_leaves=len(row_labels), invert_y=invert_yaxis, mirror_x=mirror)
+            dax.set_ylim(ax.get_ylim())
 
-    # mirror_x=True flips the row dendrogram horizontally (so it “points” to the matrix)
-    if ax_outer_left is not None:
-        _plot_row_dendrogram_aligned(ax_outer_left, Z_row, n_leaves=len(row_labels), invert_y=invert_yaxis, mirror_x=True)
-    if ax_inner_left is not None:
-        _plot_row_dendrogram_aligned(ax_inner_left, Z_row, n_leaves=len(row_labels), invert_y=invert_yaxis, mirror_x=True)
-    if ax_inner_right is not None:
-        _plot_row_dendrogram_aligned(ax_inner_right, Z_row, n_leaves=len(row_labels), invert_y=invert_yaxis, mirror_x=False)
+    # ---- legends: one column to the right, size legend above colour bar ----
+    x_leg = x0 + panel_w + right_of_panel + gap_legend
+    top_y = fig_h - top_pad
+    d_in, spacing = leg["d_in"], leg["spacing"]
 
-    # ---- legends ----
-    ax_leg.axis("off")
-    ax_leg.text(0.0, 1.00, size_title, ha="left", va="top", transform=ax_leg.transAxes)
+    if size_title:
+        fig.text(x_leg / fig_w, top_y / fig_h, size_title, ha="left", va="top", fontsize=label_fs, linespacing=1.15)
+    dots_y = top_y - size_title_lines * line_in - (0.08 if size_title_lines else 0.0) - d_in / 2.0
 
-    # legend reference points (fractions)
-    ref = np.array([0.2, 0.4, 0.6, 0.8, 1.0], dtype=float)
-    ref = np.clip(ref, dot_min_eff, dot_max_eff)
+    ref = np.clip(np.round(np.linspace(0.2, 1.0, 5) * dot_max_eff * 20.0) / 20.0, dot_min_eff, dot_max_eff)
     if (dot_max_eff - dot_min_eff) > 0:
         ref_u = ((ref - dot_min_eff) / (dot_max_eff - dot_min_eff)) ** float(size_exponent)
     else:
         ref_u = np.zeros_like(ref)
-
     ref_s = smallest_dot_eff + (largest_dot_eff - smallest_dot_eff) * ref_u
 
-    x0, y0, dx = 0.12, 0.55, 0.16
-    for j, rs in enumerate(ref_s):
-        ax_leg.scatter(
-            [x0 + j * dx],
-            [y0],
-            s=float(rs),
-            color="0.55",
-            edgecolors="0.2",
-            linewidths=0.3,
-            transform=ax_leg.transAxes,
-        )
+    ax_leg = fig.add_axes([0.0, 0.0, 1.0, 1.0], facecolor="none")  # full-figure overlay in inches
+    ax_leg.set_xlim(0.0, fig_w)
+    ax_leg.set_ylim(0.0, fig_h)
+    ax_leg.axis("off")
+    for j, (val, rs) in enumerate(zip(ref, ref_s)):
+        cx = x_leg + d_in / 2.0 + j * spacing
+        ax_leg.scatter([cx], [dots_y], s=float(rs), color="0.55", edgecolors="0.2", linewidths=0.3)
+        if size_obs_key is None:
+            label = f"{int(round(val * 100))}"
+        else:
+            label = "low" if j == 0 else ("high" if j == len(ref) - 1 else "")
+        ax_leg.text(cx, dots_y - d_in / 2.0 - 0.05, label, ha="center", va="top", fontsize=tick_fs)
 
-    if size_obs_key is None:
-        ax_leg.text(0.12, 0.25, "20  40  60  80  100", ha="left", va="center", transform=ax_leg.transAxes)
-    else:
-        ax_leg.text(0.12, 0.25, "low          high", ha="left", va="center", transform=ax_leg.transAxes)
-
-    sm = mpl.cm.ScalarMappable(norm=norm, cmap=cmap_obj)
-    cb = fig.colorbar(sm, cax=ax_cbar, orientation="horizontal")
-    cb.set_label(colorbar_title)
-
-    # ---- margins (make room for long y-labels) ----
-    if swap_axes:
-        left = 0.42 if has_row_dendro else 0.30
-        bottom = 0.18
-    else:
-        left = 0.32 if has_row_dendro else 0.20
-        bottom = 0.14
-
-    fig.subplots_adjust(left=left, right=0.98, top=0.92, bottom=bottom)
-
-    # --- shrink legend colorbar height ---
-    def _shrink_axis_box(a: plt.Axes, height_factor: float = 0.2) -> None:
-        if a is None:
-            return
-        pos = a.get_position()
-        new_h = pos.height * float(height_factor)
-        a.set_position([pos.x0, pos.y0 + (pos.height - new_h), pos.width, new_h])
-
-    _shrink_axis_box(ax_cbar, height_factor=0.2)
-
-    # ---- optional row spacing compression (kept for compatibility) ----
-    def _shrink_axis_height(a: plt.Axes, factor: float) -> None:
-        if a is None:
-            return
-        pos = a.get_position()
-        new_h = pos.height * float(factor)
-        a.set_position([pos.x0, pos.y0 + (pos.height - new_h), pos.width, new_h])
-
-    if float(row_spacing) != 1.0:
-        _shrink_axis_height(ax, float(row_spacing))
-        _shrink_axis_height(ax_outer_left, float(row_spacing))
-        _shrink_axis_height(ax_inner_left, float(row_spacing))
-        _shrink_axis_height(ax_inner_right, float(row_spacing))
+    cb_top = top_y - leg["size_h"] - 0.25
+    if colorbar_title:
+        fig.text(x_leg / fig_w, cb_top / fig_h, colorbar_title, ha="left", va="top", fontsize=label_fs, linespacing=1.15)
+    bar_y = cb_top - cbar_title_lines * line_in - (0.08 if cbar_title_lines else 0.0) - 0.13
+    ax_cbar = fig.add_axes(_rect(x_leg, bar_y, max(1.1, min(leg["w"], 1.5)), 0.13))
+    cb = fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap_obj), cax=ax_cbar, orientation="horizontal")
+    cb.ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(4))
+    cb.ax.tick_params(labelsize=tick_fs, length=2.5, pad=2)
+    cb.outline.set_linewidth(0.5)
 
     if save is not None:
         _savefig(fig, save)
