@@ -73,7 +73,7 @@ def gene_plot(
     title: str | None = None,
     figsize: tuple[float, float] | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ) -> tuple[plt.Figure, plt.Axes, dict]:
     """
     Plot one gene across groups (bulk): violin/box + optional p-value.
@@ -119,7 +119,10 @@ def gene_plot(
     # figure
     if figsize is None:
         figsize = (max(5.0, 0.8 * len(cats) + 2.2), 4.2)
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
 
     # main plot
     if kind in ("violin", "both"):

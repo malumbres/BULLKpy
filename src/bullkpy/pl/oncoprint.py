@@ -14,6 +14,7 @@ import anndata as ad
 from ._style import set_style
 from ..logging import warn
 from .._genes import gene_loc as _gene_loc
+from ._style import _savefig
 
 
 def _get_expr_matrix(
@@ -447,7 +448,7 @@ def oncoprint(
         # save directly with dpi override
         save = Path(save)
         save.parent.mkdir(parents=True, exist_ok=True)
-        fig.savefig(save, dpi=dpi_use, bbox_inches="tight")
+        _savefig(fig, save, dpi=dpi_use)
 
     if show:
         plt.show()

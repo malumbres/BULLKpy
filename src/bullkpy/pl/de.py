@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import anndata as ad
 
 from ._style import set_style, _savefig
+from ._de_utils import get_de_table
+from .._deprecated import renamed_kwargs
 
 
 def _get_de_table(
@@ -26,17 +28,18 @@ def _get_de_table(
         uns_key = "de"
     if contrast is None:
         raise ValueError("When using `adata`, you must provide `contrast=`.")
-    return adata.uns[uns_key][contrast]["results"]
+    return get_de_table(adata, uns_key=uns_key, contrast=contrast)
 
 
 
+@renamed_kwargs(q_col="qval_col", p_col="pval_col")
 def volcano(
     res: pd.DataFrame,
     *,
     gene_col: str = "gene",
     fc_col: str = "log2FC",
-    p_col: str = "pval",
-    q_col: str = "qval",
+    pval_col: str = "pval",
+    qval_col: str = "qval",
     use_qval: bool = True,
     p_cutoff: float = 0.05,
     fc_cutoff: float = 0.0,  # optional, set >0 to require |log2FC| >= fc_cutoff
@@ -57,7 +60,7 @@ def volcano(
     # thresholds lines
     show_thresholds: bool = True,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Volcano plot for DE results.
@@ -75,15 +78,15 @@ def volcano(
     set_style()
 
     df = res.copy()
-    for c in (gene_col, fc_col, p_col):
+    for c in (gene_col, fc_col, pval_col):
         if c not in df.columns:
             raise KeyError(f"'{c}' column not found in results.")
-    if use_qval and (q_col not in df.columns):
-        raise KeyError(f"use_qval=True but '{q_col}' column not found in results.")
+    if use_qval and (qval_col not in df.columns):
+        raise KeyError(f"use_qval=True but '{qval_col}' column not found in results.")
 
     # numeric coercion
     df[fc_col] = pd.to_numeric(df[fc_col], errors="coerce")
-    p_used_col = q_col if use_qval else p_col
+    p_used_col = qval_col if use_qval else pval_col
     df[p_used_col] = pd.to_numeric(df[p_used_col], errors="coerce")
 
     # drop NA for plotting
@@ -103,7 +106,10 @@ def volcano(
     down = sig & (df[fc_col] < 0)
     ns = ~sig
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     # plot in layers: ns first, then down, then up (so sig points are on top)
     ax.scatter(
@@ -202,11 +208,12 @@ def volcano(
 
 
 
+@renamed_kwargs(uns_key="key")
 def rankplot(
     adata: ad.AnnData | None = None,
     *,
     res: pd.DataFrame | None = None,
-    uns_key: str | None = None,
+    key: str | None = None,
     contrast: str | None = None,
     n_genes: int = 20,
     sort_by: str = "qval",           # "qval" | "pval" | "log2FC"
@@ -215,7 +222,7 @@ def rankplot(
     figsize: tuple[float, float] = (7, 6),
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Ranked horizontal barplot of top DE genes (up/down).
@@ -226,7 +233,7 @@ def rankplot(
     - For direction="both": top shows strongest upregulated; bottom shows strongest downregulated (last).
     """
     set_style()
-    df = _get_de_table(adata, res=res, uns_key=uns_key, contrast=contrast).copy()
+    df = _get_de_table(adata, res=res, uns_key=key, contrast=contrast).copy()
 
     gene_col = "gene" if "gene" in df.columns else df.columns[0]
 
@@ -309,7 +316,10 @@ def rankplot(
 
     colors = np.where(vals >= 0, "#D62728", "#1F77B4")  # red / blue
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
     ax.barh(genes, vals, color=colors)
     ax.axvline(0, linewidth=1)
 
@@ -354,7 +364,7 @@ def ma(
     ylabel: str | None = None,
     figsize: tuple[float, float] = (8.5, 5.5),
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     MA plot for DE results.
@@ -452,7 +462,10 @@ def ma(
     nonsig = ~(up | down)
 
     # Plot
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     # non-significant (grey)
     ax.scatter(

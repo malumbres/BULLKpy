@@ -26,7 +26,7 @@ def association_heatmap(
     figsize: tuple[float, float] | None = None,
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Generic heatmap for association outputs.
@@ -62,7 +62,10 @@ def association_heatmap(
     if figsize is None:
         figsize = (max(6, 0.25 * piv.shape[1] + 3), max(4, 0.25 * piv.shape[0] + 2))
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
     im = ax.imshow(mat, aspect="auto", cmap=cmap, vmin=vmin, vmax=vmax)
 
     ax.set_xticks(np.arange(piv.shape[1]))
@@ -94,7 +97,7 @@ def boxplot_with_stats(
     point_alpha: float = 0.3,
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Box/violin plot of a numeric obs column across categorical groups, with a
@@ -129,7 +132,10 @@ def boxplot_with_stats(
             from scipy.stats import kruskal
             pval = kruskal(*[v for v in groups if v.size > 0]).pvalue
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     positions = np.arange(len(cats))
     if kind == "box":

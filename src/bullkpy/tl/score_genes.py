@@ -7,14 +7,12 @@ import scipy.sparse as sp
 import anndata as ad
 
 from ..logging import info, warn
+from functools import partial
+from .._matrix import get_matrix as _get_matrix_impl
+from .._deprecated import renamed_kwargs
 
 
-def _get_X(adata: ad.AnnData, layer: str | None) -> sp.spmatrix | np.ndarray:
-    if layer is None:
-        return adata.X
-    if layer in adata.layers:
-        return adata.layers[layer]
-    raise KeyError(f"layer='{layer}' not found in adata.layers")
+_get_X = partial(_get_matrix_impl, dense=False)
 
 
 def _as_1d(a) -> np.ndarray:
@@ -65,6 +63,7 @@ def _validate_gene_list(adata: ad.AnnData, genes: Sequence[str], *, name: str = 
     return present
 
 
+@renamed_kwargs(random_state="seed")
 def score_genes(
     adata: ad.AnnData,
     genes: Sequence[str],
@@ -74,7 +73,7 @@ def score_genes(
     gene_pool: Sequence[str] | None = None,
     ctrl_size: int = 50,
     n_bins: int = 25,
-    random_state: int | None = 0,
+    seed: int | None = 0,
     scale: bool = False,
 ) -> None:
     """
@@ -127,7 +126,7 @@ def score_genes(
 
     pool_bins = np.digitize(pool_means, bin_edges[1:-1], right=True)
 
-    rng = np.random.default_rng(random_state)
+    rng = np.random.default_rng(seed)
 
     ctrl_indices: list[int] = []
     for m in sig_means:
@@ -159,6 +158,7 @@ def score_genes(
     info(f"score_genes: stored '{score_name}' in adata.obs (n_sig={len(sig)}, n_ctrl={ctrl_idx.size}, layer={layer})")
 
 
+@renamed_kwargs(random_state="seed")
 def score_genes_dict(
     adata: ad.AnnData,
     gene_sets: Mapping[str, Sequence[str]],
@@ -169,7 +169,7 @@ def score_genes_dict(
     gene_pool: Sequence[str] | None = None,
     ctrl_size: int = 50,
     n_bins: int = 25,
-    random_state: int | None = 0,
+    seed: int | None = 0,
     scale: bool = False,
 ) -> None:
     """
@@ -191,11 +191,12 @@ def score_genes_dict(
             gene_pool=gene_pool,
             ctrl_size=ctrl_size,
             n_bins=n_bins,
-            random_state=random_state,
+            seed=seed,
             scale=scale,
         )
 
 
+@renamed_kwargs(random_state="seed")
 def score_genes_cell_cycle(
     adata: ad.AnnData,
     *,
@@ -205,7 +206,7 @@ def score_genes_cell_cycle(
     gene_pool: Sequence[str] | None = None,
     ctrl_size: int = 50,
     n_bins: int = 25,
-    random_state: int | None = 0,
+    seed: int | None = 0,
     scale: bool = False,
     s_score: str = "S_score",
     g2m_score: str = "G2M_score",
@@ -238,7 +239,7 @@ def score_genes_cell_cycle(
         gene_pool=gene_pool,
         ctrl_size=ctrl_size,
         n_bins=n_bins,
-        random_state=random_state,
+        seed=seed,
         scale=scale,
     )
     score_genes(
@@ -249,7 +250,7 @@ def score_genes_cell_cycle(
         gene_pool=gene_pool,
         ctrl_size=ctrl_size,
         n_bins=n_bins,
-        random_state=None if random_state is None else (int(random_state) + 1),
+        seed=None if seed is None else (int(seed) + 1),
         scale=scale,
     )
 

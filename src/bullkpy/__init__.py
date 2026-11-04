@@ -15,15 +15,6 @@ except PackageNotFoundError:
 from ._settings import settings
 from .io import read_counts, add_metadata
 
-# --- auto Jupyter fix (Scanpy-like) ---
-try:
-    from ._jupyter import in_jupyter, apply_inline_dpi_defaults
-
-    if in_jupyter():
-        apply_inline_dpi_defaults()
-except Exception:
-    pass
-
 from . import pp, pl, tl, get, logging, io
 from .logging import info, warn, debug, error  # noqa: F401
 

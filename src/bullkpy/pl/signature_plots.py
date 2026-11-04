@@ -10,6 +10,9 @@ from anndata import AnnData
 
 
 from sklearn.metrics import precision_recall_curve, average_precision_score
+from ._style import _savefig
+from .._deprecated import renamed_kwargs
+from ..tl.signature import bootstrap_pr_bands
 
 
 
@@ -24,7 +27,7 @@ def auc_cv_heatmap(
     annotate: bool = True,
     annot_fontsize: float = 7.0,
     save: str | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Heatmap of mean AUC across (C, l1_ratio).
@@ -38,7 +41,10 @@ def auc_cv_heatmap(
     piv = piv.sort_index(ascending=True)
     piv = piv.loc[:, sorted(piv.columns, key=float)]
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     im = ax.imshow(piv.to_numpy(), aspect="auto")
 
     ax.set_title(title, pad=10)
@@ -63,7 +69,7 @@ def auc_cv_heatmap(
 
     fig.tight_layout()
     if save is not None:
-        fig.savefig(save, bbox_inches="tight", dpi=300)
+        _savefig(fig, save, dpi=300)
     if show:
         plt.show()
     return fig, ax, piv
@@ -83,7 +89,7 @@ def pr_curve_signatures(
     alpha: float = 0.95,
     show_baseline: bool = True,
     baseline_ls: str = "--",
-    seed: int = 0,
+    seed: int = 0, ax: plt.Axes | None = None,
 ):
     """
     Plot PR curves for multiple signatures on the same cohort.
@@ -136,7 +142,10 @@ def pr_curve_signatures(
         return 1.0 / (1.0 + np.exp(-z))
 
     rows = []
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
 
     # Plot each signature
     for name, spec in sigs.items():
@@ -334,104 +343,6 @@ def plot_pr_curves_signatures(
 #######################################################################
 
 
-
-def _pr_curve_interp(y_true, y_score, recall_grid):
-    """
-    Compute PR curve and interpolate precision onto a fixed recall grid.
-    Returns precision_on_grid (shape = len(recall_grid)).
-    """
-    prec, rec, _ = precision_recall_curve(y_true, y_score)
-
-    # sklearn PR curve can have recall either increasing or decreasing depending on version/edges;
-    # make it strictly increasing for interpolation.
-    order = np.argsort(rec)
-    rec_s = rec[order]
-    prec_s = prec[order]
-
-    # Deduplicate recall values (interp needs monotonic x)
-    # Keep the max precision for duplicate recall points (conservative-ish).
-    rec_u, idx = np.unique(rec_s, return_index=True)
-    prec_u = prec_s[idx]
-
-    # Interpolate precision at recall_grid; outside range -> boundary values
-    # (recall is in [0,1])
-    p_on_grid = np.interp(recall_grid, rec_u, prec_u, left=prec_u[0], right=prec_u[-1])
-    return p_on_grid
-
-
-def bootstrap_pr_bands(
-    y_true,
-    y_score,
-    *,
-    recall_grid=None,
-    n_boot=500,
-    seed=0,
-    ci=(2.5, 97.5),
-    min_pos=2,
-):
-    """
-    Bootstrap PR curves by resampling samples with replacement.
-    Returns dict with:
-      - recall_grid
-      - prec_med, prec_lo, prec_hi (arrays)
-      - ap, ap_lo, ap_hi (scalars) for PR-AUC (Average Precision)
-      - n_boot_ok
-    """
-    y_true = np.asarray(y_true, int)
-    y_score = np.asarray(y_score, float)
-
-    if recall_grid is None:
-        recall_grid = np.linspace(0, 1, 201)
-
-    rng = np.random.default_rng(int(seed))
-    n = y_true.size
-
-    curves = []
-    aps = []
-    n_ok = 0
-
-    for _ in range(int(n_boot)):
-        idx = rng.integers(0, n, size=n)
-        yb = y_true[idx]
-        if (yb.sum() < int(min_pos)) or (len(np.unique(yb)) < 2):
-            continue
-        sb = y_score[idx]
-
-        curves.append(_pr_curve_interp(yb, sb, recall_grid))
-        aps.append(float(average_precision_score(yb, sb)))
-        n_ok += 1
-
-    if n_ok == 0:
-        return {
-            "recall_grid": recall_grid,
-            "prec_med": np.full_like(recall_grid, np.nan, dtype=float),
-            "prec_lo": np.full_like(recall_grid, np.nan, dtype=float),
-            "prec_hi": np.full_like(recall_grid, np.nan, dtype=float),
-            "ap": np.nan,
-            "ap_lo": np.nan,
-            "ap_hi": np.nan,
-            "n_boot_ok": 0,
-        }
-
-    curves = np.vstack(curves)  # (n_ok, len(grid))
-    aps = np.asarray(aps, float)
-
-    lo_q, hi_q = np.percentile(curves, ci, axis=0)
-    med = np.median(curves, axis=0)
-
-    ap_lo, ap_hi = np.percentile(aps, ci)
-    ap = float(average_precision_score(y_true, y_score))
-
-    return {
-        "recall_grid": recall_grid,
-        "prec_med": med,
-        "prec_lo": lo_q,
-        "prec_hi": hi_q,
-        "ap": float(ap),
-        "ap_lo": float(ap_lo),
-        "ap_hi": float(ap_hi),
-        "n_boot_ok": int(n_ok),
-    }
 
 ## PR plot with bootstrap bands (single axis; one or multiple signatures)
 def plot_pr_curves_signatures_bootstrap(
@@ -777,35 +688,39 @@ def plot_pub_template_pr(
 
 
 
+@renamed_kwargs(uns_key="key")
 def signature_dispersion_heatmap(
     adata: AnnData,
     *,
-    uns_key: str = "signature_dispersion",
+    key: str = "signature_dispersion",
     title: Optional[str] = None,
     show: bool = True,
-    save: Optional[str] = None,
+    save: Optional[str] = None, ax: plt.Axes | None = None,
 ):
     """
     Heatmap of signature dispersion across groups.
-    Expects `adata.uns[uns_key]` to be a DataFrame with columns:
+    Expects `adata.uns[key]` to be a DataFrame with columns:
       group, signature, dispersion
     (as returned by `bk.tl.signature_dispersion_by_group`).
     """
-    if uns_key not in adata.uns:
-        raise KeyError(f"{uns_key!r} not found in adata.uns")
+    if key not in adata.uns:
+        raise KeyError(f"{key!r} not found in adata.uns")
 
-    df = adata.uns[uns_key]
+    df = adata.uns[key]
     if not isinstance(df, pd.DataFrame):
         df = pd.DataFrame(df)
 
     req = {"group", "signature", "dispersion"}
     if not req.issubset(df.columns):
-        raise ValueError(f"{uns_key} must contain columns {req}")
+        raise ValueError(f"{key} must contain columns {req}")
 
     mat = df.pivot(index="signature", columns="group", values="dispersion")
     arr = mat.to_numpy(dtype=float)
 
-    fig, ax = plt.subplots(figsize=(8, 4))
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(8, 4))
+    else:
+        fig = ax.figure
     im = ax.imshow(arr, aspect="auto")
     ax.set_yticks(range(mat.shape[0]))
     ax.set_yticklabels(mat.index.tolist(), fontsize=7)
@@ -815,7 +730,7 @@ def signature_dispersion_heatmap(
     fig.colorbar(im, ax=ax, fraction=0.03, pad=0.02)
 
     if save is not None:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return ax

@@ -29,7 +29,7 @@ def pca_loadings_bar(
     figsize: tuple[float, float] | None = None,
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ) -> tuple[plt.Figure, plt.Axes]:
     """
     Plot top PCA loadings for a single PC.
@@ -88,7 +88,10 @@ def pca_loadings_bar(
         h = max(3.2, 0.22 * plot_df.shape[0] + 1.2)
         figsize = (6.8, h)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
 
     # color convention: negatives one tone, positives another; abs as neutral
     colors = []
@@ -138,7 +141,7 @@ def pca_loadings_heatmap(
     figsize: tuple[float, float] | None = None,
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Heatmap of PCA loadings for union of top genes across selected PCs.
@@ -231,7 +234,10 @@ def pca_loadings_heatmap(
 
         fig = cg.fig
     else:
-        fig, ax = plt.subplots(figsize=figsize)
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+        else:
+            fig = ax.figure
         sns.heatmap(
             dfm,
             cmap=cmap,

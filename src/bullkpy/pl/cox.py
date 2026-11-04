@@ -11,6 +11,8 @@ from anndata import AnnData
 from ._style import set_style, _savefig
 from .._genes import gene_loc as _gene_loc
 from .._compat import group_labels as _group_labels
+from ..logging import warn
+from .._deprecated import renamed_kwargs
 
 
 
@@ -31,7 +33,7 @@ def cox_volcano(
     point_size: float = 12.0,
     point_alpha: float = 0.75,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Cox volcano plot: log(HR) vs -log10(significance).
@@ -114,7 +116,10 @@ def cox_volcano(
     if min_effect_loghr is not None:
         is_sig = is_sig & (np.abs(xvals) >= float(min_effect_loghr))
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     # base points
     ax.scatter(
@@ -195,7 +200,7 @@ def cox_forest(
     save: str | Path | None = None,
     show: bool = True,
     hr_text_x: float = 1.02,          # <- x position in axes-fraction (to the right)
-    right_margin: float = 0.78,       # <- makes room for the text column
+    right_margin: float = 0.78, ax: plt.Axes | None = None,       # <- makes room for the text column
 ):
     """
     Forest plot for Cox proportional hazards results.
@@ -260,7 +265,10 @@ def cox_forest(
         figsize = (7.6, h)  # a touch wider to accommodate the text column
 
     # IMPORTANT: use subplots_adjust to reserve space for right-side text
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=False)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=False)
+    else:
+        fig = ax.figure
     fig.subplots_adjust(right=right_margin)
 
     # CI bars
@@ -616,7 +624,7 @@ def time_dependent_roc(
     title: str | None = None,
     figsize: tuple[float, float] = (6.3, 5.0),
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Time-dependent ROC/AUC using scikit-survival (optional dependency).
@@ -653,7 +661,10 @@ def time_dependent_roc(
     # for proper estimation, pass external/test data or use CV.
     auc, mean_auc = cumulative_dynamic_auc(y, y, s, times)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     ax.plot(times, auc, marker="o")
     ax.set_xlabel("Time")
     ax.set_ylabel("AUC(t)")
@@ -678,7 +689,7 @@ def panel_size_cindex_plot(
     show_errorbar: bool = True,
     figsize: tuple[float, float] = (6.5, 4.5),
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ) -> tuple[plt.Figure, plt.Axes]:
     """
     Plot panel size vs (mean±sd) C-index curve produced by `bk.tl.panel_size_cindex`.
@@ -696,7 +707,10 @@ def panel_size_cindex_plot(
 
     df = df_curve.sort_values("size").copy()
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     x = df["size"].to_numpy(dtype=float)
     y = df["c_index_mean"].to_numpy(dtype=float)
 
@@ -741,7 +755,7 @@ def stability_barplot(
     title: str | None = "Stability selection (gene frequency)",
     figsize: tuple[float, float] | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ) -> tuple[plt.Figure, plt.Axes]:
     """
     Barplot for stability selection output from `bk.tl.cox_stability_selection`.
@@ -769,7 +783,10 @@ def stability_barplot(
         h = max(3.2, 0.22 * df.shape[0] + 1.2)
         figsize = (7.0, h)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     ax.barh(df["gene"].iloc[::-1], df["freq"].iloc[::-1])
     ax.set_xlabel("Selection frequency")
     ax.set_ylabel("")
@@ -802,7 +819,7 @@ def permutation_importance_barplot(
     show_values: bool = False,
     value_fontsize: float = 8.0,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Barplot of permutation importance for signature genes with error bars.
@@ -866,7 +883,10 @@ def permutation_importance_barplot(
     sds = df[col_sd].to_numpy(float)
     genes = df["gene"].to_numpy(str)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
 
     ax.barh(y, means, xerr=sds, capsize=3, alpha=0.9)
     ax.set_yticks(y)
@@ -905,62 +925,6 @@ def permutation_importance_barplot(
 
 
 
-def auc_cv_heatmap(
-    df_cv: pd.DataFrame,
-    *,
-    value_col: str = "auc_mean",
-    x_col: str = "C",
-    y_col: str = "l1_ratio",
-    title: str = "AUC CV grid (mean AUC)",
-    figsize: tuple[float, float] = (5.0, 3.8),
-    annotate: bool = True,
-    annot_fontsize: float = 7.0,
-    save: str | None = None,
-    show: bool = True,
-):
-    """
-    Heatmap of mean AUC across (C, l1_ratio).
-    Expects df_cv from recommended_auc_panel (columns: C, l1_ratio, auc_mean).
-    """
-    req = {x_col, y_col, value_col}
-    if not req.issubset(df_cv.columns):
-        raise KeyError(f"df_cv must contain {sorted(req)}")
-
-    piv = df_cv.pivot_table(index=y_col, columns=x_col, values=value_col, aggfunc="mean")
-    piv = piv.sort_index(ascending=True)
-    piv = piv.loc[:, sorted(piv.columns, key=float)]
-
-    fig, ax = plt.subplots(figsize=figsize)
-    im = ax.imshow(piv.to_numpy(), aspect="auto")
-
-    ax.set_title(title, pad=10)
-    ax.set_xlabel(x_col)
-    ax.set_ylabel(y_col)
-
-    ax.set_xticks(np.arange(piv.shape[1]))
-    ax.set_xticklabels([f"{float(c):g}" for c in piv.columns], rotation=90)
-    ax.set_yticks(np.arange(piv.shape[0]))
-    ax.set_yticklabels([f"{float(r):g}" for r in piv.index])
-
-    cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
-    cbar.set_label(value_col)
-
-    if annotate and piv.size <= 400:
-        arr = piv.to_numpy()
-        for i in range(arr.shape[0]):
-            for j in range(arr.shape[1]):
-                v = arr[i, j]
-                if np.isfinite(v):
-                    ax.text(j, i, f"{v:.3f}", ha="center", va="center", fontsize=float(annot_fontsize))
-
-    fig.tight_layout()
-    if save is not None:
-        fig.savefig(save, bbox_inches="tight", dpi=300)
-    if show:
-        plt.show()
-    return fig, ax, piv
-
-
 def stability_freq_bar(
     df_stability: pd.DataFrame,
     *,
@@ -972,7 +936,7 @@ def stability_freq_bar(
     show_values: bool = True,
     value_fontsize: float = 8.0,
     save: str | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Horizontal barplot of stability frequencies.
@@ -985,7 +949,10 @@ def stability_freq_bar(
     df = df[np.isfinite(df[freq_col])].sort_values(freq_col, ascending=False).head(int(top))
     df = df.iloc[::-1]  # so best is at top
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     y = np.arange(df.shape[0])
     ax.barh(y, df[freq_col].to_numpy(float))
 
@@ -1001,143 +968,12 @@ def stability_freq_bar(
 
     fig.tight_layout()
     if save is not None:
-        fig.savefig(save, bbox_inches="tight", dpi=300)
+        _savefig(fig, save, dpi=300)
     if show:
         plt.show()
 
     return fig, ax, df
 
-
-
-def pr_curve_signatures(
-    adata,
-    *,
-    sigs: dict,
-    label_col: str,
-    positive_label: str = "NR",
-    layer: str | None = "log1p_cpm",
-    use_proba: bool = True,
-    figsize: tuple[float, float] = (6.0, 5.0),
-    title: str | None = None,
-    lw: float = 2.0,
-    alpha: float = 0.95,
-    show_baseline: bool = True,
-    baseline_ls: str = "--",
-    seed: int = 0,
-):
-    """
-    Plot PR curves for multiple signatures on the same cohort.
-
-    Parameters
-    ----------
-    sigs : dict
-        Mapping name -> dict with:
-            - "weights": pd.DataFrame with columns ["gene","beta"]
-            - optional "intercept": float (default 0.0)
-
-        Example:
-        sigs = {
-          "S12": {"weights": w12, "intercept": 0.0},
-          "NEW12": {"weights": w_new, "intercept": out["intercept"]},
-        }
-
-    Returns
-    -------
-    fig, ax, df_scores
-        df_scores has per-signature PR-AUC and prevalence.
-    """
-    import numpy as np
-    import pandas as pd
-    import matplotlib.pyplot as plt
-
-    try:
-        from sklearn.metrics import precision_recall_curve, average_precision_score
-    except Exception as e:
-        raise ImportError(f"pr_curve_signatures requires scikit-learn. ({e})")
-
-    # local import to avoid circulars
-    from .signature import signature_score
-
-    if label_col not in adata.obs.columns:
-        raise KeyError(f"label_col='{label_col}' not found in adata.obs")
-
-    # encode labels
-    yraw = adata.obs[label_col].astype("object")
-    ok_y = yraw.notna().to_numpy()
-    y = (yraw.iloc[np.where(ok_y)[0]].astype(str) == str(positive_label)).astype(int).to_numpy()
-
-    if len(np.unique(y)) < 2:
-        raise ValueError("Need both classes present to plot PR curve.")
-
-    prevalence = float(y.mean())
-
-    def _sigmoid(z):
-        z = np.clip(np.asarray(z, float), -50, 50)
-        return 1.0 / (1.0 + np.exp(-z))
-
-    rows = []
-    fig, ax = plt.subplots(figsize=figsize)
-
-    # Plot each signature
-    for name, spec in sigs.items():
-        if "weights" not in spec:
-            raise ValueError(f"sigs['{name}'] must include 'weights'")
-
-        w = spec["weights"]
-        intercept = float(spec.get("intercept", 0.0))
-
-        score_key = f"_sigscore_{name}_{seed}"
-        signature_score(adata, weights=w, layer=layer, key_added=score_key)
-
-        s = pd.to_numeric(adata.obs[score_key], errors="coerce").to_numpy(float)
-        s = s[ok_y]
-
-        ok = np.isfinite(s)
-        yy = y[ok]
-        ss = s[ok]
-
-        if len(np.unique(yy)) < 2 or ss.size < 10:
-            rows.append({"signature": name, "pr_auc": np.nan, "n": int(ss.size), "n_pos": int(yy.sum()), "prevalence": prevalence})
-            continue
-
-        pred = _sigmoid(intercept + ss) if use_proba else ss
-
-        pr_auc = float(average_precision_score(yy, pred))
-        precision, recall, _ = precision_recall_curve(yy, pred)
-
-        ax.plot(
-            recall, precision,
-            linewidth=float(lw),
-            alpha=float(alpha),
-            label=f"{name} (PR-AUC={pr_auc:.3f})",
-        )
-
-        rows.append(
-            {
-                "signature": name,
-                "pr_auc": pr_auc,
-                "n": int(ss.size),
-                "n_pos": int(yy.sum()),
-                "prevalence": prevalence,
-            }
-        )
-
-    # baseline prevalence line
-    if show_baseline:
-        ax.hlines(prevalence, 0.0, 1.0, linestyles=baseline_ls, linewidth=1.5, label=f"Baseline (prev={prevalence:.3f})")
-
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
-    ax.set_xlabel("Recall")
-    ax.set_ylabel("Precision")
-    if title is None:
-        title = f"Precision–Recall curves ({label_col}, positive='{positive_label}')"
-    ax.set_title(title)
-    ax.legend(frameon=False, fontsize=9, loc="best")
-    ax.grid(True, linestyle=":", linewidth=0.7, alpha=0.6)
-
-    df_scores = pd.DataFrame(rows).sort_values("pr_auc", ascending=False, na_position="last").reset_index(drop=True)
-    return fig, ax, df_scores
 
 
 #################################################################
@@ -1194,10 +1030,11 @@ def _set_xscale_and_limits(
     return x_text
 
 
+@renamed_kwargs(uns_key="key")
 def cox_forest_from_uns(
     adata,
     *,
-    uns_key: str = "cox",
+    key: str = "cox",
     uns: dict | None = None,                 # : accept payload directly
     title: Optional[str] = None,
     x_keys: Optional[Sequence[str]] = None,
@@ -1210,7 +1047,7 @@ def cox_forest_from_uns(
     save: Optional[str] = None,
 ):
     """
-    Forest plot for Cox results stored in `adata.uns[uns_key]` OR passed via `uns=`.
+    Forest plot for Cox results stored in `adata.uns[key]` OR passed via `uns=`.
 
     Supports two formats:
     1) Multi-x tidy table produced by `bk.tl.cox_univariate(..., x_keys=[...])`
@@ -1232,9 +1069,9 @@ def cox_forest_from_uns(
     if uns is None:
         if adata is None:
             raise ValueError("Provide either `adata` (with adata.uns[uns_key]) or `uns=...`.")
-        if uns_key not in adata.uns:
-            raise KeyError(f"{uns_key!r} not found in adata.uns")
-        payload = adata.uns[uns_key]
+        if key not in adata.uns:
+            raise KeyError(f"{key!r} not found in adata.uns")
+        payload = adata.uns[key]
     else:
         payload = uns
 
@@ -1349,7 +1186,7 @@ def cox_forest_from_uns(
 
         plt.tight_layout()
         if save:
-            fig.savefig(save, bbox_inches="tight")
+            _savefig(fig, save)
         if show:
             plt.show()
         return ax
@@ -1411,105 +1248,13 @@ def cox_forest_from_uns(
 
     plt.tight_layout()
     if save:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return ax
 
 
-def run_cox_per_group(
-    adata,
-    *,
-    group_col: str,
-    min_n: int = 30,
-    dropna_group: bool = True,
-    time_key: str,
-    event_key: str,
-    x_keys,
-    x_mode: str = "continuous",
-    strata: str | None = None,
-    out_key_prefix: str = "cox_",
-    verbose: bool = True,
-    **cox_kwargs,
-):
-    """
-    Run tl.cox_univariate() separately within each level of `group_col`.
-
-    Returns dict:
-      {group_value: payload_dict}  where payload_dict is the same object stored in adata.uns[out_key].
-    """
-
-    # IMPORTANT: import the function directly (no 'bk' global)
-    # Adjust the relative import to your actual module layout:
-    from ..tl.cox import cox_univariate
-
-    if group_col not in adata.obs.columns:
-        raise KeyError(f"group_col='{group_col}' not found in adata.obs")
-
-    g = adata.obs[group_col]
-    if dropna_group:
-        g = g.dropna()
-
-    results = {}
-
-    # group -> list of obs_names
-    groups = g.astype(str).groupby(g.astype(str)).groups
-
-    for grp, idx in groups.items():
-        idx = list(idx)
-        if len(idx) < int(min_n):
-            if verbose:
-                print(f"[SKIP] {grp}: n={len(idx)} < min_n={min_n}")
-            continue
-
-        ad = adata[idx].copy()
-
-        # survival columns present?
-        missing_cols = [k for k in (time_key, event_key) if k not in ad.obs.columns]
-        if missing_cols:
-            if verbose:
-                print(f"[WARN] {grp}: missing {missing_cols} -> skipped")
-            continue
-
-        # within-group: strata cannot be the same as group_col
-        strata_eff = strata
-        if strata_eff is not None and str(strata_eff) == str(group_col):
-            if verbose:
-                print(f"[WARN] {grp}: strata==group_col inside subset -> setting strata=None")
-            strata_eff = None
-
-        out_key = f"{out_key_prefix}{grp}"
-
-        try:
-            cox_univariate(
-                ad,
-                time_key=time_key,
-                event_key=event_key,
-                x_keys=list(x_keys),
-                x_mode=x_mode,
-                strata=strata_eff,
-                out_key=out_key,
-                **cox_kwargs,
-            )
-
-            payload = ad.uns.get(out_key, None)
-            if payload is None:
-                if verbose:
-                    print(f"[WARN] {grp}: no payload found at ad.uns[{out_key!r}]")
-                continue
-
-            results[grp] = payload
-            if verbose:
-                print(f"[OK] {grp}: n={len(idx)} stored '{out_key}'")
-
-        except Exception as e:
-            if verbose:
-                print(f"[WARN] {grp}: {type(e).__name__}: {e}")
-
-    return results
-
-
-
+@renamed_kwargs(out_key="key_added")
 def metaprogram_rank1_composition_stackedbar(
     adata: AnnData,
     *,
@@ -1527,14 +1272,14 @@ def metaprogram_rank1_composition_stackedbar(
     ylabel: str = "Fraction of samples where MP is rank-1",
     show: bool = True,
     save: Optional[str] = None,
-    out_key: Optional[str] = "mp_rank1_composition",
+    key_added: Optional[str] = "mp_rank1_composition",
 ):
     """
     Stacked barplot showing, for each tumor type (groupby), the fraction of samples
     whose rank-1 metaprogram is each MP.
 
     Uses `adata.uns[topk_key]` with at least columns: 'sample', 'rank', 'metaprogram'.
-    Stores the plotted matrix in `adata.uns[out_key]` if provided.
+    Stores the plotted matrix in `adata.uns[key_added]` if provided.
     """
     if topk_key not in adata.uns:
         raise KeyError(f"{topk_key!r} not found in adata.uns")
@@ -1586,12 +1331,12 @@ def metaprogram_rank1_composition_stackedbar(
     plt.tight_layout()
 
     if save:
-        plt.savefig(save, bbox_inches="tight")
+        _savefig(plt.gcf(), save)
     if show:
         plt.show()
 
-    if out_key:
-        adata.uns[out_key] = {
+    if key_added:
+        adata.uns[key_added] = {
             "params": dict(
                 topk_key=topk_key,
                 groupby=groupby,
@@ -1609,14 +1354,15 @@ def metaprogram_rank1_composition_stackedbar(
 ### Kaplan-Meier curves
 ###########################################################
 
+@renamed_kwargs(time_key="time_col", event_key="event_col", out_key="key_added")
 def km_univariate(
     adata: AnnData,
     *,
     x_key: str,
     x_source: Literal["auto", "obs", "gene"] = "auto",
     layer: str | None = None,
-    time_key: str,
-    event_key: str,
+    time_col: str,
+    event_col: str,
     group_col: str | None = "surv_group_1d",
     groupby_for_binning: Optional[str] = None,
     binning: str = "global",
@@ -1631,14 +1377,14 @@ def km_univariate(
     annotate_p: bool = True,
     show: bool = True,
     save: Optional[str] = None,
-    out_key: Optional[str] = "km_1d",
+    key_added: Optional[str] = "km_1d",
     force_rebin: bool = False,
     cleanup_tmp_cols: bool = True,
 
     # NEW: binary handling + colors
     binary_mode: Literal["auto", "force", "off"] = "auto",
     binary_labels: Tuple[str, str] = ("0", "1"),   # e.g. ("WT","Mut")
-    palette: Optional[object] = None,              # tuple/list/dict; see below
+    palette: Optional[object] = None, ax: plt.Axes | None = None,              # tuple/list/dict; see below
 ):
     """
     Kaplan–Meier plot for one variable (x_key).
@@ -1736,8 +1482,8 @@ def km_univariate(
     )
 
     # also rebin if prior params mismatch
-    if (not need_rebin) and out_key and (out_key in adata.uns) and isinstance(adata.uns[out_key], dict):
-        prev = adata.uns[out_key].get("params", {})
+    if (not need_rebin) and key_added and (key_added in adata.uns) and isinstance(adata.uns[key_added], dict):
+        prev = adata.uns[key_added].get("params", {})
         # if previously binary vs quantile mode differs, rebin
         if prev.get("binary_direct") != bool(binary_direct):
             need_rebin = True
@@ -1777,8 +1523,8 @@ def km_univariate(
             surv_1d_bins(
                 adata,
                 x_key=x_obs_key,
-                time_key=time_key,
-                event_key=event_key,
+                time_col=time_col,
+                event_col=event_col,
                 groupby=groupby_for_binning,
                 binning=binning,
                 q=q,
@@ -1790,14 +1536,14 @@ def km_univariate(
 
     # Build plotting df
     obs = adata.obs
-    for k in [time_key, event_key, group_col]:
+    for k in [time_col, event_col, group_col]:
         if k not in obs:
             raise KeyError(f"{k!r} not found in adata.obs")
 
-    df = obs[[time_key, event_key, group_col]].copy()
-    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[time_key, event_key, group_col])
-    df = df[df[time_key].astype(float) > 0]
-    df[event_key] = df[event_key].astype(float).astype(int)
+    df = obs[[time_col, event_col, group_col]].copy()
+    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[time_col, event_col, group_col])
+    df = df[df[time_col].astype(float) > 0]
+    df[event_col] = df[event_col].astype(float).astype(int)
 
     # filter small groups
     sizes = df[group_col].value_counts()
@@ -1806,7 +1552,7 @@ def km_univariate(
 
     if len(keep_groups) < 2:
         # warn early; still plot what exists
-        print(f"[WARN] km_univariate: only {len(keep_groups)} group(s) remain after min_n={min_n}. sizes={sizes.to_dict()}")
+        warn(f"km_univariate: only {len(keep_groups)} group(s) remain after min_n={min_n}. sizes={sizes.to_dict()}")
 
     # Order + colors
     if binary_direct:
@@ -1818,14 +1564,17 @@ def km_univariate(
 
     order = [g for g in canonical if g in keep_groups] + [g for g in keep_groups if g not in canonical]
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     kmf = KaplanMeierFitter()
 
     for i, g in enumerate(order):
         sub = df[df[group_col].astype(str) == str(g)]
         color = _pick_color(str(g), i, default=None)
         label = f"{g} (n={sub.shape[0]})"
-        kmf.fit(durations=sub[time_key], event_observed=sub[event_key], label=label)
+        kmf.fit(durations=sub[time_col], event_observed=sub[event_col], label=label)
         kmf.plot(ax=ax, ci_show=False, color=color)
 
     ax.set_xlabel("Time (days)")
@@ -1845,10 +1594,10 @@ def km_univariate(
             d1 = df[df[group_col].astype(str) == str(g1)]
             d2 = df[df[group_col].astype(str) == str(g2)]
             logrank_res = logrank_test(
-                d1[time_key],
-                d2[time_key],
-                event_observed_A=d1[event_key],
-                event_observed_B=d2[event_key],
+                d1[time_col],
+                d2[time_col],
+                event_observed_A=d1[event_col],
+                event_observed_B=d2[event_col],
             )
             if annotate_p:
                 p = float(logrank_res.p_value)
@@ -1859,18 +1608,18 @@ def km_univariate(
 
     plt.tight_layout()
     if save:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
 
-    if out_key:
-        adata.uns[out_key] = {
+    if key_added:
+        adata.uns[key_added] = {
             "params": dict(
                 x_key=x_key,
                 x_source=x_src,
                 layer=layer,
-                time_key=time_key,
-                event_key=event_key,
+                time_key=time_col,
+                event_key=event_col,
                 group_col=group_col,
                 groupby_for_binning=groupby_for_binning,
                 binning=binning,
@@ -1897,6 +1646,7 @@ def km_univariate(
     return ax
 
 
+@renamed_kwargs(time_key="time_col", event_key="event_col", out_key="key_added")
 def km_2x2_interaction(
     adata,
     *,
@@ -1905,8 +1655,8 @@ def km_2x2_interaction(
     x_source: Literal["auto", "obs", "gene"] = "auto",
     z_source: Literal["auto", "obs", "gene"] = "auto",
     layer: str | None = None,
-    time_key: str,
-    event_key: str,
+    time_col: str,
+    event_col: str,
     group_col: str | None = "surv_group_2x2",
     groupby_for_binning: Optional[str] = None,
     binning: str = "global",  # "global" | "within_group"
@@ -1920,7 +1670,7 @@ def km_2x2_interaction(
     annotate_p: bool = True,
     show: bool = True,
     save: Optional[str] = None,
-    out_key: Optional[str] = "km_2x2",
+    key_added: Optional[str] = "km_2x2",
     force_rebin: bool = False,
     cleanup_tmp_cols: bool = True,
 
@@ -1933,7 +1683,7 @@ def km_2x2_interaction(
     # NEW: color selection
     # - dict: {group_label: color}
     # - list/tuple len>=4: mapped to canonical order
-    palette: Optional[object] = None,
+    palette: Optional[object] = None, ax: plt.Axes | None = None,
 ):
     """
     Kaplan–Meier plot for a 2x2 interaction: x low/high × z low/high
@@ -2022,8 +1772,8 @@ def km_2x2_interaction(
     )
 
     # Also rebin if prior params mismatch
-    if (not need_rebin) and out_key and (out_key in adata.uns) and isinstance(adata.uns[out_key], dict):
-        prev = adata.uns[out_key].get("params", {})
+    if (not need_rebin) and key_added and (key_added in adata.uns) and isinstance(adata.uns[key_added], dict):
+        prev = adata.uns[key_added].get("params", {})
         if (
             prev.get("x_key") != x_key
             or prev.get("z_key") != z_key
@@ -2080,8 +1830,8 @@ def km_2x2_interaction(
             surv_1d_bins(
                 adata,
                 x_key=x_obs_key,
-                time_key=time_key,
-                event_key=event_key,
+                time_col=time_col,
+                event_col=event_col,
                 groupby=groupby_for_binning,
                 binning=binning,
                 q=q,
@@ -2100,8 +1850,8 @@ def km_2x2_interaction(
             surv_1d_bins(
                 adata,
                 x_key=z_obs_key,
-                time_key=time_key,
-                event_key=event_key,
+                time_col=time_col,
+                event_col=event_col,
                 groupby=groupby_for_binning,
                 binning=binning,
                 q=q,
@@ -2128,14 +1878,14 @@ def km_2x2_interaction(
 
     # Build plotting df
     obs = adata.obs
-    for k in [time_key, event_key, group_col]:
+    for k in [time_col, event_col, group_col]:
         if k not in obs:
             raise KeyError(f"{k!r} not found in adata.obs")
 
-    df = obs[[time_key, event_key, group_col]].copy()
-    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[time_key, event_key, group_col])
-    df = df[df[time_key].astype(float) > 0]
-    df[event_key] = df[event_key].astype(float).astype(int)
+    df = obs[[time_col, event_col, group_col]].copy()
+    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[time_col, event_col, group_col])
+    df = df[df[time_col].astype(float) > 0]
+    df[event_col] = df[event_col].astype(float).astype(int)
 
     # filter small groups
     sizes = df[group_col].value_counts()
@@ -2143,19 +1893,22 @@ def km_2x2_interaction(
     df = df[df[group_col].isin(keep_groups)].copy()
 
     if len(keep_groups) < 2:
-        print(f"[WARN] km_2x2_interaction: only {len(keep_groups)} group(s) remain after min_n={min_n}. sizes={sizes.to_dict()}")
+        warn(f"km_2x2_interaction: only {len(keep_groups)} group(s) remain after min_n={min_n}. sizes={sizes.to_dict()}")
 
     canonical = ["X_low & Z_low", "X_low & Z_high", "X_high & Z_low", "X_high & Z_high"]
     order = [g for g in canonical if g in keep_groups] + [g for g in keep_groups if g not in canonical]
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     kmf = KaplanMeierFitter()
 
     for i, g in enumerate(order):
         sub = df[df[group_col].astype(str) == str(g)]
         color = _pick_color(str(g), i)
         label = f"{g} (n={sub.shape[0]})"
-        kmf.fit(durations=sub[time_key], event_observed=sub[event_key], label=label)
+        kmf.fit(durations=sub[time_col], event_observed=sub[event_col], label=label)
         kmf.plot(ax=ax, ci_show=False, color=color)
 
     ax.set_xlabel("Time (days)")
@@ -2172,9 +1925,9 @@ def km_2x2_interaction(
         try:
             from lifelines.statistics import multivariate_logrank_test
             res = multivariate_logrank_test(
-                df[time_key].astype(float),
+                df[time_col].astype(float),
                 df[group_col].astype(str),
-                df[event_key].astype(int),
+                df[event_col].astype(int),
             )
             logrank_p = float(res.p_value)
             if annotate_p:
@@ -2185,20 +1938,20 @@ def km_2x2_interaction(
 
     plt.tight_layout()
     if save:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
 
-    if out_key:
-        adata.uns[out_key] = {
+    if key_added:
+        adata.uns[key_added] = {
             "params": dict(
                 x_key=x_key,
                 z_key=z_key,
                 x_source=x_src,
                 z_source=z_src,
                 layer=layer,
-                time_key=time_key,
-                event_key=event_key,
+                time_key=time_col,
+                event_key=event_col,
                 group_col=group_col,
                 groupby_for_binning=groupby_for_binning,
                 binning=binning,

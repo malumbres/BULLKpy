@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from anndata import AnnData
 from .._compat import ensure_actual as _ensure_actual
+from .._deprecated import renamed_kwargs
 
 
 def _mad(x: np.ndarray, axis: int = 0) -> np.ndarray:
@@ -12,6 +13,7 @@ def _mad(x: np.ndarray, axis: int = 0) -> np.ndarray:
     return np.nanmedian(np.abs(x - med), axis=axis)
 
 
+@renamed_kwargs(out_key="key_added")
 def sample_dispersion(
     adata: AnnData,
     *,
@@ -20,7 +22,7 @@ def sample_dispersion(
     groupby: Optional[str] = None,
     standardize_within_group: bool = True,
     method: str = "mad",  # "mad" | "iqr" | "std"
-    out_key: str = "dispersion_sample",
+    key_added: str = "dispersion_sample",
     min_genes: int = 5000,
     copy: bool = False,
 ) -> Optional[AnnData]:
@@ -30,7 +32,7 @@ def sample_dispersion(
     If `standardize_within_group=True`, dispersion is computed on z-scored genes
     within each `groupby` group (recommended for cross-tumor comparability).
 
-    Writes `adata.obs[out_key]`.
+    Writes `adata.obs[key_added]`.
     """
     ad = adata.copy() if copy else adata
 
@@ -89,23 +91,24 @@ def sample_dispersion(
             else:
                 raise ValueError("method must be one of {'mad','iqr','std'}")
 
-    ad.obs[out_key] = disp
+    ad.obs[key_added] = disp
     return ad if copy else None
 
 
+@renamed_kwargs(out_key="key_added")
 def signature_dispersion_by_group(
     adata: AnnData,
     *,
     score_keys: Sequence[str],
     groupby: str,
     method: str = "mad",
-    out_key: str = "signature_dispersion",
+    key_added: str = "signature_dispersion",
 ) -> pd.DataFrame:
     """
     Compute dispersion of signature scores across samples within each group.
 
     Returns a tidy DataFrame: [group, signature, dispersion, n].
-    Also stores in `adata.uns[out_key]`.
+    Also stores in `adata.uns[key_added]`.
     """
     obs = adata.obs
     if groupby not in obs:
@@ -130,6 +133,6 @@ def signature_dispersion_by_group(
             rows.append({"group": grp, "signature": sig, "dispersion": d, "n": int(np.isfinite(x).sum())})
 
     out = pd.DataFrame(rows)
-    adata.uns[out_key] = out
+    adata.uns[key_added] = out
     return out
 

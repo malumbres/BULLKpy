@@ -7,7 +7,6 @@ ari_resolution_heatmap
 association_heatmap
 auc_cv_heatmap
 axis_vs_dispersion
-bootstrap_pr_bands
 boxplot_with_stats
 categorical_colors_array
 categorical_confusion
@@ -21,7 +20,6 @@ cox_volcano
 dispersion_summary
 dotplot
 dotplot_association
-export_leading_edge_clusters_cytoscape
 gene_association
 gene_association_volcano
 gene_panel_correlation_heatmap
@@ -37,10 +35,8 @@ km_2x2_interaction
 km_plot_signature
 km_univariate
 leading_edge_cluster_bubbles
-leading_edge_cluster_driver_genes
 leading_edge_jaccard_heatmap
 leading_edge_overlap_matrix
-leading_edge_pathway_clusters
 library_size_vs_genes
 ma
 metaprogram_corr
@@ -70,7 +66,6 @@ rank_genes_groups
 rank_genes_groups_dotplot
 rankplot
 rankplot_association
-run_cox_per_group
 sample_correlation_clustergram
 sample_distances
 set_style

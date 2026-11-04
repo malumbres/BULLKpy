@@ -83,8 +83,10 @@ def test_notebook_calls_match_signatures(nb_path):
                 isinstance(a, ast.Starred) for a in node.args
             ):
                 continue
+            deprecated = getattr(obj, "__deprecated_kwargs__", {})
+            names = [deprecated.get(k.arg, k.arg) for k in node.keywords]  # old spelling still works
             try:
-                sig.bind(*([None] * len(node.args)), **{k.arg: None for k in node.keywords})
+                sig.bind(*([None] * len(node.args)), **{n: None for n in names})
             except TypeError as exc:
                 problems.append(f"cell {idx}: bk.{sub}.{name}(): {exc}")
 

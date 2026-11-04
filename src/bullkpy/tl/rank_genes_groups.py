@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from typing import Literal, Sequence
 import numpy as np
-import scipy.sparse as sp
 import anndata as ad
 
 from ..logging import info, warn
 from .._stats import bh_fdr as _bh_fdr
+from functools import partial
+from .._matrix import get_matrix as _get_matrix_impl
 
 try:
     from scipy import stats
@@ -15,11 +16,7 @@ except Exception:  # pragma: no cover
 
 
 
-def _get_X(adata: ad.AnnData, layer: str | None) -> np.ndarray:
-    X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    if sp.issparse(X):
-        X = X.toarray()
-    return np.asarray(X, dtype=float)
+_get_X = partial(_get_matrix_impl, dense=True)
 
 
 def rank_genes_groups(

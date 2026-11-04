@@ -9,8 +9,10 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 
 from ._style import set_style, _savefig
+from .._deprecated import renamed_kwargs
 
 
+@renamed_kwargs(fdr_col="qval_col")
 def gsea_bubbleplot(
     df_gsea: pd.DataFrame,
     *,
@@ -18,7 +20,7 @@ def gsea_bubbleplot(
     comparison_col: str = "comparison",
     term_col: str = "Term",
     nes_col: str = "NES",
-    fdr_col: str = "FDR q-val",
+    qval_col: str = "FDR q-val",
     # ordering
     comparison_order: Sequence[str] | None = None,
     drop_empty_comparisons: bool = True,
@@ -48,7 +50,7 @@ def gsea_bubbleplot(
     title: str | None = None,
     # output
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Bubble plot matrix for GSEA results.
@@ -66,7 +68,7 @@ def gsea_bubbleplot(
 
     if not isinstance(df_gsea, pd.DataFrame):
         raise TypeError("df_gsea must be a pandas DataFrame.")
-    for c in (comparison_col, term_col, nes_col, fdr_col):
+    for c in (comparison_col, term_col, nes_col, qval_col):
         if c not in df_gsea.columns:
             raise KeyError(
                 f"'{c}' not found in df_gsea columns. Available: {list(df_gsea.columns)[:30]} ..."
@@ -103,7 +105,7 @@ def gsea_bubbleplot(
         comps = [str(x) for x in comparison_order]
 
     nes_mat = sub.pivot_table(index=comparison_col, columns=term_col, values=nes_col, aggfunc="mean")
-    q_mat = sub.pivot_table(index=comparison_col, columns=term_col, values=fdr_col, aggfunc="mean")
+    q_mat = sub.pivot_table(index=comparison_col, columns=term_col, values=qval_col, aggfunc="mean")
 
     nes_mat = nes_mat.reindex(index=comps, columns=terms)
     q_mat = q_mat.reindex(index=comps, columns=terms)
@@ -172,7 +174,10 @@ def gsea_bubbleplot(
         h = max(3.5, row_height * len(comps_final) + 2.0)   # room for labels
         figsize = (w, h)
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=False)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=False)
+    else:
+        fig = ax.figure
     fig.subplots_adjust(right=0.78)
 
     # coords

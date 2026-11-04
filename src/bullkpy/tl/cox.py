@@ -16,12 +16,14 @@ from ..logging import info, warn
 from .._genes import gene_indexer as _gene_indexer
 from .._stats import bh_fdr as _bh_fdr
 from .._compat import ensure_actual as _ensure_actual
+from functools import partial
+from .._matrix import get_matrix as _get_matrix_impl
+from .._deprecated import renamed_kwargs
 
 
 
-def _get_matrix(adata, layer, use="samples"):
-    X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    return X
+_get_matrix = partial(_get_matrix_impl, dense=False)  # sparse stays sparse
+
 
 def _get_expr_matrix(
     adata: ad.AnnData,
@@ -464,14 +466,6 @@ def _require_lifelines():
             f"Original error: {e}"
         )
     return CoxPHFitter, concordance_index
-
-
-def _as_list(x):
-    if x is None:
-        return None
-    if isinstance(x, (list, tuple, np.ndarray, pd.Index)):
-        return list(x)
-    return [x]
 
 
 def _prepare_cox_df(
@@ -1366,11 +1360,12 @@ def cox_fit_penalized(
 
 
 
+@renamed_kwargs(time_key="time_col", event_key="event_col", out_key="key_added")
 def cox_univariate(
     adata: AnnData,
     *,
-    time_key: str,
-    event_key: str,
+    time_col: str,
+    event_col: str,
     x_keys: Sequence[str],
     x_mode: str = "continuous",   # "continuous" | "binary"
     q: Tuple[float, float] = (0.25, 0.75),
@@ -1381,11 +1376,11 @@ def cox_univariate(
     covariates: Optional[Sequence[str]] = None,
     robust: bool = True,
     penalizer: float = 0.0,
-    out_key: str = "cox_univariate_multi",
+    key_added: str = "cox_univariate_multi",
 ):
     """
     Fit Cox models for multiple predictors (x_keys) under the same settings.
-    Stores a combined tidy summary in `adata.uns[out_key]["summary"]`.
+    Stores a combined tidy summary in `adata.uns[key_added]["summary"]`.
 
     x_mode:
       - "continuous": predictor is used as numeric (recommended for entropy)
@@ -1403,8 +1398,8 @@ def cox_univariate(
     from lifelines import CoxPHFitter
 
     obs = adata.obs
-    if time_key not in obs or event_key not in obs:
-        raise KeyError(f"{time_key!r} and/or {event_key!r} not found in adata.obs")
+    if time_col not in obs or event_col not in obs:
+        raise KeyError(f"{time_col!r} and/or {event_col!r} not found in adata.obs")
 
     x_keys = list(x_keys)
     for x in x_keys:
@@ -1425,16 +1420,16 @@ def cox_univariate(
                 raise KeyError(f"strata column {s!r} not found in adata.obs")
 
     # base frame (shared)
-    base_cols = [time_key, event_key] + covariates + strata_cols
+    base_cols = [time_col, event_col] + covariates + strata_cols
     if binning == "within_group":
         if groupby not in obs:
             raise KeyError(f"{groupby!r} not found in adata.obs (required for binning='within_group')")
         base_cols += [groupby]
 
     base = obs[base_cols].copy()
-    base = base.replace([np.inf, -np.inf], np.nan).dropna(subset=[time_key, event_key])
-    base = base[base[time_key].astype(float) > 0]
-    base[event_key] = base[event_key].astype(float).astype(int)
+    base = base.replace([np.inf, -np.inf], np.nan).dropna(subset=[time_col, event_col])
+    base = base[base[time_col].astype(float) > 0]
+    base[event_col] = base[event_col].astype(float).astype(int)
 
     def _bin_extremes(s: pd.Series, lo: float, hi: float) -> pd.Series:
         out = pd.Series(np.nan, index=s.index, dtype=float)
@@ -1493,8 +1488,8 @@ def cox_univariate(
         # fit
         cph = CoxPHFitter(penalizer=penalizer)
         fit_kwargs = dict(
-            duration_col=time_key,
-            event_col=event_key,
+            duration_col=time_col,
+            event_col=event_col,
             robust=robust,
             formula=" + ".join(formula_terms),
         )
@@ -1502,7 +1497,7 @@ def cox_univariate(
             fit_kwargs["strata"] = strata_cols
 
         # need at least some events
-        if df_used.shape[0] < 30 or df_used[event_key].sum() < 5:
+        if df_used.shape[0] < 30 or df_used[event_col].sum() < 5:
             # store NA row and skip model
             all_rows.append({
                 "x_key": x_key,
@@ -1513,7 +1508,7 @@ def cox_univariate(
                 "HR_upper_95": np.nan,
                 "p": np.nan,
                 "n_used": int(df_used.shape[0]),
-                "events": int(df_used[event_key].sum()),
+                "events": int(df_used[event_col].sum()),
             })
             continue
 
@@ -1541,15 +1536,15 @@ def cox_univariate(
             "HR_upper_95": hi95,
             "p": pval,
             "n_used": int(df_used.shape[0]),
-            "events": int(df_used[event_key].sum()),
+            "events": int(df_used[event_col].sum()),
         })
 
     results_df = pd.DataFrame(all_rows)
 
-    adata.uns[out_key] = {
+    adata.uns[key_added] = {
         "params": {
-            "time_key": time_key,
-            "event_key": event_key,
+            "time_key": time_col,
+            "event_key": event_col,
             "x_keys": x_keys,
             "x_mode": x_mode,
             "q": q if x_mode == "binary" else None,
@@ -1567,11 +1562,12 @@ def cox_univariate(
     return results_df, models
 
 
+@renamed_kwargs(time_key="time_col", event_key="event_col", out_key="key_added")
 def cox_interaction(
     adata: AnnData,
     *,
-    time_key: str,
-    event_key: str,
+    time_col: str,
+    event_col: str,
     x_key: str,
     z_key: str,
     groupby: Optional[str] = None,
@@ -1583,7 +1579,7 @@ def cox_interaction(
     covariates: Optional[Sequence[str]] = None,
     robust: bool = True,
     penalizer: float = 0.0,
-    out_key: str = "cox_interaction",
+    key_added: str = "cox_interaction",
 ):
     """
     Fit Cox proportional hazards model with an interaction term:
@@ -1598,9 +1594,9 @@ def cox_interaction(
     ----------
     adata
         AnnData with survival data and covariates in `.obs`.
-    time_key, event_key
+    time_col, event_col
         Survival time and event indicator columns in `.obs`.
-        event_key should be 0/1 (will be coerced).
+        event_col should be 0/1 (will be coerced).
     x_key
         Primary variable (e.g., NE score).
     z_key
@@ -1627,8 +1623,8 @@ def cox_interaction(
         Use robust variance estimates (recommended for TCGA).
     penalizer
         L2 penalizer for CoxPHFitter (helps with collinearity).
-    out_key
-        Store results in `adata.uns[out_key]`.
+    key_added
+        Store results in `adata.uns[key_added]`.
 
     Returns
     -------
@@ -1648,7 +1644,7 @@ def cox_interaction(
 
     obs = adata.obs
 
-    needed = [time_key, event_key, x_key, z_key]
+    needed = [time_col, event_col, x_key, z_key]
     for k in needed:
         if k not in obs:
             raise KeyError(f"{k!r} not found in adata.obs")
@@ -1662,7 +1658,7 @@ def cox_interaction(
             raise KeyError(f"covariate {c!r} not found in adata.obs")
 
     # Build dataframe
-    cols = [time_key, event_key, x_key, z_key] + covariates
+    cols = [time_col, event_col, x_key, z_key] + covariates
     if isinstance(strata, str):
         if strata is not None:
             cols += [strata]
@@ -1672,13 +1668,13 @@ def cox_interaction(
         cols += [groupby]
 
     df = obs[cols].copy()
-    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[time_key, event_key, x_key, z_key])
+    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[time_col, event_col, x_key, z_key])
 
     # Coerce event to 0/1
-    df[event_key] = df[event_key].astype(float).astype(int)
+    df[event_col] = df[event_col].astype(float).astype(int)
 
     # Keep positive time
-    df = df[df[time_key].astype(float) > 0]
+    df = df[df[time_col].astype(float) > 0]
 
     # --- Binning helpers
     def _bin_extremes(s: pd.Series, lo: float, hi: float) -> pd.Series:
@@ -1741,8 +1737,8 @@ def cox_interaction(
     # Fit Cox
     cph = CoxPHFitter(penalizer=penalizer)
     fit_kwargs = dict(
-        duration_col=time_key,
-        event_col=event_key,
+        duration_col=time_col,
+        event_col=event_col,
         formula=formula,
         robust=robust,
     )
@@ -1767,10 +1763,10 @@ def cox_interaction(
     summ["HR_upper_95"] = np.exp(summ["coef upper 95%"])
     summ = summ[["coef", "HR", "HR_lower_95", "HR_upper_95", "p"]]
 
-    adata.uns[out_key] = {
+    adata.uns[key_added] = {
         "params": {
-            "time_key": time_key,
-            "event_key": event_key,
+            "time_key": time_col,
+            "event_key": event_col,
             "x_key": x_key,
             "z_key": z_key,
             "groupby": groupby,
@@ -1790,12 +1786,13 @@ def cox_interaction(
 
 
 
+@renamed_kwargs(time_key="time_col", event_key="event_col")
 def surv_1d_bins(
     adata: AnnData,
     *,
     x_key: str,
-    time_key: str,
-    event_key: str,
+    time_col: str,
+    event_col: str,
     groupby: Optional[str] = None,
     binning: str = "global",  # "global" | "within_group"
     q: Tuple[float, float] = (0.25, 0.75),
@@ -1816,7 +1813,7 @@ def surv_1d_bins(
     ----------
     x_key
         Continuous score in adata.obs.
-    time_key, event_key
+    time_col, event_col
         Survival time and event columns in adata.obs.
     groupby
         Required if binning="within_group" (e.g. "Project_ID").
@@ -1842,7 +1839,7 @@ def surv_1d_bins(
     ad = adata.copy() if copy else adata
     obs = _ensure_actual(ad).obs
 
-    for k in [x_key, time_key, event_key]:
+    for k in [x_key, time_col, event_col]:
         if k not in obs:
             raise KeyError(f"{k!r} not found in adata.obs")
 
@@ -1852,9 +1849,9 @@ def surv_1d_bins(
         if groupby not in obs:
             raise KeyError(f"{groupby!r} not found in adata.obs")
 
-    df = obs[[x_key, time_key, event_key] + ([groupby] if groupby else [])].copy()
-    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[x_key, time_key, event_key])
-    df = df[df[time_key].astype(float) > 0]
+    df = obs[[x_key, time_col, event_col] + ([groupby] if groupby else [])].copy()
+    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[x_key, time_col, event_col])
+    df = df[df[time_col].astype(float) > 0]
 
     low_label, high_label = labels
 
@@ -1894,13 +1891,14 @@ def surv_1d_bins(
     return ad if copy else None
 
 
+@renamed_kwargs(time_key="time_col", event_key="event_col")
 def surv_2x2_bins(
     adata: AnnData,
     *,
     x_key: str,
     z_key: str,
-    time_key: str,
-    event_key: str,
+    time_col: str,
+    event_col: str,
     groupby: Optional[str] = None,
     binning: str = "global",  # "global" | "within_group"
     q: Tuple[float, float] = (0.25, 0.75),
@@ -1921,7 +1919,7 @@ def surv_2x2_bins(
     ----------
     x_key, z_key
         Continuous scores in adata.obs (e.g. NE score, heterogeneity entropy).
-    time_key, event_key
+    time_col, event_col
         Survival time and event columns in adata.obs.
     groupby
         Required if binning="within_group" (e.g. "Project_ID").
@@ -1945,7 +1943,7 @@ def surv_2x2_bins(
     ad = adata.copy() if copy else adata
     obs = _ensure_actual(ad).obs
 
-    for k in [x_key, z_key, time_key, event_key]:
+    for k in [x_key, z_key, time_col, event_col]:
         if k not in obs:
             raise KeyError(f"{k!r} not found in adata.obs")
 
@@ -1955,9 +1953,9 @@ def surv_2x2_bins(
         if groupby not in obs:
             raise KeyError(f"{groupby!r} not found in adata.obs")
 
-    df = obs[[x_key, z_key, time_key, event_key] + ([groupby] if groupby else [])].copy()
-    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[x_key, z_key, time_key, event_key])
-    df = df[df[time_key].astype(float) > 0]
+    df = obs[[x_key, z_key, time_col, event_col] + ([groupby] if groupby else [])].copy()
+    df = df.replace([np.inf, -np.inf], np.nan).dropna(subset=[x_key, z_key, time_col, event_col])
+    df = df[df[time_col].astype(float) > 0]
 
     def _bin_extremes(s: pd.Series, lo: float, hi: float) -> pd.Series:
         out = pd.Series(pd.NA, index=s.index, dtype="string")
@@ -2008,3 +2006,95 @@ def surv_2x2_bins(
 
     return ad if copy else None
 
+
+@renamed_kwargs(time_key="time_col", event_key="event_col", group_col="groupby")
+def run_cox_per_group(
+    adata,
+    *,
+    groupby: str,
+    min_n: int = 30,
+    dropna_group: bool = True,
+    time_col: str,
+    event_col: str,
+    x_keys,
+    x_mode: str = "continuous",
+    strata: str | None = None,
+    out_key_prefix: str = "cox_",
+    verbose: bool = True,
+    **cox_kwargs,
+):
+    """
+    Run tl.cox_univariate() separately within each level of `groupby`.
+
+    Returns dict:
+      {group_value: payload_dict}  where payload_dict is the same object stored in adata.uns[out_key].
+    """
+
+    # IMPORTANT: import the function directly (no 'bk' global)
+    # Adjust the relative import to your actual module layout:
+    from ..tl.cox import cox_univariate
+
+    if groupby not in adata.obs.columns:
+        raise KeyError(f"group_col='{groupby}' not found in adata.obs")
+
+    g = adata.obs[groupby]
+    if dropna_group:
+        g = g.dropna()
+
+    results = {}
+
+    # group -> list of obs_names
+    groups = g.astype(str).groupby(g.astype(str)).groups
+
+    for grp, idx in groups.items():
+        idx = list(idx)
+        if len(idx) < int(min_n):
+            if verbose:
+                info(f"{grp}: n={len(idx)} < min_n={min_n}")
+            continue
+
+        ad = adata[idx].copy()
+
+        # survival columns present?
+        missing_cols = [k for k in (time_col, event_col) if k not in ad.obs.columns]
+        if missing_cols:
+            if verbose:
+                warn(f"{grp}: missing {missing_cols} -> skipped")
+            continue
+
+        # within-group: strata cannot be the same as group_col
+        strata_eff = strata
+        if strata_eff is not None and str(strata_eff) == str(groupby):
+            if verbose:
+                warn(f"{grp}: strata==group_col inside subset -> setting strata=None")
+            strata_eff = None
+
+        out_key = f"{out_key_prefix}{grp}"
+
+        try:
+            cox_univariate(
+                ad,
+                time_col=time_col,
+                event_col=event_col,
+                x_keys=list(x_keys),
+                x_mode=x_mode,
+                strata=strata_eff,
+                key_added=out_key,
+                **cox_kwargs,
+            )
+
+            payload = ad.uns.get(out_key, None)
+            if payload is None:
+                if verbose:
+                    warn(f"{grp}: no payload found at ad.uns[{out_key!r}]")
+                continue
+
+            results[grp] = payload
+            if verbose:
+                info(f"{grp}: n={len(idx)} stored '{out_key}'")
+
+        except Exception as e:
+            if verbose:
+                warn(f"{grp}: {type(e).__name__}: {e}")
+
+    return results

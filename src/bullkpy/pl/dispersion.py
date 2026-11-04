@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from anndata import AnnData
+from ._style import _savefig
+from .._deprecated import renamed_kwargs
 
 # Optional scipy for clustering/dendrogram ordering
 try:
@@ -25,7 +27,7 @@ def axis_vs_dispersion(
     max_groups: int = 12,
     title: Optional[str] = None,
     show: bool = True,
-    save: Optional[str] = None,
+    save: Optional[str] = None, ax: plt.Axes | None = None,
 ):
     """
     Scatter plot of signature axis vs per-sample dispersion.
@@ -37,7 +39,10 @@ def axis_vs_dispersion(
     x = adata.obs[axis_key].to_numpy(dtype=float)
     y = adata.obs[dispersion_key].to_numpy(dtype=float)
 
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig, ax = plt.subplots()
+    else:
+        fig = ax.figure
     if groupby is None:
         ax.scatter(x, y, s=10, alpha=0.7)
     else:
@@ -55,7 +60,7 @@ def axis_vs_dispersion(
     ax.set_title(title or f"{axis_key} vs {dispersion_key}")
 
     if save is not None:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return ax
@@ -68,7 +73,7 @@ def dispersion_summary(
     groupby: str,
     title: Optional[str] = None,
     show: bool = True,
-    save: Optional[str] = None,
+    save: Optional[str] = None, ax: plt.Axes | None = None,
 ):
     """
     Boxplot of per-sample dispersion across groups (e.g., tumor types).
@@ -82,7 +87,10 @@ def dispersion_summary(
     groups = df[groupby].astype("category")
     order = df.groupby(groupby)[dispersion_key].median().sort_values(ascending=False).index
 
-    fig, ax = plt.subplots(figsize=(8, 3))
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(8, 3))
+    else:
+        fig = ax.figure
     data = [df.loc[df[groupby] == g, dispersion_key].to_numpy() for g in order]
     ax.boxplot(data, tick_labels=[str(g) for g in order], showfliers=False)
     ax.set_ylabel(dispersion_key)
@@ -90,7 +98,7 @@ def dispersion_summary(
     ax.tick_params(axis="x", labelrotation=90)
 
     if save is not None:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return ax
@@ -504,45 +512,38 @@ def metaprogram_heatmap(
 
 
 
-# Backward-compatible names for your requested API
-def metaprogram_heatmap_plot(*args, **kwargs):
-    return metaprogram_heatmap(*args, **kwargs)
-
-def metaprogram_corr_plot(*args, **kwargs):
-    return metaprogram_corr(*args, **kwargs)
-
-
 ##########################
 ### NEW METAPROGRAMS
 ##########################
 
 
+@renamed_kwargs(uns_key="key")
 def metaprogram_dispersion_heatmap(
     adata: AnnData,
     *,
-    uns_key: str = "metaprogram_dispersion",
+    key: str = "metaprogram_dispersion",
     sort_groups_by: str = "median",   # "median" | "name"
     sort_programs_by: str = "median", # "median" | "name"
     title: str = "Metaprogram dispersion by tumor type",
     cmap="viridis",
     figsize=(8, 6),
     show: bool = True,
-    save: Optional[str] = None,
+    save: Optional[str] = None, ax: plt.Axes | None = None,
 ):
     """
     Heatmap of per-group dispersion (rows: metaprograms, cols: groups).
 
-    Requires adata.uns[uns_key] with columns: group, metaprogram, dispersion.
+    Requires adata.uns[key] with columns: group, metaprogram, dispersion.
     """
-    if uns_key not in adata.uns:
-        raise KeyError(f"{uns_key!r} not found in adata.uns")
-    df = adata.uns[uns_key]
+    if key not in adata.uns:
+        raise KeyError(f"{key!r} not found in adata.uns")
+    df = adata.uns[key]
     if not isinstance(df, pd.DataFrame):
         df = pd.DataFrame(df)
 
     req = {"group", "metaprogram", "dispersion"}
     if not req.issubset(df.columns):
-        raise ValueError(f"{uns_key} must contain columns {req}")
+        raise ValueError(f"{key} must contain columns {req}")
 
     mat = df.pivot(index="metaprogram", columns="group", values="dispersion")
 
@@ -558,7 +559,10 @@ def metaprogram_dispersion_heatmap(
 
     arr = mat.to_numpy(dtype=float)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     im = ax.imshow(arr, aspect="auto", cmap=cmap)
     ax.set_title(title)
     ax.set_yticks(range(mat.shape[0]))
@@ -569,7 +573,7 @@ def metaprogram_dispersion_heatmap(
     cbar.set_label("Dispersion (MAD)", fontsize=8)
 
     if save:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return ax
@@ -621,7 +625,7 @@ def metaprogram_metrics_summary(
     plt.tight_layout()
 
     if save:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return axes
@@ -637,7 +641,7 @@ def metaprogram_ne_scatter(
     title: Optional[str] = None,
     figsize=(5, 4),
     show: bool = True,
-    save: Optional[str] = None,
+    save: Optional[str] = None, ax: plt.Axes | None = None,
 ):
     """
     Scatter: NE score vs metaprogram heterogeneity (or dispersion).
@@ -651,7 +655,10 @@ def metaprogram_ne_scatter(
     x = adata.obs[x_key].to_numpy(dtype=float)
     y = adata.obs[ne_key].to_numpy(dtype=float)
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     if groupby is None:
         ax.scatter(x, y, s=10, alpha=0.7)
     else:
@@ -669,7 +676,7 @@ def metaprogram_ne_scatter(
     ax.set_title(title or f"{ne_key} vs {x_key}")
 
     if save:
-        fig.savefig(save, bbox_inches="tight")
+        _savefig(fig, save)
     if show:
         plt.show()
     return ax
@@ -688,7 +695,7 @@ def metaprogram_dominance_ridgeplot_like(
     label_rotation=90,
     fontsize=8,
     show=True,
-    save=None,
+    save=None, ax: plt.Axes | None = None,
 ):
     """
     Ridge/violin-style plot of dominance of the top metaprogram (rank-1 weight)
@@ -721,7 +728,10 @@ def metaprogram_dominance_ridgeplot_like(
 
     data = [df.loc[df[groupby] == g, weight_key].values for g in order]
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
 
     parts = ax.violinplot(
         data,
@@ -774,7 +784,7 @@ def metaprogram_dominance_ridgeplot_like(
 
     plt.tight_layout()
     if save:
-        plt.savefig(save, bbox_inches="tight")
+        _savefig(plt.gcf(), save)
     if show:
         plt.show()
 

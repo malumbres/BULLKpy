@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Literal
 
@@ -9,7 +10,13 @@ import anndata as ad
 
 from .logging import info, warn
 
-__all__ = ["read_counts", "add_metadata"]
+__all__ = [
+    "read_counts",
+    "add_metadata",
+    "read_metaprograms_xlsx",
+    "save_signature_bank",
+    "load_signature_bank",
+]
 
 
 def read_counts(
@@ -186,3 +193,125 @@ def add_metadata(
     )
 
     return adata
+
+
+def save_signature_bank(sig_bank: dict, outdir: str):
+    """
+    Write a bank of signatures to disk.
+
+    Each signature becomes a weights table plus a JSON sidecar holding its
+    intercept and fit parameters, so a bank can be version-controlled and
+    reloaded without refitting.
+
+    Parameters
+    ----------
+    sig_bank
+        Mapping of name to signature dict (``weights_df``, ``intercept``, ``params``).
+    outdir
+        Destination directory; created if absent.
+
+    Returns
+    -------
+    None
+
+    See Also
+    --------
+    load_signature_bank : read a bank back.
+    """
+    outdir = Path(outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    meta = {"signatures": {}}
+
+    for name, sig in sig_bank.items():
+        # save weights as CSV (clean + easy diff)
+        w_path = outdir / f"{name}.weights.tsv"
+        sig["weights_df"].to_csv(w_path, sep="\t", index=False)
+
+        # store everything else in JSON-friendly form
+        meta["signatures"][name] = {
+            "intercept": float(sig.get("intercept", 0.0)),
+            "params": sig.get("params", {}),
+            "genes_requested": sig.get("genes_requested", sig.get("genes", [])),
+            "genes_used": sig.get("genes_used", sig.get("genes", [])),
+            "panel_nonzero": sig.get("panel_nonzero", []),
+            "n_nonzero": int(sig.get("n_nonzero", 0)),
+            # optional quick metrics snapshots (if present)
+            "metrics_train": sig.get("metrics_train", None),
+            "metrics_ext": sig.get("metrics_ext", None),
+            "weights_tsv": w_path.name,
+        }
+
+    with open(outdir / "sig_bank.json", "w") as f:
+        json.dump(meta, f, indent=2)
+
+    info(f"Saved {len(sig_bank)} signatures to: {outdir}")
+def load_signature_bank(indir: str):
+    """
+    Load a bank of signatures previously written by :func:`save_signature_bank`.
+
+    Parameters
+    ----------
+    indir
+        Directory containing the saved weights tables and their JSON sidecars.
+
+    Returns
+    -------
+    dict
+        Mapping of name to signature dict, ready to pass to
+        :func:`evaluate_signatures_store` or :func:`benchmark_signatures_pr_auc`.
+    """
+    indir = Path(indir)
+    with open(indir / "sig_bank.json", "r") as f:
+        meta = json.load(f)
+
+    sig_bank = {}
+    for name, rec in meta["signatures"].items():
+        w = pd.read_csv(indir / rec["weights_tsv"], sep="\t")
+        sig_bank[name] = {
+            "name": name,
+            "weights_df": w,
+            "intercept": float(rec.get("intercept", 0.0)),
+            "params": rec.get("params", {}),
+            "genes_requested": rec.get("genes_requested", []),
+            "genes_used": rec.get("genes_used", []),
+            "panel_nonzero": rec.get("panel_nonzero", []),
+            "n_nonzero": int(rec.get("n_nonzero", 0)),
+            "metrics_train": rec.get("metrics_train", None),
+            "metrics_ext": rec.get("metrics_ext", None),
+        }
+    return sig_bank
+
+
+
+def read_metaprograms_xlsx(
+    xlsx_path: str,
+    *,
+    sheet_name: str = "Malignant",
+    min_genes: int = 5,
+) -> dict[str, list[str]]:
+    """
+    Excel format expected: each column is an MP, rows are gene symbols.
+    Returns dict mp_name -> list of genes (non-empty strings).
+    """
+    df = pd.read_excel(xlsx_path, sheet_name=sheet_name)
+
+    mp = {}
+    for col in df.columns:
+        genes = (
+            df[col]
+            .dropna()
+            .astype(str)
+            .str.strip()
+            .replace({"": np.nan, "nan": np.nan, "None": np.nan})
+            .dropna()
+            .tolist()
+        )
+        genes = [g for g in genes if g and g.lower() != "nan"]
+        if len(genes) >= int(min_genes):
+            mp[str(col)] = genes
+
+    if len(mp) == 0:
+        raise ValueError(f"No metaprograms found in sheet='{sheet_name}' of {xlsx_path}")
+
+    return mp

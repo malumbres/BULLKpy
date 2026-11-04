@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Sequence, Literal
-import json
 import numpy as np
 import pandas as pd
 import anndata as ad
@@ -23,17 +21,19 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from .._compat import is_categorical_like
 from .._genes import gene_loc as _gene_loc, gene_indexer as _gene_indexer
+from functools import partial
+from .._matrix import get_matrix as _get_matrix_impl
+from sklearn.metrics import precision_recall_curve
 
 
 ############################################
 ## HELPERS
 ############################################
 
-def _get_matrix(adata, layer, use="samples"):
-    X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    return X
-
 # Extract expression matrix for genes (train only)
+_get_matrix = partial(_get_matrix_impl, dense=False)  # sparse stays sparse
+
+
 def get_expr_matrix(adata, genes, *, layer="log1p_cpm"):
     genes = [g for g in genes if g in adata.var_names]
     X = adata.layers[layer] if (layer is not None and layer in getattr(adata, "layers", {})) else adata.X
@@ -99,7 +99,7 @@ def filter_genes_var(
     if top_var is not None and df.shape[0] > int(top_var):
         df = df.head(int(top_var)).copy()
 
-    print(f"Basic filter: kept {df.shape[0]} genes (min_var={min_var}, top_var={top_var})")
+    info(f"Basic filter: kept {df.shape[0]} genes (min_var={min_var}, top_var={top_var})")
 
     return df
 
@@ -279,7 +279,7 @@ def gene_corr_redundancy(
     df_audit["keep"] = df_audit["gene"].astype(str).isin(kept_set)
 
     # Add a quick summary
-    print(f"Redundancy filter (audit): {len(genes_ranked)} -> {len(kept)} genes (thr={corr_threshold})")
+    info(f"Redundancy filter (audit): {len(genes_ranked)} -> {len(kept)} genes (thr={corr_threshold})")
 
     return df_audit, kept
 
@@ -2063,7 +2063,7 @@ def validate_signature_auc_external(
     return df
 
 
-def score_signature_on_PPV(
+def score_signature_on_ppv(
     adata_dev,
     *,
     weights_df,
@@ -2897,7 +2897,7 @@ def build_signature_bank_from_genes(
             if on_missing == "raise":
                 raise ValueError(msg)
             else:
-                print("WARNING:", msg)
+                warn(msg)
                 continue
 
         # IMPORTANT: pass genes_in_train (not genes_req) to avoid _build_Xy crashing
@@ -2946,91 +2946,98 @@ def build_signature_bank_from_genes(
 ## SAVE and RELOAD Signature Banks
 ########################################################
 
-def save_signature_bank(sig_bank: dict, outdir: str):
+def _pr_curve_interp(y_true, y_score, recall_grid):
     """
-    Write a bank of signatures to disk.
-
-    Each signature becomes a weights table plus a JSON sidecar holding its
-    intercept and fit parameters, so a bank can be version-controlled and
-    reloaded without refitting.
-
-    Parameters
-    ----------
-    sig_bank
-        Mapping of name to signature dict (``weights_df``, ``intercept``, ``params``).
-    outdir
-        Destination directory; created if absent.
-
-    Returns
-    -------
-    None
-
-    See Also
-    --------
-    load_signature_bank : read a bank back.
+    Compute PR curve and interpolate precision onto a fixed recall grid.
+    Returns precision_on_grid (shape = len(recall_grid)).
     """
-    outdir = Path(outdir)
-    outdir.mkdir(parents=True, exist_ok=True)
+    prec, rec, _ = precision_recall_curve(y_true, y_score)
 
-    meta = {"signatures": {}}
+    # sklearn PR curve can have recall either increasing or decreasing depending on version/edges;
+    # make it strictly increasing for interpolation.
+    order = np.argsort(rec)
+    rec_s = rec[order]
+    prec_s = prec[order]
 
-    for name, sig in sig_bank.items():
-        # save weights as CSV (clean + easy diff)
-        w_path = outdir / f"{name}.weights.tsv"
-        sig["weights_df"].to_csv(w_path, sep="\t", index=False)
+    # Deduplicate recall values (interp needs monotonic x)
+    # Keep the max precision for duplicate recall points (conservative-ish).
+    rec_u, idx = np.unique(rec_s, return_index=True)
+    prec_u = prec_s[idx]
 
-        # store everything else in JSON-friendly form
-        meta["signatures"][name] = {
-            "intercept": float(sig.get("intercept", 0.0)),
-            "params": sig.get("params", {}),
-            "genes_requested": sig.get("genes_requested", sig.get("genes", [])),
-            "genes_used": sig.get("genes_used", sig.get("genes", [])),
-            "panel_nonzero": sig.get("panel_nonzero", []),
-            "n_nonzero": int(sig.get("n_nonzero", 0)),
-            # optional quick metrics snapshots (if present)
-            "metrics_train": sig.get("metrics_train", None),
-            "metrics_ext": sig.get("metrics_ext", None),
-            "weights_tsv": w_path.name,
+    # Interpolate precision at recall_grid; outside range -> boundary values
+    # (recall is in [0,1])
+    p_on_grid = np.interp(recall_grid, rec_u, prec_u, left=prec_u[0], right=prec_u[-1])
+    return p_on_grid
+def bootstrap_pr_bands(
+    y_true,
+    y_score,
+    *,
+    recall_grid=None,
+    n_boot=500,
+    seed=0,
+    ci=(2.5, 97.5),
+    min_pos=2,
+):
+    """
+    Bootstrap PR curves by resampling samples with replacement.
+    Returns dict with:
+      - recall_grid
+      - prec_med, prec_lo, prec_hi (arrays)
+      - ap, ap_lo, ap_hi (scalars) for PR-AUC (Average Precision)
+      - n_boot_ok
+    """
+    y_true = np.asarray(y_true, int)
+    y_score = np.asarray(y_score, float)
+
+    if recall_grid is None:
+        recall_grid = np.linspace(0, 1, 201)
+
+    rng = np.random.default_rng(int(seed))
+    n = y_true.size
+
+    curves = []
+    aps = []
+    n_ok = 0
+
+    for _ in range(int(n_boot)):
+        idx = rng.integers(0, n, size=n)
+        yb = y_true[idx]
+        if (yb.sum() < int(min_pos)) or (len(np.unique(yb)) < 2):
+            continue
+        sb = y_score[idx]
+
+        curves.append(_pr_curve_interp(yb, sb, recall_grid))
+        aps.append(float(average_precision_score(yb, sb)))
+        n_ok += 1
+
+    if n_ok == 0:
+        return {
+            "recall_grid": recall_grid,
+            "prec_med": np.full_like(recall_grid, np.nan, dtype=float),
+            "prec_lo": np.full_like(recall_grid, np.nan, dtype=float),
+            "prec_hi": np.full_like(recall_grid, np.nan, dtype=float),
+            "ap": np.nan,
+            "ap_lo": np.nan,
+            "ap_hi": np.nan,
+            "n_boot_ok": 0,
         }
 
-    with open(outdir / "sig_bank.json", "w") as f:
-        json.dump(meta, f, indent=2)
+    curves = np.vstack(curves)  # (n_ok, len(grid))
+    aps = np.asarray(aps, float)
 
-    print(f"Saved {len(sig_bank)} signatures to: {outdir}")
+    lo_q, hi_q = np.percentile(curves, ci, axis=0)
+    med = np.median(curves, axis=0)
 
+    ap_lo, ap_hi = np.percentile(aps, ci)
+    ap = float(average_precision_score(y_true, y_score))
 
-def load_signature_bank(indir: str):
-    """
-    Load a bank of signatures previously written by :func:`save_signature_bank`.
-
-    Parameters
-    ----------
-    indir
-        Directory containing the saved weights tables and their JSON sidecars.
-
-    Returns
-    -------
-    dict
-        Mapping of name to signature dict, ready to pass to
-        :func:`evaluate_signatures_store` or :func:`benchmark_signatures_pr_auc`.
-    """
-    indir = Path(indir)
-    with open(indir / "sig_bank.json", "r") as f:
-        meta = json.load(f)
-
-    sig_bank = {}
-    for name, rec in meta["signatures"].items():
-        w = pd.read_csv(indir / rec["weights_tsv"], sep="\t")
-        sig_bank[name] = {
-            "name": name,
-            "weights_df": w,
-            "intercept": float(rec.get("intercept", 0.0)),
-            "params": rec.get("params", {}),
-            "genes_requested": rec.get("genes_requested", []),
-            "genes_used": rec.get("genes_used", []),
-            "panel_nonzero": rec.get("panel_nonzero", []),
-            "n_nonzero": int(rec.get("n_nonzero", 0)),
-            "metrics_train": rec.get("metrics_train", None),
-            "metrics_ext": rec.get("metrics_ext", None),
-        }
-    return sig_bank
+    return {
+        "recall_grid": recall_grid,
+        "prec_med": med,
+        "prec_lo": lo_q,
+        "prec_hi": hi_q,
+        "ap": float(ap),
+        "ap_lo": float(ap_lo),
+        "ap_hi": float(ap_hi),
+        "n_boot_ok": int(n_ok),
+    }

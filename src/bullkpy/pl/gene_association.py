@@ -17,19 +17,7 @@ from ..tl.posthoc import pairwise_posthoc
 from .._genes import gene_loc as _gene_loc
 from .._stats import bh_fdr as _bh_fdr
 from .._compat import group_labels as _group_labels
-
-
-def _get_gene_vector(adata: ad.AnnData, gene: str, *, layer: str | None = "log1p_cpm") -> np.ndarray:
-    if gene not in adata.var_names:
-        raise KeyError(f"Gene '{gene}' not in adata.var_names")
-    X = adata.layers[layer] if (layer is not None and layer in adata.layers) else adata.X
-    idx = _gene_loc(adata, gene)
-    v = X[:, idx]
-    if sp.issparse(v):
-        v = v.toarray().ravel()
-    else:
-        v = np.asarray(v).ravel()
-    return v.astype(float)
+from .._matrix import get_gene_vector as _get_gene_vector
 
 
 def _stars(q: float) -> str:
@@ -193,7 +181,7 @@ def gene_association_volcano(
     figsize: tuple[float, float] = (6.5, 5.5),
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Effect-size aware volcano for categorical association:
@@ -257,7 +245,10 @@ def gene_association_volcano(
     df["neglog10q"] = -np.log10(df["qval"].clip(lower=1e-300))
     df = df.sort_values("qval", na_position="last").reset_index(drop=True)
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
     ax.scatter(df["effect"], df["neglog10q"], s=10, alpha=0.75, edgecolors="none")
 
     # threshold line

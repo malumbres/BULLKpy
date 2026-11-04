@@ -8,6 +8,7 @@ import anndata as ad
 
 from ..logging import info, warn
 from .associations import categorical_association
+from .._deprecated import renamed_kwargs
 
 
 
@@ -17,6 +18,7 @@ from .associations import categorical_association
 
 
 
+@renamed_kwargs(random_state="seed")
 def cluster(
     adata: ad.AnnData,
     *,
@@ -26,7 +28,7 @@ def cluster(
     n_clusters: int = 8,        # used for kmeans fallback
     use_rep: str = "X_pca",
     n_pcs: int = 20,
-    random_state: int = 0,
+    seed: int = 0,
 ) -> None:
     """
     Cluster samples.
@@ -64,7 +66,7 @@ def cluster(
             leidenalg.RBConfigurationVertexPartition,
             weights="weight",
             resolution_parameter=float(resolution),
-            seed=int(random_state),
+            seed=int(seed),
         )
 
         labels = np.array(part.membership, dtype=int)
@@ -75,7 +77,7 @@ def cluster(
         adata.uns["clusters"][key_added] = {
             "method": "leiden",
             "resolution": float(resolution),
-            "random_state": int(random_state),
+            "random_state": int(seed),
         }
         info(f"Leiden produced {len(np.unique(labels))} clusters stored in adata.obs['{key_added}'].")
 
@@ -88,7 +90,7 @@ def cluster(
             X = X[:, : int(min(n_pcs, X.shape[1]))]
 
         info(f"Clustering with kmeans (k={n_clusters}, rep={use_rep}, n_pcs={X.shape[1]})")
-        labels = _kmeans(X, k=int(n_clusters), random_state=int(random_state))
+        labels = _kmeans(X, k=int(n_clusters), random_state=int(seed))
         adata.obs[key_added] = labels.astype(str)
         adata.obs[key_added] = adata.obs[key_added].astype("category")
 
@@ -96,7 +98,7 @@ def cluster(
         adata.uns["clusters"][key_added] = {
             "method": "kmeans",
             "n_clusters": int(n_clusters),
-            "random_state": int(random_state),
+            "random_state": int(seed),
             "use_rep": use_rep,
             "n_pcs": int(X.shape[1]),
         }
@@ -163,20 +165,21 @@ def _cramers_v(x: pd.Series, y: pd.Series) -> float:
     return float(np.sqrt((chi2 / n) / (min(r - 1, k - 1))))
 
 
+@renamed_kwargs(store_key="key_added", random_state="seed")
 def leiden_resolution_scan(
     adata: ad.AnnData,
     *,
     true_key: str,
     resolutions: Sequence[float] | None = None,
     base_key: str = "leiden",
-    store_key: str = "leiden_scan",
+    key_added: str = "leiden_scan",
     use_rep: str = "X_pca",
     n_pcs: int = 20,
     n_neighbors: int = 15,
     metric: str = "euclidean",
     recompute_neighbors: bool = False,
     inplace: bool = True,
-    random_state: int = 0,
+    seed: int = 0,
 ) -> pd.DataFrame:
     """
     Scan multiple Leiden resolutions and score vs a ground-truth annotation.
@@ -224,20 +227,20 @@ def leiden_resolution_scan(
 
     rows: list[dict] = []
     for r in resolutions:
-        key_added = f"{base_key}_{r:g}"
+        res_key = f"{base_key}_{r:g}"
         info(f"Leiden resolution={r:g}")
 
         cluster(
             adata,
             method="leiden",
             resolution=float(r),
-            key_added=key_added,
+            key_added=res_key,
             use_rep=str(use_rep),
             n_pcs=int(n_pcs),
-            random_state=int(random_state),
+            seed=int(seed),
         )
 
-        y_pred_all = adata.obs[key_added]
+        y_pred_all = adata.obs[res_key]
 
         # drop NaNs for metrics
         mask = (~pd.isna(y_true_all)) & (~pd.isna(y_pred_all))
@@ -257,7 +260,7 @@ def leiden_resolution_scan(
         rows.append(
             {
                 "resolution": float(r),
-                "key": key_added,
+                "key": res_key,
                 "n_clusters": n_clusters,
                 "ARI": ari,
                 "NMI": nmi,
@@ -269,7 +272,7 @@ def leiden_resolution_scan(
 
     df = pd.DataFrame(rows).sort_values("resolution").reset_index(drop=True)
     if inplace:
-        adata.uns[store_key] = df
+        adata.uns[key_added] = df
     return df
 
 

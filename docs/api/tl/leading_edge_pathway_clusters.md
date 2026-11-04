@@ -1,7 +1,7 @@
 # Leading-edge pathway clusters
 
 ```{eval-rst}
-.. autofunction:: bullkpy.pl.leading_edge_pathway_clusters
+.. autofunction:: bullkpy.tl.leading_edge_pathway_clusters
 
 ```
 
@@ -80,7 +80,7 @@ retained; pairs below this are zeroed out before clustering. Default: `0` (no fi
 ```python
 pre_res = bk.tl.gsea_preranked(adata, gene_sets="MSigDB_Hallmark_2020")
 
-result = bk.pl.leading_edge_pathway_clusters(
+result = bk.tl.leading_edge_pathway_clusters(
     pre_res,
     threshold=0.6,   # distance = 1 - Jaccard; lower -> tighter clusters
 )
@@ -90,7 +90,7 @@ print(result["clusters"].value_counts())
 
 2) Request a fixed number of clusters
 ```python
-result = bk.pl.leading_edge_pathway_clusters(
+result = bk.tl.leading_edge_pathway_clusters(
     pre_res,
     n_clusters=5,
 )
@@ -98,7 +98,7 @@ result = bk.pl.leading_edge_pathway_clusters(
 
 3) Restrict to a subset of pathways and apply de-noising
 ```python
-result = bk.pl.leading_edge_pathway_clusters(
+result = bk.tl.leading_edge_pathway_clusters(
     pre_res,
     terms=["HALLMARK_INFLAMMATORY_RESPONSE", "HALLMARK_TNF_SIGNALING_VIA_NFKB",
            "HALLMARK_IL6_JAK_STAT3_SIGNALING"],
@@ -109,7 +109,7 @@ result = bk.pl.leading_edge_pathway_clusters(
 
 4) Pass result to downstream visualizations
 ```python
-result = bk.pl.leading_edge_pathway_clusters(pre_res, n_clusters=6)
+result = bk.tl.leading_edge_pathway_clusters(pre_res, n_clusters=6)
 
 bk.pl.leading_edge_cluster_bubbles(pre_res, result)
 ```

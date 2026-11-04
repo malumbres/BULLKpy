@@ -25,7 +25,7 @@ def rank_genes_groups(
     show: bool = True,
     save: str | Path | None = None,
     figsize: tuple[float, float] | None = None,
-    title: str | None = None,
+    title: str | None = None, ax: plt.Axes | None = None,
 ) -> tuple[plt.Figure, plt.Axes]:
     """
     Scanpy-like quick view: show top genes per group as a compact table plot.
@@ -66,7 +66,10 @@ def rank_genes_groups(
     if figsize is None:
         figsize = (max(6.5, 1.6 * len(col_labels) + 2.5), max(3.0, 0.35 * max_r + 1.8))
 
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
     ax.axis("off")
 
     tbl = ax.table(

@@ -15,36 +15,26 @@ except Exception:  # pragma: no cover
     stats = None
 
 from ..logging import info
-from .._genes import gene_loc as _gene_loc, gene_indexer as _gene_indexer
+from .._genes import gene_indexer as _gene_indexer
 from .._stats import bh_fdr as _bh_fdr
 from .._compat import group_labels as _group_labels
+from functools import partial
+from .._matrix import get_matrix as _get_matrix_impl
+from .._matrix import get_gene_vector as _get_gene_vector
+from .._deprecated import renamed_kwargs
+from .._store import stores_result
 
 
 
 # -----------------------------
 # Utilities
 # -----------------------------
+_get_matrix = partial(_get_matrix_impl, dense=False)  # sparse stays sparse
+
+
 def _require_scipy() -> None:
     if stats is None:
         raise ImportError("associations requires scipy. Please install scipy.")
-
-
-def _get_matrix(adata: ad.AnnData, layer: str | None = None) -> Any:
-    """Return X/layer as (n_obs x n_vars), sparse or dense."""
-    if layer is not None and layer in adata.layers:
-        return adata.layers[layer]
-    return adata.X
-
-
-def _get_gene_vector(adata: ad.AnnData, gene: str, layer: str | None = None) -> np.ndarray:
-    """Return expression vector for one gene (n_obs,)."""
-    if gene not in adata.var_names:
-        raise KeyError(f"Gene '{gene}' not in adata.var_names.")
-    X = _get_matrix(adata, layer=layer)
-    j = int(_gene_loc(adata, gene))
-    if sp.issparse(X):
-        return np.asarray(X[:, j].toarray()).ravel().astype(float)
-    return np.asarray(X[:, j], dtype=float).ravel()
 
 
 def _as_categorical(s: pd.Series) -> pd.Categorical:
@@ -86,6 +76,7 @@ def _epsilon2_from_kruskal(H: float, n: int, k: int) -> float:
 # -----------------------------
 # A) Gene ↔ categorical obs (global test across all groups)
 # -----------------------------
+@stores_result(params=("groupby","layer","test","effect_size","min_group_size","adjust"), default_subkey="gene~{groupby}", subkey_of=lambda a: f"gene~{a['groupby']}")
 def gene_categorical_association(
     adata: ad.AnnData,
     *,
@@ -356,6 +347,7 @@ def obs_categorical_association(
 # -----------------------------
 # B) Fast “rank_genes_groups”-like for one group vs reference/rest
 # -----------------------------
+@stores_result(params=("groupby","group","reference","layer","method","effect","adjust","min_n"), default_subkey="{groupby}:{group}_vs_{reference or 'rest'}", subkey_of=lambda a: f"{a['groupby']}:{a['group']}_vs_{a['reference'] if a['reference'] is not None else 'rest'}")
 def rank_genes_groups_fast(
     adata: ad.AnnData,
     *,
@@ -517,62 +509,6 @@ def categorical_association(
 # -----------------------------
 # D) Convenience: store results in adata.uns
 # -----------------------------
-def store_gene_categorical_association(
-    adata: ad.AnnData,
-    *,
-    groupby: str,
-    key: str = "associations",
-    subkey: str | None = None,
-    **kwargs,
-) -> pd.DataFrame:
-    """
-    Run `gene_categorical_association` and store results in `adata.uns[key][subkey]`.
-
-    If subkey is None, uses f"gene~{groupby}".
-    """
-    subkey = subkey or f"gene~{groupby}"
-    res = gene_categorical_association(adata, groupby=groupby, **kwargs)
-
-    adata.uns.setdefault(key, {})
-    adata.uns[key][subkey] = {
-        "results": res,
-        "params": {"groupby": groupby, **kwargs},
-    }
-    info(f"Stored gene_categorical_association results in adata.uns['{key}']['{subkey}']")
-
-    return res
-
-
-def store_rank_genes_groups_fast(
-    adata: ad.AnnData,
-    *,
-    groupby: str,
-    group: str,
-    reference: str | None = None,
-    key: str = "rank_genes_groups_fast",
-    subkey: str | None = None,
-    **kwargs,
-) -> pd.DataFrame:
-    """
-    Run `rank_genes_groups_fast` and store results in `adata.uns[key][subkey]`.
-
-    If subkey is None, uses f"{groupby}:{group}_vs_{reference or 'rest'}".
-    """
-    ref_name = reference if reference is not None else "rest"
-    subkey = subkey or f"{groupby}:{group}_vs_{ref_name}"
-
-    res = rank_genes_groups_fast(adata, groupby=groupby, group=group, reference=reference, **kwargs)
-
-    adata.uns.setdefault(key, {})
-    adata.uns[key][subkey] = {
-        "results": res,
-        "params": {"groupby": groupby, "group": group, "reference": ref_name, **kwargs},
-    }
-    info(f"Stored rank_genes_groups_fast results in adata.uns['{key}']['{subkey}']")
-
-    return res
-
-
 # -----------------------------
 # E) Very small dispatcher (optional)
 # -----------------------------
@@ -747,6 +683,7 @@ def posthoc_per_gene(
 
 
 
+@renamed_kwargs(out_key="key_added")
 def gene_metadata_association_scan(
     adata: AnnData,
     *,
@@ -756,7 +693,7 @@ def gene_metadata_association_scan(
     groupby: Optional[str] = None,   # optional: run separately per tumor type
     method: str = "spearman",        # "spearman" (v1)
     adjust: str = "fdr_bh",
-    out_key: str = "gene_meta_assoc",
+    key_added: str = "gene_meta_assoc",
 ) -> pd.DataFrame:
     """
     Scan gene–metadata associations (v1: Spearman correlation for continuous metadata).
@@ -764,7 +701,7 @@ def gene_metadata_association_scan(
     Returns a tidy DataFrame with columns:
       group (if groupby), gene, n, rho, pval, qval
 
-    Stores in `adata.uns[out_key]`.
+    Stores in `adata.uns[key_added]`.
     """
     if metadata_key not in adata.obs:
         raise KeyError(f"{metadata_key!r} not found in adata.obs")
@@ -818,13 +755,14 @@ def gene_metadata_association_scan(
             out_parts.append(run_block(y_all[idx], X[idx, :], var_names, group_label=str(grp)))
         out = pd.concat(out_parts, ignore_index=True)
 
-    adata.uns[out_key] = out
+    adata.uns[key_added] = out
     return out
 
 
 
 
 
+@renamed_kwargs(out_key="key_added")
 def signature_axis(
     adata: AnnData,
     *,
@@ -832,13 +770,13 @@ def signature_axis(
     neg_key: str,
     standardize: str = "global",  # "global" | "groupby"
     groupby: Optional[str] = None,
-    out_key: str = "signature_axis",
+    key_added: str = "signature_axis",
 ) -> None:
     """
     Create a two-sided axis from two signature score columns:
         axis = z(pos) - z(neg)
 
-    Stores in `adata.obs[out_key]`.
+    Stores in `adata.obs[key_added]`.
     """
     obs = adata.obs
     if pos_key not in obs or neg_key not in obs:
@@ -872,21 +810,22 @@ def signature_axis(
     else:
         raise ValueError("standardize must be 'global' or 'groupby'")
 
-    adata.obs[out_key] = axis
+    adata.obs[key_added] = axis
 
 
+@renamed_kwargs(out_key="key_added")
 def quantile_groups(
     adata: AnnData,
     *,
     key: str,
     q: Tuple[float, float] = (0.25, 0.75),
     labels: Tuple[str, str, str] = ("low", "mid", "high"),
-    out_key: Optional[str] = None,
+    key_added: Optional[str] = None,
 ) -> None:
     """
     Assign samples into low/mid/high based on quantiles of a continuous `.obs[key]`.
 
-    Stores categorical groups in `.obs[out_key or f'{key}_qgrp']`.
+    Stores categorical groups in `.obs[key_added or f'{key}_qgrp']`.
     """
     if key not in adata.obs:
         raise KeyError(f"{key!r} not found in adata.obs")
@@ -899,5 +838,5 @@ def quantile_groups(
     grp[np.isfinite(x) & (x >= hi)] = labels[2]
     grp[~np.isfinite(x)] = pd.NA
 
-    target = out_key or f"{key}_qgrp"
+    target = key_added or f"{key}_qgrp"
     adata.obs[target] = pd.Categorical(grp, categories=list(labels), ordered=True)

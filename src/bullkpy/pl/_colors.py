@@ -12,6 +12,7 @@ except Exception:  # pragma: no cover
 from matplotlib.colors import to_hex
 
 from .._settings import settings
+from ..logging import warn
 
 Where = Literal["obs", "var"]
 
@@ -96,3 +97,29 @@ def categorical_colors_array(
     )
     s = _get_series(adata, key, where).astype(str)
     return s.map(lambda x: cmap.get(str(x), "#B0B0B0"))
+
+
+def categorical_palette(categories: Sequence[str], palette: str = "Set1") -> dict[str, str]:
+    """Map each category to a hex colour using a seaborn or matplotlib palette name.
+
+    An unknown palette name falls back to ``tab20`` with a warning, rather than silently
+    giving default colours.
+    """
+    import matplotlib as mpl
+
+    cats = [str(c) for c in categories]
+    n = len(cats)
+
+    if sns is not None:
+        try:
+            cols = sns.color_palette(palette, n_colors=n)
+            return {cats[i]: to_hex(cols[i]) for i in range(n)}
+        except Exception:
+            pass
+
+    if palette in mpl.colormaps:
+        cmap = mpl.colormaps[palette]
+    else:
+        warn(f"Unknown palette {palette!r}; using 'tab20'.")
+        cmap = mpl.colormaps["tab20"]
+    return {cats[i]: to_hex(cmap(i / max(n - 1, 1))) for i in range(n)}

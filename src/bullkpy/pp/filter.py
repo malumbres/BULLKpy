@@ -7,14 +7,11 @@ import scipy.sparse as sp
 import anndata as ad
 
 from ..logging import info, warn
+from functools import partial
+from .._matrix import get_matrix as _get_matrix_impl
 
 
-def _get_X(adata: ad.AnnData, layer: str | None) -> np.ndarray | sp.spmatrix:
-    if layer is None:
-        return adata.X
-    if layer not in adata.layers:
-        raise KeyError(f"layer='{layer}' not found in adata.layers")
-    return adata.layers[layer]
+_get_X = partial(_get_matrix_impl, dense=False)
 
 
 def _sum_axis0(X):

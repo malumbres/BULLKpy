@@ -100,11 +100,10 @@ def test_umap_plot(adata_pca):
 def test_categorical_palette_unknown_name_falls_back():
     # An unrecognised palette name takes the matplotlib fallback branch, which
     # called mpl.cm.get_cmap -- removed in matplotlib 3.9.
-    import importlib
+    from bullkpy.pl._colors import categorical_palette
 
-    for mod in ("bullkpy.pl.umap", "bullkpy.pl.pca"):
-        cols = importlib.import_module(mod)._categorical_palette(["a", "b", "c"], "NotAPalette")
-        assert set(cols) == {"a", "b", "c"}
+    cols = categorical_palette(["a", "b", "c"], "NotAPalette")
+    assert set(cols) == {"a", "b", "c"}
 
 
 def test_pca_scatter_unknown_palette_falls_back(adata_pca):
@@ -240,3 +239,70 @@ def test_no_removed_boxplot_labels_argument():
         if re.search(r"\.boxplot\([^\n]*\blabels=", p.read_text().replace("tick_labels=", ""))
     ]
     assert not bad, f"removed boxplot(labels=) still used in: {bad}"
+
+
+def test_every_figure_is_saved_through_the_shared_helper():
+    # One save path means one dpi rule (bk.settings.plot_dpi) and one place to fix bugs.
+    import pathlib
+    import re
+
+    root = pathlib.Path(bk.__file__).parent
+    bad = [
+        str(p.relative_to(root))
+        for p in root.rglob("*.py")
+        if p.name != "_style.py" and re.search(r"\.savefig\(", p.read_text())
+    ]
+    assert not bad, f"call _savefig from pl._style instead of savefig in: {bad}"
+
+
+def test_library_code_does_not_print():
+    import pathlib
+    import re
+
+    root = pathlib.Path(bk.__file__).parent
+    bad = [
+        str(p.relative_to(root))
+        for p in root.rglob("*.py")
+        if re.search(r"^\s+print\(", p.read_text(), flags=re.M)
+    ]
+    assert not bad, f"use bullkpy.logging (info/warn) instead of print in: {bad}"
+
+
+def test_plot_save_writes_a_file(adata_pca, tmp_path):
+    out = tmp_path / "sub" / "pca.png"
+    bk.pl.pca_scatter(adata_pca, color="Subtype", save=out, show=False)
+    assert out.exists() and out.stat().st_size > 0
+
+
+def _fresh_ax():
+    fig, ax = plt.subplots()
+    return fig, ax
+
+
+def test_single_axes_plots_draw_on_a_given_axes(adata, de_table, genes):
+    fig, axes = plt.subplots(1, 4, figsize=(12, 3))
+    bk.pl.volcano(de_table, ax=axes[0], show=False)
+    bk.pl.ma(de_table, ax=axes[1], show=False)
+    bk.pl.gene_plot(adata, gene=genes[0], groupby="Subtype", ax=axes[2], show=False)
+    bk.pl.library_size_vs_genes(adata, ax=axes[3], show=False)
+    for ax in axes:
+        assert ax.has_data(), "nothing was drawn on the axes that was passed in"
+    assert len(plt.get_fignums()) == 1, "a second figure was created"
+    plt.close("all")
+
+
+def test_ax_argument_is_added_to_the_single_axes_plots():
+    import inspect
+
+    for name in ("volcano", "ma", "rankplot", "gene_plot", "pca_variance_ratio", "boxplot_with_stats",
+                 "km_univariate", "cox_forest", "gsea_bubbleplot"):
+        assert "ax" in inspect.signature(getattr(bk.pl, name)).parameters, name
+
+
+def test_clustered_heatmaps_refuse_an_external_axes(adata, genes):
+    fig, ax = plt.subplots()
+    with pytest.raises(ValueError, match="ax="):
+        bk.pl.gene_panel_correlation_heatmap(adata, genes=genes[:4], cluster=True, ax=ax, show=False)
+    with pytest.raises(ValueError, match="ax="):
+        bk.pl.corr_heatmap(adata, use="samples", dendrogram=True, ax=ax, show=False)
+    plt.close("all")

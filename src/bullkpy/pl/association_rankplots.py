@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 
 from ._style import set_style, _savefig
+from .._deprecated import renamed_kwargs
 
 
 def rankplot_association(
@@ -21,7 +22,7 @@ def rankplot_association(
     figsize: tuple[float, float] = (7, 6),
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Ranked barplot for categorical association results.
@@ -104,7 +105,10 @@ def rankplot_association(
 
     colors = np.where(vals >= 0, "#D62728", "#1F77B4")  # red / blue
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
     ax.barh(labels, vals, color=colors)
     ax.axvline(0, linewidth=1)
 
@@ -121,13 +125,14 @@ def rankplot_association(
 
     return fig, ax
 
+@renamed_kwargs(q_col="qval_col")
 def dotplot_association(
     df: pd.DataFrame,
     *,
     feature_col: str,            # "gene" or "obs"
     groupby_col: str = "groupby",
     effect_col: str = "effect",
-    q_col: str = "qval",
+    qval_col: str = "qval",
     top_n: int = 50,
     figsize: tuple[float, float] | None = None,
     cmap: str = "RdBu_r",
@@ -137,7 +142,7 @@ def dotplot_association(
     size_max: float = 250.0,
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Scanpy-like dotplot for association results across multiple contrasts/groupby runs.
@@ -148,14 +153,14 @@ def dotplot_association(
     set_style()
 
     d = df.copy()
-    d = d.replace([np.inf, -np.inf], np.nan).dropna(subset=[feature_col, groupby_col, effect_col, q_col])
+    d = d.replace([np.inf, -np.inf], np.nan).dropna(subset=[feature_col, groupby_col, effect_col, qval_col])
 
     # take top_n per groupby_col
-    d = d.sort_values([groupby_col, q_col], ascending=[True, True])
+    d = d.sort_values([groupby_col, qval_col], ascending=[True, True])
     d = d.groupby(groupby_col, group_keys=False).head(int(top_n))
 
     piv_eff = d.pivot_table(index=feature_col, columns=groupby_col, values=effect_col, aggfunc="first")
-    piv_q = d.pivot_table(index=feature_col, columns=groupby_col, values=q_col, aggfunc="first")
+    piv_q = d.pivot_table(index=feature_col, columns=groupby_col, values=qval_col, aggfunc="first")
 
     eff = piv_eff.to_numpy(dtype=float)
     qq = piv_q.to_numpy(dtype=float)
@@ -172,7 +177,10 @@ def dotplot_association(
     if figsize is None:
         figsize = (max(6, 0.45 * piv_eff.shape[1] + 2.8), max(4, 0.22 * piv_eff.shape[0] + 1.6))
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
 
     if vmin is None:
         vmin = float(np.nanmin(eff))
@@ -204,7 +212,7 @@ def dotplot_association(
     cbar = fig.colorbar(sm, ax=ax, pad=0.01)
     cbar.set_label(effect_col)
 
-    ax.set_title(title or f"Association dotplot: color={effect_col}, size=-log10({q_col})")
+    ax.set_title(title or f"Association dotplot: color={effect_col}, size=-log10({qval_col})")
 
     if save is not None:
         _savefig(fig, save)
@@ -225,7 +233,7 @@ def heatmap_association(
     figsize: tuple[float, float] | None = None,
     title: str | None = None,
     save: str | Path | None = None,
-    show: bool = True,
+    show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Heatmap of association values (effect by default), selecting top_n rows by best qval per column.
@@ -247,7 +255,10 @@ def heatmap_association(
     if figsize is None:
         figsize = (max(6, 0.45 * piv.shape[1] + 3), max(4, 0.22 * piv.shape[0] + 1.8))
 
-    fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize, constrained_layout=True)
+    else:
+        fig = ax.figure
     im = ax.imshow(mat, aspect="auto", cmap=cmap)
     ax.set_xticks(np.arange(piv.shape[1]))
     ax.set_xticklabels([str(c) for c in piv.columns], rotation=90)

@@ -150,3 +150,7 @@ res = bk.tl.gene_categorical_association(
 	•	tl.pairwise_posthoc
 	•	pl.violin
 	•	pl.rankplot
+
+## Storing the result
+
+Pass `key_added="associations"` (and optionally `subkey=`) to also store `{"results", "params"}` in `adata.uns`. This replaces the former `store_gene_categorical_association()` function, which still works but is deprecated.

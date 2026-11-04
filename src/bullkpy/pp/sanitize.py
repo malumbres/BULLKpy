@@ -167,7 +167,7 @@ def sanitize_metadata(
 
     if verbose:
         rep = pd.DataFrame(report, columns=["col", "from", "to", "rule"]).sort_values("to")
-        print(rep.to_string(index=False))
+        info("\n" + rep.to_string(index=False))
 
     return df
 

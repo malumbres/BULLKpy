@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from typing import Literal
+
 import numpy as np
 import scipy.sparse as sp
 import anndata as ad
 
 from ..logging import info
+from .._deprecated import renamed_kwargs
 
 
+@renamed_kwargs(random_state="seed")
 def umap(
     adata: ad.AnnData,
     *,
@@ -17,19 +21,37 @@ def umap(
     spread: float = 1.0,
     n_components: int = 2,
     metric: str = "euclidean",
-    random_state: int = 0,
+    seed: int = 0,
     init: str = "spectral",
+    method: Literal["knn", "graph"] = "knn",
+    graph_key: str = "connectivities",
+    negative_sample_rate: int = 5,
+    n_epochs: int | None = None,
 ) -> None:
     """
-    Compute UMAP embedding from a representation (default: PCA).
+    Compute a UMAP embedding.
 
-    This mirrors Scanpy practice: UMAP is computed from `X_pca` with
-    `n_neighbors`/`min_dist`, consistent with the neighbors graph settings.
+    ``method="knn"`` (default) embeds from a representation (default: PCA), mirroring
+    Scanpy practice, with ``n_neighbors``/``min_dist``.
+
+    ``method="graph"`` embeds strictly from the precomputed neighbour graph in
+    ``adata.obsp[graph_key]`` (from ``bk.tl.neighbors``); ``adata.obsm[use_rep]`` is then
+    used only to initialise the layout. ``n_neighbors`` and ``metric`` are ignored, and
+    ``negative_sample_rate`` and ``n_epochs`` apply.
 
     Stores:
-      - adata.obsm['X_umap']
-      - adata.uns['umap']
+      - ``method="knn"``: ``adata.obsm['X_umap']`` and ``adata.uns['umap']``
+      - ``method="graph"``: ``adata.obsm['X_umap_graph']`` and ``adata.uns['umap_graph']``
     """
+    if method == "graph":
+        return _umap_graph(
+            adata, graph_key=graph_key, use_rep=use_rep, n_pcs=n_pcs, min_dist=min_dist,
+            spread=spread, n_components=n_components, seed=seed, init=init,
+            negative_sample_rate=negative_sample_rate, n_epochs=n_epochs,
+        )
+    if method != "knn":
+        raise ValueError("method must be 'knn' or 'graph'")
+
     if use_rep not in adata.obsm:
         raise KeyError(f"adata.obsm['{use_rep}'] not found. Run bk.tl.pca(adata) first.")
 
@@ -58,7 +80,7 @@ def umap(
         min_dist=float(min_dist),
         spread=float(spread),
         metric=metric,
-        random_state=int(random_state),
+        random_state=int(seed),
         init=init,
     )
 
@@ -74,13 +96,13 @@ def umap(
             "spread": float(spread),
             "n_components": int(n_components),
             "metric": metric,
-            "random_state": int(random_state),
+            "random_state": int(seed),
             "init": init,
         }
     }
 
 
-def umap_graph(
+def _umap_graph(
     adata: ad.AnnData,
     *,
     graph_key: str = "connectivities",
@@ -89,7 +111,7 @@ def umap_graph(
     min_dist: float = 0.5,
     spread: float = 1.0,
     n_components: int = 2,
-    random_state: int = 0,
+    seed: int = 0,
     init: str = "spectral",  # "spectral" or "random"
     negative_sample_rate: int = 5,
     n_epochs: int | None = None,
@@ -146,7 +168,7 @@ def umap_graph(
         min_dist=float(min_dist),
         spread=float(spread),
         metric="euclidean",
-        random_state=int(random_state),
+        random_state=int(seed),
         init=init,
         negative_sample_rate=int(negative_sample_rate),
         n_epochs=n_epochs,
@@ -178,7 +200,7 @@ def umap_graph(
             n_epochs_eff = 500  # safe default for small cohorts
 
 
-        rs = np.random.RandomState(int(random_state))
+        rs = np.random.RandomState(int(seed))
         emb = reducer._fit_embed_data(X, int(n_epochs_eff), init_emb, rs)
 
     if isinstance(emb, tuple):
@@ -201,7 +223,7 @@ def umap_graph(
             "min_dist": float(min_dist),
             "spread": float(spread),
             "n_components": int(n_components),
-            "random_state": int(random_state),
+            "random_state": int(seed),
             "init": init,
             "negative_sample_rate": int(negative_sample_rate),
             "n_epochs": n_epochs,
