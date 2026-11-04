@@ -29,6 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   A `figsize=` too small for the labels and legends is enlarged, with a warning, instead of squashed.
   The size legend now follows `dot_max` and no longer shows the faint grid behind the dots.
 
+- `pl.volcano()` puts the legend to the right of the plot (`legend_outside=True`) instead of over the
+  points, adds headroom so labels at the extremes stay inside the frame, and moves gene labels apart so
+  none overlaps another or leaves the axes (`avoid_label_overlap=True`); a thin line joins a moved label
+  to its point. Both can be switched off.
 - `pl.dotplot_association()` leaves empty space around the outermost dots (`pad=`, default 0.7 cells),
   caps dots to the size of their cell so none is clipped or overlaps, adds a size legend for
   -log10(q) (it had none), keeps the colour bar to a sensible length, skips missing cells, and drops

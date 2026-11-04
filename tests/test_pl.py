@@ -544,3 +544,56 @@ def test_dotplot_association_into_a_given_axes_and_missing_cells():
     out_fig, out_ax = bk.pl.dotplot_association(d, feature_col="gene", ax=ax, show=False)
     assert out_ax is ax and ax.has_data()
     plt.close("all")
+
+
+# ------------------------------------------------------------------ volcano layout
+def _volcano_table(n=400, seed=0):
+    import numpy as np
+    import pandas as pd
+
+    r = np.random.default_rng(seed)
+    fc = r.normal(0, 1.5, n)
+    q = 10 ** -(np.abs(fc) * r.uniform(0.5, 4, n))
+    return pd.DataFrame({"gene": [f"GENE{i}" for i in range(n)], "log2FC": fc, "pval": q, "qval": q})
+
+
+def test_volcano_legend_is_outside_the_plot():
+    res = _volcano_table()
+    fig, ax = bk.pl.volcano(res, show=False)
+    fig.canvas.draw()
+    legend = ax.get_legend()
+    assert legend is not None
+    renderer = fig.canvas.get_renderer()
+    assert legend.get_window_extent(renderer).x0 >= ax.get_window_extent(renderer).x1 - 1
+    assert _inside_figure(fig)
+    plt.close("all")
+    fig, ax = bk.pl.volcano(res, legend_outside=False, show=False)
+    fig.canvas.draw()
+    assert ax.get_legend().get_window_extent(fig.canvas.get_renderer()).x0 < ax.get_window_extent(fig.canvas.get_renderer()).x1
+    plt.close("all")
+
+
+def test_volcano_labels_do_not_overlap_and_stay_inside():
+    res = _volcano_table()
+    # genes that are close together on purpose, plus the most extreme ones
+    near = res.sort_values("log2FC").head(12)["gene"].tolist()
+    fig, ax = bk.pl.volcano(res, label_genes=near, top_n_labels=6, bottom_n_labels=0, show=False)
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    boxes = [t.get_window_extent(renderer) for t in ax.texts]
+    assert len(boxes) >= 12
+    for i, a in enumerate(boxes):
+        for b in boxes[i + 1:]:
+            assert not (a.x0 < b.x1 - 0.5 and b.x0 < a.x1 - 0.5 and a.y0 < b.y1 - 0.5 and b.y0 < a.y1 - 0.5), "two labels overlap"
+    axbox = ax.get_window_extent(renderer)
+    assert all(axbox.x0 - 1 <= b.x0 and b.x1 <= axbox.x1 + 1 and axbox.y0 - 1 <= b.y0 and b.y1 <= axbox.y1 + 1 for b in boxes)
+    plt.close("all")
+
+
+def test_volcano_label_placement_can_be_switched_off():
+    res = _volcano_table()
+    genes = res.sort_values("log2FC").head(6)["gene"].tolist()
+    fig, ax = bk.pl.volcano(res, label_genes=genes, top_n_labels=0, bottom_n_labels=0,
+                            avoid_label_overlap=False, show=False)
+    assert len(ax.texts) == 6 and not ax.lines[0:0]
+    plt.close("all")
