@@ -279,6 +279,33 @@ def corr_heatmap(
 
 
 
+def _place_clustermap_colorbar(g, *, width_in: float = 0.16, gap_in: float = 0.18) -> None:
+    """Put a clustermap's colour bar to the right of the heatmap *and* its row labels.
+
+    The labels are measured after drawing, so long gene names never run under the bar. If the bar
+    would fall outside the figure, the figure is widened and every axes is rescaled so that sizes in
+    inches (heatmap, dendrograms, label fonts) stay exactly as they were.
+    """
+    fig = g.fig
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    fig_w, _ = fig.get_size_inches()
+
+    right_edge = fig.transFigure.inverted().transform(g.ax_heatmap.get_tightbbox(renderer).get_points())[1, 0]
+    hm = g.ax_heatmap.get_position()
+    x0 = right_edge + gap_in / fig_w
+    w = width_in / fig_w
+    g.cax.set_position([x0, hm.y0 + 0.10 * hm.height, w, 0.55 * hm.height])
+
+    needed = x0 + w + 0.05 / fig_w  # in old figure fractions
+    if needed > 1.0:
+        scale = needed
+        fig.set_size_inches(fig_w * scale, fig.get_size_inches()[1])
+        for a in fig.axes:
+            pos = a.get_position()
+            a.set_position([pos.x0 / scale, pos.y0, pos.width / scale, pos.height])
+
+
 def gene_panel_correlation_heatmap(
     adata,
     *,
@@ -296,12 +323,15 @@ def gene_panel_correlation_heatmap(
     title: str | None = None,
     cluster: bool = False,          # uses seaborn.clustermap if True
     dendrogram_ratio: float = 0.12, # only for cluster=True
-    cbar_pos: tuple[float, float, float, float] = (0.92, 0.15, 0.02, 0.7),
+    cbar_pos: tuple[float, float, float, float] | None = None,
     save: str | None = None,
     show: bool = True, ax: plt.Axes | None = None,
 ):
     """
     Pairwise correlation heatmap for a gene panel.
+
+    With ``cluster=True`` the colour bar is placed automatically to the right of the row labels
+    (the figure is widened if needed). Pass ``cbar_pos=(x, y, w, h)`` in figure fractions to set it yourself.
 
     Returns
     -------
@@ -365,13 +395,14 @@ def gene_panel_correlation_heatmap(
             yticklabels=True,
             figsize=figsize,
             dendrogram_ratio=float(dendrogram_ratio),
-            cbar_pos=cbar_pos,  # initial hint
+            vmin=vmin,
+            vmax=vmax,
         )
 
         # --- title ---
         if title is None:
             title = f"Gene–gene correlation ({method}{', abs' if use_abs else ''})"
-        g.ax_heatmap.set_title(title, pad=12)
+        g.fig.suptitle(title, y=1.0, va="bottom")  # above the dendrogram, not over it
 
         # --- ticks ---
         for lab in g.ax_heatmap.get_xticklabels():
@@ -386,8 +417,11 @@ def gene_panel_correlation_heatmap(
 
         # IMPORTANT in seaborn 0.11.x:
         # Force layout to settle, THEN force the colorbar position at the end.
-        g.fig.canvas.draw()
-        g.cax.set_position(cbar_pos)
+        if cbar_pos is None:
+            _place_clustermap_colorbar(g)
+        else:
+            g.fig.canvas.draw()
+            g.cax.set_position(cbar_pos)
         g.fig.canvas.draw()
 
         # if you want df in plotted order:

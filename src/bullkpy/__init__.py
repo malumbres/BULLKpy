@@ -15,7 +15,7 @@ except PackageNotFoundError:
 from ._settings import settings
 from .io import read_counts, add_metadata
 
-from . import pp, pl, tl, get, logging, io
+from . import pp, pl, tl, get, logging, io, datasets
 from .logging import info, warn, debug, error  # noqa: F401
 
 __all__ = [
@@ -31,6 +31,7 @@ __all__ = [
     "error",
     "get",
     "io",
+    "datasets",
     "logging",
     "__version__",
 ]

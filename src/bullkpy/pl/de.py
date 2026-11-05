@@ -57,6 +57,8 @@ def volcano(
     bottom_n_labels: int = 10,
     label_fontsize: float | None = None,
     label_offset: tuple[float, float] = (0.02, 0.02),  # in data units (x,y); small nudge
+    avoid_label_overlap: bool = True,
+    legend_outside: bool = True,
     # thresholds lines
     show_thresholds: bool = True,
     save: str | Path | None = None,
@@ -74,6 +76,10 @@ def volcano(
       - label_genes: explicit list
       - top_n_labels: top upregulated significant genes
       - bottom_n_labels: top downregulated significant genes (most negative log2FC)
+
+    With ``avoid_label_overlap`` (default) labels are moved vertically until none overlaps another or
+    leaves the axes, and a thin line joins a moved label to its point. ``legend_outside`` (default)
+    puts the legend to the right of the plot instead of over the points.
     """
     set_style()
 
@@ -150,6 +156,7 @@ def volcano(
             ax.axvline(+fc_cutoff, lw=1, ls="--", color="0.4")
             ax.axvline(-fc_cutoff, lw=1, ls="--", color="0.4")
 
+    ax.margins(x=0.06, y=0.08)
     ax.set_xlabel("log2 fold change")
     ax.set_ylabel(f"-log10({'qval' if use_qval else 'pval'})")
     if title is not None:
@@ -177,6 +184,7 @@ def volcano(
         labels.update(top_down[gene_col].astype(str).tolist())
 
     # annotate (only if present in df)
+    label_texts: list[tuple[plt.Text, float, float]] = []
     if labels:
         df_idx = df.set_index(df[gene_col].astype(str), drop=False)
         for g in labels:
@@ -188,7 +196,7 @@ def volcano(
                 row = row.iloc[0]
             x = float(row[fc_col])
             y = float(row["_neglog10p"])
-            ax.text(
+            t = ax.text(
                 x + label_offset[0],
                 y + label_offset[1],
                 str(g),
@@ -196,8 +204,15 @@ def volcano(
                 ha="left",
                 va="bottom",
             )
+            label_texts.append((t, x, y))
 
-    ax.legend(frameon=False, loc="upper right")
+    if legend_outside:
+        ax.legend(frameon=False, loc="upper left", bbox_to_anchor=(1.01, 1.0), borderaxespad=0.0)
+    else:
+        ax.legend(frameon=False, loc="upper right")
+
+    if label_texts and avoid_label_overlap:
+        _separate_labels(ax, label_texts)
 
     if save is not None:
         _savefig(fig, save)
@@ -206,6 +221,59 @@ def volcano(
 
     return fig, ax
 
+
+def _separate_labels(ax: plt.Axes, items: list[tuple[plt.Text, float, float]]) -> None:
+    """Move labels vertically until none overlaps another or sticks out of the axes.
+
+    ``items`` holds (text, x, y) with (x, y) the data point each label belongs to. A label that
+    would run past the right edge is flipped to the left of its point. Moved labels get a thin
+    connector line back to the point.
+    """
+    fig = ax.figure
+    fig.canvas.draw()  # final layout, so text extents are real
+    renderer = fig.canvas.get_renderer()
+    axbox = ax.get_window_extent(renderer)
+    to_data = ax.transData.inverted()
+
+    def _box(t):
+        b = t.get_window_extent(renderer)
+        return b.x0, b.y0, b.x1, b.y1
+
+    def _overlaps(a, b, gap=1.0):
+        return not (a[2] + gap <= b[0] or b[2] + gap <= a[0] or a[3] + gap <= b[1] or b[3] + gap <= a[1])
+
+    placed: list[tuple[float, float, float, float]] = []
+    # strongest signals first: labels higher up keep their position, others move around them
+    for t, x, y in sorted(items, key=lambda it: -it[2]):
+        box = _box(t)
+        if box[2] > axbox.x1:  # would leave the frame on the right: put it on the left of the point
+            t.set_ha("right")
+            t.set_position((x - (t.get_position()[0] - x), t.get_position()[1]))
+            box = _box(t)
+        h = box[3] - box[1]
+        base = ax.transData.transform(t.get_position())
+        chosen = None
+        for k in range(0, 60):
+            for sign in ((0,) if k == 0 else (1, -1)):
+                dy = sign * k * 0.9 * h
+                shifted = (box[0], box[1] + dy, box[2], box[3] + dy)
+                inside = axbox.y0 <= shifted[1] and shifted[3] <= axbox.y1 and axbox.x0 <= shifted[0]
+                if inside and not any(_overlaps(shifted, q) for q in placed):
+                    chosen = (dy, shifted)
+                    break
+            if chosen:
+                break
+        if chosen is None:
+            placed.append(box)
+            continue
+        dy, shifted = chosen
+        if dy:
+            new_x, new_y = to_data.transform((base[0], base[1] + dy))
+            t.set_position((new_x, new_y))
+            ax.plot(
+                [x, new_x], [y, new_y], lw=0.5, color="0.45", zorder=1, solid_capstyle="round"
+            )
+        placed.append(shifted)
 
 
 @renamed_kwargs(uns_key="key")

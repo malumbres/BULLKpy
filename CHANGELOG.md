@@ -7,7 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [Unreleased]
+## [0.3.0] - 2026-11-05
+
+### Highlights
+- Three tutorial notebooks on public TCGA lung data (LUAD + LUSC) replace the single pan-cancer notebook:
+  1. build the AnnData object, QC and 2-D embedding; 2. clustering, signatures and statistics;
+  3. differential expression, pathway enrichment and survival.
+- `bk.datasets.tcga_lung()` downloads the tutorial data (integer counts, gene annotation, clinical
+  metadata) from Zenodo, verifies checksums and builds the AnnData object.
+- A plain `pip install bullkpy` now installs everything the tutorials need (UMAP, Leiden, networkx);
+  the old `umap`, `leiden` and `network` extras remain as no-ops. Requires matplotlib >= 3.9,
+  seaborn >= 0.13, pandas >= 2.
+- Parameter names are consistent across the package and several functions moved to the namespace that
+  matches what they do. Every old name keeps working with a `DeprecationWarning`; see `docs/migration.md`.
+- Plot layouts that clipped or overlapped (dotplot, dotplot_association, gene_panel_correlation_heatmap,
+  volcano, cox_forest_from_uns) were rebuilt, and 43 plotting functions accept `ax=`.
+- Tests and CI run on Linux, macOS and Windows.
 
 ### Results may change
 - `tl.de()` reported `log2FC` as a difference of natural logs, about 1.44 times too
@@ -20,6 +35,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Samples with a missing group label are now excluded from analyses. With
   `reference="rest"` they used to be counted in the comparison group, and on pandas 2
   they could also form a group called `"nan"` in tests and plots.
+
+### Changed
+- `pl.dotplot()` lays out in inches from the number of rows/columns and the label lengths, so
+  figures stay compact and uncluttered at any size (a 2 x 3 plot no longer gets a 5.8 x 4.2 in canvas,
+  a 25 x 30 one is smaller than before). Labels sit under their legend dots, dendrograms line up with
+  the dots, and the colour bar and size legend are compact. New `cell_size=` (inches per dot cell).
+  A `figsize=` too small for the labels and legends is enlarged, with a warning, instead of squashed.
+  The size legend now follows `dot_max` and no longer shows the faint grid behind the dots.
+
+- `pl.cox_forest_from_uns()` leaves empty space around the points and confidence bars (the first and last
+  rows no longer touch the frame, and the x range extends past the CIs), puts the p-values in a column
+  outside the frame, sizes the figure from the number of rows, wraps and centres the title above the plot,
+  and accepts `ax=`. The two near-identical drawing blocks (tidy table and single model) are now one helper.
+- `pl.volcano()` puts the legend to the right of the plot (`legend_outside=True`) instead of over the
+  points, adds headroom so labels at the extremes stay inside the frame, and moves gene labels apart so
+  none overlaps another or leaves the axes (`avoid_label_overlap=True`); a thin line joins a moved label
+  to its point. Both can be switched off.
+- `pl.dotplot_association()` leaves empty space around the outermost dots (`pad=`, default 0.7 cells),
+  caps dots to the size of their cell so none is clipped or overlaps, adds a size legend for
+  -log10(q) (it had none), keeps the colour bar to a sensible length, skips missing cells, and drops
+  the long default title. A `figsize` too small for the labels, colour bar and legend is enlarged with
+  a warning.
+- `pl.gene_panel_correlation_heatmap(cluster=True)` places the colour bar to the right of the row
+  labels (measured after drawing, widening the figure if needed) instead of at a fixed position that
+  long gene names ran under, and it now passes `vmin`/`vmax` to the clustermap. `cbar_pos=` is `None`
+  by default (automatic); a tuple still sets it by hand. The title sits above the dendrogram.
 
 ### Fixed
 - `tl.gene_gene_correlations(batch_mode="meta")` crashed on NumPy 2 (`np.math` was removed).

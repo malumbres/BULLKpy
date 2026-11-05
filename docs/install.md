@@ -8,24 +8,34 @@ BULLKpy requires **Python 3.10 or newer**.
 pip install bullkpy
 ```
 
-## Optional extras
+A plain install includes everything the tutorials need: UMAP, Leiden clustering, GSEA, survival
+analysis and network layouts. The optional extras are:
 
-Some functions rely on heavier dependencies, kept optional so the base install
-stays light:
-
-| Extra | Enables |
+| Extra | Adds |
 | --- | --- |
-| `umap` | `bk.tl.umap()`, `bk.pl.umap()` |
-| `leiden` | `bk.tl.cluster(method="leiden")` |
-| `network` | network layouts in the GSEA leading-edge plots |
-| `notebook` | Jupyter kernel and the tutorial dependencies |
+| `survival-ml` | scikit-survival, for `bk.pl.time_dependent_roc()` |
+| `notebook` | the Jupyter kernel and JupyterLab, to run the tutorials |
 
 ```bash
-pip install "bullkpy[umap,leiden]"
+pip install "bullkpy[notebook]"
 ```
 
-Calling a function whose extra is missing raises an `ImportError` naming the
-package to install.
+The extras `umap`, `leiden` and `network` from 0.2 still exist but do nothing, because those packages are now installed
+by default. Calling a function whose optional package is missing raises an `ImportError` naming the package.
+
+## Check the installation
+
+```bash
+python scripts/smoke_test.py     # from a clone of the repository
+```
+
+runs a short analysis on synthetic data (load, QC, PCA, UMAP, Leiden, differential expression, a plot, an `.h5ad`
+round trip) and prints the installed version.
+
+## Tutorial data
+
+The tutorials use TCGA lung cancer data. `bk.datasets.tcga_lung()` downloads it once (about 60 MB) into
+`~/.cache/bullkpy`; set the environment variable `BULLKPY_DATA` to use another folder.
 
 ## From source
 

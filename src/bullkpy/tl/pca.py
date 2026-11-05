@@ -332,7 +332,7 @@ def pca_loadings(
                 continue
             lines.append("\t".join([set_name, desc] + geneset))
 
-        export_gmt.write_text("\n".join(lines) + ("\n" if lines else ""))
+        export_gmt.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
         info(f"pca_loadings: exported GMT to {export_gmt}")
 
     return out

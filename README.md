@@ -29,14 +29,11 @@ https://pypi.org/project/bullkpy/
 pip install bullkpy
 ```
 
-BULLKpy requires **Python 3.10 or newer**.
+BULLKpy requires **Python 3.10 or newer**. A plain `pip install bullkpy` installs everything the tutorials
+need (UMAP, Leiden clustering, GSEA, survival analysis, networks). The one optional extra is
+`bullkpy[survival-ml]` for `pl.time_dependent_roc` (scikit-survival).
 
-Optional extras:
-
-```bash
-pip install "bullkpy[umap]"      # bk.tl.umap / bk.pl.umap
-pip install "bullkpy[leiden]"    # bk.tl.cluster(method="leiden")
-```
+Check an installation end to end with [`scripts/smoke_test.py`](scripts/smoke_test.py).
 
 --- 
 
@@ -46,7 +43,7 @@ pip install "bullkpy[leiden]"    # bk.tl.cluster(method="leiden")
 git clone https://github.com/malumbres/BULLKpy.git
 cd BULLKpy
 python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev,docs,umap,leiden]"
+pip install -e ".[dev,docs]"
 
 pytest                                  # run the test suite
 ruff check src/                         # lint
@@ -57,11 +54,39 @@ python -m sphinx -b html docs docs/_build/html   # build the docs
 
 ## 🚀 Tutorials
 
-Use this initial Jupyter notebook for a practical presentation of BULLKpy functions:  
+The tutorials use public TCGA lung cancer RNA-seq (LUAD and LUSC) and follow one analysis from raw counts to
+survival. Run them in order:
 
-https://bullkpy.readthedocs.io/en/latest/notebooks/BULLKpy_TCGA_example_notebook.html
+1. [Data, QC and 2-D embedding](https://bullkpy.readthedocs.io/en/latest/notebooks/BULLKpy_nb1.html): build the
+   AnnData object, quality control, normalisation, PCA and UMAP.
+2. [Clustering, signatures and statistics](https://bullkpy.readthedocs.io/en/latest/notebooks/BULLKpy_nb2.html):
+   Leiden and k-means, gene signatures, correlations and associations.
+3. [Differential expression, pathways and survival](https://bullkpy.readthedocs.io/en/latest/notebooks/BULLKpy_nb3.html):
+   DE, GSEA and enrichment, metaprograms, Cox models and Kaplan-Meier curves.
 
-More functions and field-specific tutorials to come...
+The data are downloaded once by `bk.datasets.tcga_lung()` (see *Data* below), or build them yourself in notebook 1.
+
+--- 
+## 🧪 Data
+
+`bk.datasets.tcga_lung()` returns the TCGA lung cancer data used by the tutorials (1,108 open-access samples:
+567 LUAD and 541 LUSC) as an AnnData object with **integer counts**. The files are downloaded once from Zenodo
+into a cache folder and checked against their SHA-256.
+
+```python
+import bullkpy as bk
+
+adata = bk.datasets.tcga_lung()                   # all samples
+adata = bk.datasets.tcga_lung(primary_only=True)  # primary tumours only
+```
+
+*Provenance.* UCSC Xena distributes the GDC Pan-Cancer RNA-seq table (`GDC-PANCAN.htseq_counts.tsv`) as
+log2(count + 1). Integer counts were recovered as `2**x - 1` with
+[`scripts/make_tcga_lung_subset.py`](scripts/make_tcga_lung_subset.py). Every value was an integer to within
+floating-point precision (largest deviation 2.4e-7), except for 10 samples whose values were half-integers; those
+were rounded half-to-even and are listed in the dataset record. The recovered counts are consistent with the original
+GDC HTSeq counts but were not compared with the raw GDC files. Clinical annotation is from the TCGA Pan-Cancer
+Clinical Data Resource (Liu *et al.*, Cell 2018).
 
 --- 
 ## 📦 Project structure
@@ -263,6 +288,19 @@ bk.pp.batch_correct_combat(adata)
 	•	Requires Python ≥ 3.10
 
 ---
+## Upgrading to 0.3.0
+
+0.3.0 renames parameters for consistency and moves some functions to the namespace that matches what they do. **Nothing
+was removed**: every old name still works and raises a `DeprecationWarning`. The full table is in the
+[migration guide](https://bullkpy.readthedocs.io/en/latest/migration.html). Behaviour changes that can alter results:
+
+- `tl.de()` reported `log2FC` on the natural-log scale (about 1.44 times too small); it is now log2.
+- Genes that cannot be tested get `NaN` p/q-values and no longer count towards the number of tests.
+- Samples with a missing group label are excluded from comparisons.
+- A named layer that does not exist raises an error instead of silently using `adata.X`.
+- Requires matplotlib >= 3.9, seaborn >= 0.13 and pandas >= 2.
+
+---
 ## Upgrading to 0.2.0
 
 0.2.0 fixes several defects that silently produced wrong results, so re-running
@@ -289,7 +327,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a full list of changes.
 
 BSD 3-Clause License
 
-Please cite:   
+Please cite the software (use *Cite this repository* on GitHub, or the Zenodo record of the release you used) and the preprint:
 Malumbres M. (2026) BULLKpy: An AnnData-Inspired Unified Framework for Comprehensive Bulk OMICs Analysis. BioRxiv 10.64898/2026.01.26.701768v1. doi: https://doi.org/10.64898/2026.01.26.701768. 
 
 https://www.biorxiv.org/content/10.64898/2026.01.26.701768v1. 

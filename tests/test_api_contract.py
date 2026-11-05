@@ -12,7 +12,7 @@ import pytest
 
 import bullkpy as bk
 
-SUBMODULES = ["pp", "tl", "pl", "get", "io"]
+SUBMODULES = ["pp", "tl", "pl", "get", "io", "datasets"]
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SRC = ROOT / "src" / "bullkpy"
 DOCS_API = ROOT / "docs" / "api"
@@ -72,7 +72,7 @@ def test_toctree_matches_files(sub):
     assert idx.exists(), f"missing docs/api/{sub}/index.md"
 
     listed, in_toc = set(), False
-    for line in idx.read_text().splitlines():
+    for line in idx.read_text(encoding="utf-8").splitlines():
         s = line.strip()
         if s.startswith("```{toctree}"):
             in_toc = True
@@ -90,7 +90,7 @@ def test_toctree_matches_files(sub):
 
 def test_version_is_single_sourced():
     """__version__ must come from package metadata, not a hardcoded literal."""
-    tree = ast.parse((SRC / "__init__.py").read_text())
+    tree = ast.parse((SRC / "__init__.py").read_text(encoding="utf-8"))
     # The only permitted literal is the "unknown" fallback for a non-installed package.
     literals = [
         node.value.value
@@ -111,7 +111,7 @@ def test_no_source_file_uses_the_bk_alias():
     """Library code must not reference the `bk` notebook alias (NameError at runtime)."""
     offenders = []
     for f in SRC.rglob("*.py"):
-        tree = ast.parse(f.read_text())
+        tree = ast.parse(f.read_text(encoding="utf-8"))
         defined = {"bk"} & {
             n.asname or n.name
             for node in ast.walk(tree)

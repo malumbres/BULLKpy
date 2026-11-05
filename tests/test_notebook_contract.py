@@ -19,11 +19,11 @@ import bullkpy as bk
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 NOTEBOOKS = sorted((ROOT / "notebooks").glob("*.ipynb"))
 
-SUBMODULES = {"pp", "tl", "pl", "get", "io"}
+SUBMODULES = {"pp", "tl", "pl", "get", "io", "datasets"}
 
 
 def _code_cells(path: pathlib.Path):
-    nb = json.loads(path.read_text())
+    nb = json.loads(path.read_text(encoding="utf-8"))
     for idx, cell in enumerate(nb.get("cells", [])):
         if cell.get("cell_type") != "code":
             continue
