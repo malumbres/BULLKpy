@@ -71,7 +71,9 @@ The data are downloaded once by `bk.datasets.tcga_lung()` (see *Data* below), or
 
 `bk.datasets.tcga_lung()` returns the TCGA lung cancer data used by the tutorials (1,108 open-access samples:
 567 LUAD and 541 LUSC) as an AnnData object with **integer counts**. The files are downloaded once from Zenodo
-into a cache folder and checked against their SHA-256.
+into a cache folder and checked against their SHA-256. Data DOI:
+[10.5281/zenodo.23966459](https://doi.org/10.5281/zenodo.23966459) (always the latest version); version 1.0, the one
+downloaded by this release, is [10.5281/zenodo.23966460](https://doi.org/10.5281/zenodo.23966460).
 
 ```python
 import bullkpy as bk

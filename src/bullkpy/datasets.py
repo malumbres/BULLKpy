@@ -15,9 +15,10 @@ from .logging import info, warn
 
 __all__ = ["tcga_lung"]
 
-#: Zenodo record holding the tutorial files. Set when the record is published; until then
-#: ``tcga_lung()`` works from a local folder (``path=``) but cannot download.
-ZENODO_RECORD: str | None = None
+#: Zenodo record holding version 1.0 of the tutorial files. Cite the concept DOI
+#: 10.5281/zenodo.23966459 (always the latest version); the files are fetched from this fixed version so the
+#: checksums below stay valid.
+ZENODO_RECORD: str | None = "23966460"
 
 #: SHA-256 of the files in the record (written by ``scripts/make_tcga_lung_subset.py``).
 _FILES = {
@@ -77,6 +78,7 @@ def tcga_lung(path: str | Path | None = None, *, primary_only: bool = False) -> 
         Folder containing ``TCGA_lung_counts.tsv.gz``, ``TCGA_lung_genes.tsv`` and
         ``TCGA_lung_metadata.tsv``. By default the files are downloaded once from Zenodo into a cache
         folder (``~/.cache/bullkpy``, or ``$BULLKPY_DATA``) and checked against their SHA-256.
+        Data DOI: 10.5281/zenodo.23966459.
     primary_only
         Keep only the primary tumours (drops normal and recurrent samples).
     """

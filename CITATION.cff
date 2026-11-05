@@ -40,3 +40,13 @@ preferred-citation:
       email: mmalumbres@vhio.net
       orcid: "https://orcid.org/0000-0002-0829-6315"
       affiliation: "Vall d'Hebron Institute of Oncology (VHIO)"
+
+references:
+  - type: dataset
+    title: "TCGA lung cancer (LUAD and LUSC) RNA-seq: integer counts and clinical annotation for the BULLKpy tutorials"
+    authors:
+      - family-names: Malumbres
+        given-names: Marcos
+        orcid: "https://orcid.org/0000-0002-0829-6315"
+    doi: 10.5281/zenodo.23966459
+    year: 2026
