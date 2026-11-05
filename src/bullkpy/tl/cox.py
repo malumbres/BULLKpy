@@ -409,7 +409,7 @@ def cox_multivariate(
         beta = np.asarray(res.params, dtype=float)
         se = np.asarray(res.bse, dtype=float)
         z = beta / se
-        pval = 2.0 * (1.0 - _norm_cdf(np.abs(z)))
+        pval = 2.0 * _norm_sf(np.abs(z))
 
         lo = beta - 1.96 * se
         hi = beta + 1.96 * se
@@ -449,9 +449,10 @@ def cox_multivariate(
 
     return out
 
-def _norm_cdf(x: np.ndarray) -> np.ndarray:
+def _norm_sf(x: np.ndarray) -> np.ndarray:
+    # survival function, not 1 - cdf: the latter rounds to 0 for |z| > 8
     from scipy.stats import norm
-    return norm.cdf(x)
+    return norm.sf(x)
 
 
 

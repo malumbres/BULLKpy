@@ -268,7 +268,7 @@ def _corr_batch_aware(
 
         # z-stat in Fisher space
         z = np.arctanh(r_meta) / se
-        p = float(2.0 * (1.0 - 0.5 * (1.0 + math.erf(np.abs(z) / np.sqrt(2.0)))))  # 2*sf(|z|) approx
+        p = float(math.erfc(np.abs(z) / np.sqrt(2.0)))  # 2*sf(|z|), exact in the tail
         return r_meta, p, int(np.nansum(n_list))
 
     raise ValueError(f"Unknown batch_mode='{batch_mode}'")

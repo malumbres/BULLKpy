@@ -108,7 +108,7 @@ def de_glm(
                     continue
 
                 z = num / den
-                p = 2 * (1 - stats.norm.cdf(abs(z)))
+                p = 2 * stats.norm.sf(abs(z))
 
                 beta[j, :] = b
                 se_c[j] = den

@@ -204,7 +204,7 @@ def _de_nb_glm(
                 se[j] = fit.bse[1]
 
                 z = coef[j] / se[j] if se[j] > 0 else 0.0
-                pval[j] = 2 * (1 - stats.norm.cdf(abs(z)))
+                pval[j] = 2 * stats.norm.sf(abs(z))
             except Exception:
                 continue
 
