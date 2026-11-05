@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import gzip
+import os
 import shutil
 
 import numpy as np
@@ -96,3 +97,14 @@ def test_download_goes_through_the_cache_and_checks_the_checksum(lung_folder, tm
     with pytest.raises(RuntimeError, match="Checksum mismatch"):
         bk.datasets.tcga_lung()
     assert not list((cache / "tcga_lung").glob("TCGA_lung_counts*"))
+
+
+def test_a_zenodo_record_is_set_so_the_download_works_out_of_the_box():
+    assert datasets.ZENODO_RECORD and datasets.ZENODO_RECORD.isdigit()
+
+
+@pytest.mark.skipif(not os.environ.get("BULLKPY_TEST_NETWORK"), reason="set BULLKPY_TEST_NETWORK=1 to download from Zenodo")
+def test_the_published_zenodo_files_download_and_match_their_checksums(tmp_path, monkeypatch):
+    monkeypatch.setenv("BULLKPY_DATA", str(tmp_path))
+    a = bk.datasets.tcga_lung()
+    assert a.shape[0] == 1108 and set(a.obs["Project_ID"]) == {"LUAD", "LUSC"}

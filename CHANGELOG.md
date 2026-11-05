@@ -14,7 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   1. build the AnnData object, QC and 2-D embedding; 2. clustering, signatures and statistics;
   3. differential expression, pathway enrichment and survival.
 - `bk.datasets.tcga_lung()` downloads the tutorial data (integer counts, gene annotation, clinical
-  metadata) from Zenodo, verifies checksums and builds the AnnData object.
+  metadata) from Zenodo ([10.5281/zenodo.23966459](https://doi.org/10.5281/zenodo.23966459)), verifies
+  checksums and builds the AnnData object.
 - A plain `pip install bullkpy` now installs everything the tutorials need (UMAP, Leiden, networkx);
   the old `umap`, `leiden` and `network` extras remain as no-ops. Requires matplotlib >= 3.9,
   seaborn >= 0.13, pandas >= 2.

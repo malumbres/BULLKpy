@@ -7,6 +7,9 @@
 The TCGA lung cancer data used by the three tutorials: 1,108 open-access samples (567 LUAD and 541 LUSC) with
 **integer counts**, gene annotation and the clinical metadata.
 
+Data DOI: [10.5281/zenodo.23966459](https://doi.org/10.5281/zenodo.23966459) (always the latest version; version 1.0 is
+10.5281/zenodo.23966460, the one `bk.datasets.tcga_lung()` downloads).
+
 ## Where the counts come from
 
 UCSC Xena distributes the GDC Pan-Cancer RNA-seq table (`GDC-PANCAN.htseq_counts.tsv`) as
