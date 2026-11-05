@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- **p-values of very strong effects were reported as exactly 0.** The Wald p-values in `tl.de(method="nb_glm")`,
+  `tl.de_glm`, `tl.cox_multivariate(backend="statsmodels")` and the `batch_mode="meta"` correlation were computed as
+  `2 * (1 - cdf(|z|))`, which rounds to 0 once |z| exceeds about 8. They now use `2 * sf(|z|)`, so p-values stay
+  positive down to about 1e-300 and the adjusted q-values stay ordered. **Results change** only for genes with
+  p < 1e-15; in the TCGA lung LUSC vs LUAD comparison this affected 23% of the NB tests.
+  (Welch t-test and lifelines-based Cox models were not affected.)
+
+---
+
 ## [0.3.0] - 2026-11-05
 
 ### Highlights
