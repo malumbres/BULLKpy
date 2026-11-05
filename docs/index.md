@@ -104,7 +104,9 @@ Issue tracker: ([https://github.com/malumbres/BULLKpy/issues](https://github.com
 ---
 ## 📄 Citation
 
-Please refer to:  
+Software (Zenodo, all versions): [10.5281/zenodo.23966752](https://doi.org/10.5281/zenodo.23966752); version 0.3.0: [10.5281/zenodo.23966753](https://doi.org/10.5281/zenodo.23966753).
+
+Preprint:  
 Malumbres M. (2026) BULLKpy: An AnnData-Inspired Unified Framework for Comprehensive Bulk OMICs Analysis. BioRxiv 10.64898/2026.01.26.701768v1. doi: https://doi.org/10.64898/2026.01.26.701768. 
 
 **BioRxiv**: ([https://www.biorxiv.org/content/10.64898/2026.01.26.701768v1](https://www.biorxiv.org/content/10.64898/2026.01.26.701768v1)
