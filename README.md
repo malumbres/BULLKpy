@@ -1,6 +1,10 @@
 # BULLKpy 🧬
 <img src="https://raw.githubusercontent.com/malumbres/BULLKpy/main/docs/images/BULLKpy_logo.png" width="300">
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23966752.svg)](https://doi.org/10.5281/zenodo.23966752)
+[![PyPI](https://img.shields.io/pypi/v/bullkpy.svg)](https://pypi.org/project/bullkpy/)
+[![Docs](https://readthedocs.org/projects/bullkpy/badge/?version=stable)](https://bullkpy.readthedocs.io/en/stable/)
+
 **BULLKpy** is a Python pipeline for **bulk OMICs analysis**, based on AnnData objects and inspired by Scanpy/scverse but adapted for bulk transcriptomics. It integrates QC, normalization, clustering, correlation and association utilities, differential expression, gene set enrichment analysis (GSEA), metaprograms, and rich visualization utilities (oncoprints, etc.).  
 
 ---
@@ -329,7 +333,9 @@ See [CHANGELOG.md](CHANGELOG.md) for a full list of changes.
 
 BSD 3-Clause License
 
-Please cite the software (use *Cite this repository* on GitHub, or the Zenodo record of the release you used) and the preprint:
+Please cite the software and the preprint. The software is archived on Zenodo ([10.5281/zenodo.23966752](https://doi.org/10.5281/zenodo.23966752), all versions; this release: [10.5281/zenodo.23966753](https://doi.org/10.5281/zenodo.23966753)); *Cite this repository* on GitHub gives the same reference.
+
+Preprint:  
 Malumbres M. (2026) BULLKpy: An AnnData-Inspired Unified Framework for Comprehensive Bulk OMICs Analysis. BioRxiv 10.64898/2026.01.26.701768v1. doi: https://doi.org/10.64898/2026.01.26.701768. 
 
 https://www.biorxiv.org/content/10.64898/2026.01.26.701768v1. 

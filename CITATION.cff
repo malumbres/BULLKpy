@@ -9,6 +9,7 @@ abstract: >-
   with publication-ready visualisation, in a single consistent workflow.
 type: software
 license: BSD-3-Clause
+doi: 10.5281/zenodo.23966752
 version: 0.3.0
 date-released: 2026-11-05
 repository-code: "https://github.com/malumbres/BULLKpy"
@@ -20,6 +21,13 @@ keywords:
   - AnnData
   - cancer research
   - TCGA
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23966752
+    description: Software on Zenodo, all versions (always resolves to the latest release)
+  - type: doi
+    value: 10.5281/zenodo.23966753
+    description: Software on Zenodo, version 0.3.0
 authors:
   - family-names: Malumbres
     given-names: Marcos
